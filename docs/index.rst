@@ -21,6 +21,24 @@ Modules
 .. automodule:: nyx_xlsimporter
     :members:
 
+.. automodule:: biac_import_kizeo
+    :members:
+
+.. automodule:: biac_import_kpi102
+    :members:
+
+.. automodule:: biac_import_kpi103
+    :members:
+
+.. automodule:: biac_import_kpi105
+    :members:
+
+.. automodule:: biac_import_instawork
+    :members:
+
+.. automodule:: biac_feedback_dispatcher
+    :members:
+
 
 .. toctree::
    :maxdepth: 2
