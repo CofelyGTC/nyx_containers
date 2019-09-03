@@ -39,6 +39,9 @@ Modules
 .. automodule:: biac_feedback_dispatcher
     :members:
 
+.. automodule:: biac_import_maximo
+    :members:
+
 
 .. toctree::
    :maxdepth: 2
