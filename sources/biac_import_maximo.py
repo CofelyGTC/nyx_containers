@@ -1,3 +1,32 @@
+"""
+BIAC IMPORT MAXIMO
+====================================
+Reads Maximo Excels files imported from MaxBI by mails to "maximorepport@cofelygtc.com" transfered to AQMC by Camelworker treated and stored into an ElasticSearch collection
+
+Sends:
+-------------------------------------
+
+* /topic/BIAC_MAXIMO_IMPORTED
+
+Listens to:
+-------------------------------------
+
+* /queue/MAXIMO_IMPORT
+
+Collections:
+-------------------------------------
+
+* **biac_maximo** (Raw Data / Modified when a new file append)
+* **biac_maximo_monthly** (Computed Data for Current Month / Modified when a new file append)
+* **biac_histo_maximo** (Raw Data historicly saved by day / Never Change)
+
+VERSION HISTORY
+-------------------------------------
+
+* 03 Jun 2019 1.0.20 **PDB** Finished version for basic applications
+* 01 Aug 2019 2.0.1 **AMA** Add Historical system
+"""
+
 import re
 import json
 import time
@@ -72,6 +101,15 @@ def getDisplayStart(now):
 ################################################################################
 
 def extract_screen_name(row):
+
+    """
+    Defined the screen where the data must be displayed based on lot and technic
+
+    Parameters
+    ----------
+    raw
+        All the row that conatins the workorder information
+    """
     
     lot = int(row['lot'])
     
@@ -159,6 +197,14 @@ def set_lot(contract):
 ################################################################################
 
 def getDisplayStop(now):
+    """
+    Defined the date until the workerorder must be displayed on the screens        
+
+    Parameters
+    ----------
+    now
+        unix timestamp taked at the start of importation
+    """
     datestop = now - timedelta(days=13)
     datestop = datestop.replace(hour=0)
     datestop = datestop.replace(minute=0)
@@ -171,6 +217,14 @@ def getDisplayStop(now):
 ##################################################################################
 
 def getDisplayKPI302(now):
+    """
+    Defined the date until the workerorder must be used in the calculation of KPI302   
+
+    Parameters
+    ----------
+    now
+        unix timestamp taked at the start of importation
+    """
     KPI302Start = datetime(now.year, now.month, 1, 0, 0, 0, 0)
     start = (int(KPI302Start.timestamp()) - 3601 )
     #logger.info('Start KPI 302:' + str(start))
@@ -178,6 +232,9 @@ def getDisplayKPI302(now):
 
 ################################################################################
 def messageReceived(destination,message,headers):
+    """
+    Main function that reads the Excel file.         
+    """
     global es
     starttime = time.time()
     logger.info("==> "*10)
