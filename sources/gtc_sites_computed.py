@@ -47,7 +47,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 def log_message(message):
@@ -346,9 +346,11 @@ if __name__ == '__main__':
 
             if (datetime.now() > nextload):
                 try:
+                    start = datetime.now()
+                    start = start.replace(hour=0,minute=0,second=0, microsecond=0)
                     nextload=datetime.now()+timedelta(seconds=SECONDSBETWEENCHECKS)
-                    doTheWork(datetime.now()-timedelta(1))
-                    doTheWork(datetime.now())
+                    doTheWork(start-timedelta(1))
+                    doTheWork(start)
                 except Exception as e2:
                     logger.error("Unable to load sites data.")
                     logger.error(e2,exc_info=True)
