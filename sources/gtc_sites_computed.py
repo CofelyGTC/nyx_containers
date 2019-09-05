@@ -1,5 +1,5 @@
 """
-BIAC IMPORT KIZEO
+GTC SITES COMPUTED
 ====================================
 
 Collections:
@@ -11,6 +11,7 @@ VERSION HISTORY
 
 * 04 Sep 2019 0.0.2 **PDE** First version
 * 04 Sep 2019 0.0.3 **PDE** Adding **VME**'s functions
+* 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
 
 """  
 import re
@@ -47,7 +48,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 def log_message(message):
@@ -218,10 +219,38 @@ def create_obj(day, df_raw):
         obj_report_cogen['total_efficiency'] = 0
         obj_report_cogen['elec_efficiency'] = 0
         obj_report_cogen['heat_efficiency'] = 0
+
+        obj_report_cogen['gaznat_ratio'] = 0
+        obj_report_cogen['biogaz_ratio'] = 0
+        
     else:
         obj_report_cogen['total_efficiency'] = obj_report_cogen['out_total_kWh'] / obj_report_cogen['in_total_cogen_kWh']
         obj_report_cogen['elec_efficiency'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['in_total_cogen_kWh']
         obj_report_cogen['heat_efficiency'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+    
+        obj_report_cogen['gaznat_ratio'] = obj_report_cogen['in_gaznat_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+        obj_report_cogen['biogaz_ratio'] = obj_report_cogen['in_biogaz_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+    
+        obj_report_cogen['total_efficiency_wo_zero'] = obj_report_cogen['out_total_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+        obj_report_cogen['elec_efficiency_wo_zero'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+        obj_report_cogen['heat_efficiency_wo_zero'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+    
+        obj_report_cogen['gaznat_ratio_wo_zero'] = obj_report_cogen['in_gaznat_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+        obj_report_cogen['biogaz_ratio_wo_zero'] = obj_report_cogen['in_biogaz_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
+    
+    
+    if obj_report_cogen['out_total_kWh'] == 0: 
+        obj_report_cogen['heat_ratio'] = 0
+        obj_report_cogen['elec_ratio'] = 0
+        
+    else:
+        obj_report_cogen['heat_ratio'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['out_total_kWh']
+        obj_report_cogen['elec_ratio'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['out_total_kWh']
+    
+        obj_report_cogen['heat_ratio_wo_zero'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['out_total_kWh']
+        obj_report_cogen['elec_ratio_wo_zero'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['out_total_kWh']
+    
+
     
     
     
@@ -237,7 +266,8 @@ def doTheWork(start):
 
     obj_to_es = create_obj(start, df)
     obj_to_es['@timestamp'] = containertimezone.localize(start)
-    es.index(index='daily_cogen', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
+    obj_to_es['site'] = 'LUTOSA'
+    es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
 
 
     df = retrieve_raw_data(start)
