@@ -98,6 +98,7 @@ def retrieve_raw_data(day):
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
+                                           scrollsize=10000
                                            size=1000000)
 
     containertimezone=pytz.timezone(get_localzone().zone)
