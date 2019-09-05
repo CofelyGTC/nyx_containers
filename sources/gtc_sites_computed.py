@@ -34,6 +34,7 @@ from dateutil.tz import tzlocal
 from tzlocal import get_localzone
 
 from functools import wraps
+import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 #from lib import pandastoelastic as pte
@@ -45,11 +46,22 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 import collections
 import dateutil.parser
 
+
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
 VERSION = "0.0.7"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, dt.datetime):
+            return o.isoformat()
+
+        elif isinstance(o, dt.time):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
 
 def log_message(message):
     global conn
@@ -98,7 +110,7 @@ def retrieve_raw_data(day):
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
-                                           scrollsize=10000
+                                           scrollsize=10000,
                                            size=1000000)
 
     containertimezone=pytz.timezone(get_localzone().zone)
@@ -259,6 +271,90 @@ def create_obj(day, df_raw):
     return obj_report_cogen
 
 
+def save_tags_to_computed(es, obj):
+    list_of_tag = ['in_biogaz_thiopaq', 'in_gaznat_cogen', 
+               'in_gaznat_cogen_kWh', 'in_biogaz_cogen', 'in_biogaz_chaudiere', 'in_biogaz_cogen_kWh', 
+               'in_total_cogen_kWh', 'out_elec_kWh', 
+               'out_moteur_kWh', 'out_total_kWh']
+
+
+    bulkbody = ''
+
+    for i in list_of_tag:
+
+        new_obj = {
+            'client': 'COGLTS',
+            'area': 'COGEN_LUTOSA_COMPUTED',
+            'name': i,
+            'value': obj[i],
+            'area_name':'COGEN_LUTOSA_COMPUTED'+i,
+            'client_area_name': 'COGLTSCOGEN_LUTOSA_COMPUTED'+i,
+            '@timestamp': obj['@timestamp']
+        }
+        
+        _id = new_obj['client_area_name'] + '-' + new_obj['@timestamp'].strftime('%Y-%m-%d')
+
+        index = 'opt_sites_computed-' + new_obj['@timestamp'].strftime('%Y-%m')
+
+        action={}
+        action["index"]={"_index":index, "_type":"doc", "_id":_id}
+        
+        
+        bulkbody+=json.dumps(action)+"\r\n"
+        bulkbody+=json.dumps(new_obj, cls=DateTimeEncoder)+"\r\n"
+
+    diff_list = [
+        {
+            'name': 'INminusOUT',
+            'a': 'in_total_cogen_kWh',
+            'b': 'out_total_kWh',
+        },
+        {
+            'name': 'INminusHEAT',
+            'a': 'in_total_cogen_kWh',
+            'b': 'out_moteur_kWh',
+        },
+        {
+            'name': 'INminusELEC',
+            'a': 'in_total_cogen_kWh',
+            'b': 'out_elec_kWh',
+        },
+    ]
+
+    for i in diff_list:
+
+        new_obj = {
+            'client': 'COGLTS',
+            'area': 'COGEN_LUTOSA_COMPUTED',
+            'name': i['name'],
+            'value': obj[i['a']] - obj[i['b']],
+            'area_name':'COGEN_LUTOSA_COMPUTED'+i['name'],
+            'client_area_name': 'COGLTSCOGEN_LUTOSA_COMPUTED'+i['name'],
+            '@timestamp': obj['@timestamp']
+        }
+        
+        _id = new_obj['client_area_name'] + '-' + new_obj['@timestamp'].strftime('%Y-%m-%d')
+
+        index = 'opt_sites_computed-' + new_obj['@timestamp'].strftime('%Y-%m')
+
+        action={}
+        action["index"]={"_index":index, "_type":"doc", "_id":_id}
+        
+        
+        bulkbody+=json.dumps(action)+"\r\n"
+        bulkbody+=json.dumps(new_obj, cls=DateTimeEncoder)+"\r\n"
+
+
+
+    bulkres=es.bulk(bulkbody)
+
+    if(not(bulkres["errors"])):
+        logger.info("BULK done without errors.")
+    else:
+        logger.info("BULK ERRORS.")
+        logger.info(bulkres)
+        
+
 
 def doTheWork(start):
     #now = datetime.now()
@@ -270,6 +366,7 @@ def doTheWork(start):
     obj_to_es['site'] = 'LUTOSA'
     es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
 
+    save_tags_to_computed(es, obj_to_es)
 
     df = retrieve_raw_data(start)
     df['value_min'] = df['value']
