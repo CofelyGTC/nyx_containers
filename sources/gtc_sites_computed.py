@@ -12,6 +12,7 @@ VERSION HISTORY
 * 04 Sep 2019 0.0.2 **PDE** First version
 * 04 Sep 2019 0.0.3 **PDE** Adding **VME**'s functions
 * 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
+* 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
 
 """  
 import re
@@ -50,7 +51,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -358,6 +359,8 @@ def save_tags_to_computed(es, obj):
 
 def doTheWork(start):
     #now = datetime.now()
+
+    start = datetime(start.year, start.month, start.day)
 
     df = retrieve_raw_data(start)
 
