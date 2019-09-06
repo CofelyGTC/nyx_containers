@@ -51,7 +51,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -102,6 +102,86 @@ def getCustomMin(minrow):
         return 0
     else:
         return minrow.min()
+
+
+def compute_fct_thiopaq(df_raw):
+    df_debit = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
+    df_debit.columns = ['@timestamp', 'value_debit']
+    df_h2s_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_H2S_Ap_Thiopaq'][['@timestamp', 'value']]
+    df_h2s_thiopaq.columns = ['@timestamp', 'value_h2s']
+    df_pression_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'][['@timestamp', 'value']]
+    df_pression_thiopaq.columns = ['@timestamp', 'value_pression']
+    df_computed = df_debit.set_index('@timestamp').join(df_h2s_thiopaq.set_index('@timestamp').join(df_pression_thiopaq.set_index('@timestamp')))
+    df_computed['value'] = df_computed.apply(lambda raw: calc_fct_thiopaq(raw), axis=1)
+    sumvalue = df_computed['value'].mean()*24
+    return sumvalue
+
+def calc_fct_thiopaq(raw):
+    debit = 1 if raw['value_debit'] > 120 else 0
+    h2s = 1 if raw['value_h2s'] < 5000 else 0
+    pression =  1 if raw['value_pression'] >= 15 and raw['value_pression'] <= 40 else 0
+    result = debit * h2s * pression
+    #print(raw)
+    return result
+
+def get_tps_fct_thiopaq(df_raw):
+    df_fct = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Thiopaq_Fct'][['@timestamp', 'value']]
+    fct = df_fct['value'].mean()*24
+    return fct
+
+def get_tps_fct_real_thiopaq(fct_max, tps_fct):
+    cond_1 = 1 if fct_max != 0 else 0
+    cond_2 = 1
+    if cond_1 == 0:
+        cond_2 = 0
+    else:
+        cond_2 = tps_fct / fct_max
+        if cond_2 > 1:
+            cond_2 = 1
+            
+    result = cond_1 * cond_2
+    return result
+    
+
+def get_tps_fct_surpresseur(df_raw):
+    df_surp1 = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Surp1_Fct'][['@timestamp', 'value']]
+    df_surp1.columns = ['@timestamp', 'surp1']
+    df_surp2 = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Surp2_Fct'][['@timestamp', 'value']]
+    df_surp2.columns = ['@timestamp', 'surp2']
+    
+    df_computed = df_surp1.set_index('@timestamp').join(df_surp2.set_index('@timestamp'))
+    df_computed['value'] = df_computed.apply(lambda raw: calc_surpr(raw), axis=1)
+    return df_computed['value'].mean()*24
+
+def calc_surpr(raw):
+    if raw['surp1'] == 1 or raw['surp2'] == 1:
+        return 1
+    else:
+        return 0
+    
+def get_total_biogaz_thiopaq(df_raw):
+    df_debit = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
+    df_debit['filtre120220'] = df_debit['value'].apply(lambda x: getFiltre(x , 120))
+    df_debit['filtre220330'] = df_debit['value'].apply(lambda x: getFiltre(x , 220))
+    df_debit['filtre330600'] = df_debit['value'].apply(lambda x: getFiltre(x , 330))
+    results = dict()
+    results['120'] = df_debit['filtre120220'].sum() / 60
+    results['220'] = df_debit['filtre220330'].sum() / 60
+    results['330'] = df_debit['filtre330600'].sum() / 60
+    return results
+
+def getFiltre(value, filtre):
+    if filtre == 120:
+        if value >=120 and value <= 220:
+            return value
+    elif filtre == 220:
+        if value >=220 and value <= 330:
+            return value
+    elif filtre == 330:
+        if value >=330 and value <= 600:
+            return value
+
+    return 0
 
 def retrieve_raw_data(day):
     start_dt = datetime(day.year, day.month, day.day)
@@ -263,7 +343,38 @@ def create_obj(day, df_raw):
     
         obj_report_cogen['heat_ratio_wo_zero'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['out_total_kWh']
         obj_report_cogen['elec_ratio_wo_zero'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['out_total_kWh']
+
+
     
+    fct_max_thiopaq_min = compute_fct_thiopaq(df_raw)
+    obj_report_cogen['fct_max_thiopaq'] = fct_max_thiopaq_min
+    fct_max_thiopaq_min_avail = fct_max_thiopaq_min/24
+    obj_report_cogen['fct_max_thiopaq_min_avail'] = fct_max_thiopaq_min_avail
+
+    tps_fct_thiopaq_min = get_tps_fct_thiopaq(df_raw)
+    obj_report_cogen['tps_fct_thiopaq'] = tps_fct_thiopaq_min
+    tps_fct_thiopaq_avail = tps_fct_thiopaq_min /24
+    obj_report_cogen['tps_fct_thiopaq_avail'] = tps_fct_thiopaq_avail
+
+    tps_fct_surpresseur_min = get_tps_fct_surpresseur(df_raw)
+    obj_report_cogen['tps_fct_surpresseur'] =  tps_fct_surpresseur_min
+    tps_fct_surpresseur_avail = tps_fct_surpresseur_min / 24
+    obj_report_cogen['tps_fct_surpresseur_avail'] = tps_fct_surpresseur_avail
+
+    tps_fct_real_thiopaq = get_tps_fct_real_thiopaq(fct_max_thiopaq_min, tps_fct_thiopaq_min) 
+    obj_report_cogen['tps_fct_real_thiopaq'] = tps_fct_real_thiopaq
+    tps_fct_real_surpresseur = get_tps_fct_real_thiopaq(fct_max_thiopaq_min, tps_fct_surpresseur_min)
+    obj_report_cogen['tps_fct_real_surpresseur'] = tps_fct_real_surpresseur
+    total_biogaz_thiopaq = get_total_biogaz_thiopaq(df_raw)
+    obj_report_cogen['total_biogaz_thiopaq'] = total_biogaz_thiopaq
+    total_biogaz_thiopaq_120 = total_biogaz_thiopaq['120']
+    obj_report_cogen['total_biogaz_thiopaq_120'] = total_biogaz_thiopaq_120
+    total_biogaz_thiopaq_220 = total_biogaz_thiopaq['220']
+    obj_report_cogen['total_biogaz_thiopaq_220'] = total_biogaz_thiopaq_220
+    total_biogaz_thiopaq_330 = total_biogaz_thiopaq['330']
+    obj_report_cogen['total_biogaz_thiopaq_330'] = total_biogaz_thiopaq_330 
+    total_biogaz_thiopaq_120_600 = total_biogaz_thiopaq_120 + total_biogaz_thiopaq_220 + total_biogaz_thiopaq_330
+    obj_report_cogen['total_biogaz_thiopaq_120_600'] = total_biogaz_thiopaq_120_600
 
     
     
