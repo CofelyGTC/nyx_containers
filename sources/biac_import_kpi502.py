@@ -1,3 +1,38 @@
+"""
+BIAC KPI 502
+====================================
+Expects a 502 compatible Excel File encoded as base 64 on the queue (BIAC_EXCELS_KPI502).
+There must be as many sheets as there are lots and they should be named as follows:
+
+* Lot 1
+* Lot 2
+* Lot 3
+* Lot 4
+
+The name of the file is decoded to determine the month. A month is subtracted to the file name.
+For example:  SafetyRegister-KPI502-Lots_1_2_3_4-2019-09.xlsx is the safety register used for August 2019.
+Note that all lots use the same overdue periods for Inbreuken and Opmerkingen except lot 4.
+
+
+Sends:
+-------------------------------------
+
+
+Listens to:
+-------------------------------------
+
+* /queue/BIAC_EXCELS_KPI502
+
+Collections:
+-------------------------------------
+
+* **biac_kpi502** (Raw Data)
+
+VERSION HISTORY
+--------------------------------------
+
+* 09 Sep 2019 0.0.9 **AMA** Lot 4 overdue durations for Opmerkingen and Inbreuken moved from 12 months /6 months  to 6 months / 3 months
+"""
 import re
 import json
 import time
@@ -24,15 +59,18 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.8"
+VERSION="0.0.9"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502"]
 
 goodmonth="NA"
 
 def computeOverdue(row):
+    """This functionb determines if a record is overdued. It depends on the lot and record type.
+    Returns:
+        String -- The month as string or overdue
+    """
     global goodmonth
-    print(row["Month"])
     try:
         curmonth=datetime.strptime(row["Month"],"%Y-%m")
     except:
@@ -41,11 +79,21 @@ def computeOverdue(row):
         return row["Month"]
     gm=datetime.strptime(goodmonth,"%m-%Y")
 #    print(gm)    
-    if row["ShortStatus"]==5:
-        gm=gm- relativedelta(months=5)
-    else:
-        gm=gm- relativedelta(months=11)
+
+    if row["Sheet"] == "Lot 4":
+        if row["ShortStatus"]==5:
+            gm=gm- relativedelta(months=2)
+        else:
+            gm=gm- relativedelta(months=5)
         
+    else:
+        if row["ShortStatus"]==5:
+            gm=gm- relativedelta(months=5)
+        else:
+            gm=gm- relativedelta(months=11)
+        
+
+
 #    print("GM= %s" %(gm))    
     if curmonth>=gm:
         return row["Month"]
@@ -53,6 +101,10 @@ def computeOverdue(row):
         return "OVERDUE" 
 
 def computeShortStatus(status):
+    """Determines a status based on the flemish status.
+    Returns:
+        int -- 5 for Inbreuk,4 for Opmerkingen, 0 otherwise
+    """
     if status=="Inbreuk":
         return 5
     elif status=="Opmerking":
@@ -191,36 +243,6 @@ def messageReceived(destination,message,headers):
         dfdata["MonthFU"]=dfdata.apply(computeOverdue,axis=1)
 
 
-        #print(dfdata)
-        #A/0
-        #dfdata = dfdata.drop(0)
-        
-
-### DELETE PREVIOUS RECORDS
-        # deletequery={
-        #             "query":{
-        #                 "bool": {
-        #                     "must": [
-        #                     {
-        #                         "query_string": {
-        #                         "query": "filedate: "+filedate
-        #                         }
-        #                     }
-        #                     ]
-        #                 }            
-        #             }   
-        #         }
-        # logger.info("Deleting records")
-        # logger.info(deletequery)
-        # try:
-        #     resdelete=es.delete_by_query(body=deletequery,index="biac_month_kpi502")
-        #     logger.info(resdelete)
-        # except Exception as e3:            
-        #     logger.info(e3)   
-        #     logger.info("Unable to delete records.") 
-
-        # time.sleep(2)
-
         dfdata2 = dfdata.reset_index(drop=True)
         dfdata2.fillna('', inplace=True)
         dfdata2=dfdata2.drop(dfdata2[dfdata2["Month"]==''].index)
@@ -253,13 +275,22 @@ def messageReceived(destination,message,headers):
         logger.info(filedate)
         #res4=compute_previous_months(int(filedate.split("-")[1]),int(filedate.split("-")[0]),12,skip=0)
         res4=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),12,skip=0)
+        res4lot4=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),6,skip=0)
         res4table=[]
         
 
         for key in dfdata2['key'].unique():
-            for rec in res4:
+            print("===>"*30)
+            print(key)
+            if key.startswith("Lot4"):
+                res4touse=res4lot4
+                print("LOT4"*100)
+            else:
+                res4touse=res4
+            for rec in res4touse:                
                 res4table.append({"Month":goodmonth,"MonthFU":rec,"ShortStatus":4,"Status":4,"ValueCount":0,"_id":goodmonth+rec+"-S4-"+str(hash(key))
-                                    ,"_index":"biac_kpi502","key":key,"filedate":filedate})
+                                ,"_index":"biac_kpi502","key":key,"filedate":filedate})
+                
 
         res4tabledf=pd.DataFrame(res4table)  
         #print(res4tabledf)
@@ -267,9 +298,15 @@ def messageReceived(destination,message,headers):
         #A/0
         #res5=compute_previous_months(int(filedate.split("-")[1]),int(filedate.split("-")[0]),6,skip=0)
         res5=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),6,skip=0)
+        res5lot4=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),3,skip=0)
         res5table=[]
         for key in dfdata2['key'].unique():
-            for rec in res5:
+            if key.startswith("Lot4"):
+                res5touse=res5lot4
+                print("LOT4"*100)
+            else:
+                res5touse=res5
+            for rec in res5touse:
                 res5table.append({"Month":goodmonth,"MonthFU":rec,"ShortStatus":5,"Status":5,"ValueCount":0,"_id":goodmonth+rec+"-S5-"+str(hash(key))
                                     ,"_index":"biac_kpi502","key":key,"filedate":filedate})
 
@@ -509,56 +546,56 @@ def messageReceived(destination,message,headers):
 
     logger.info("<== "*10)
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
-                ,"heartbeats":(120000,120000),"earlyack":True}
-logger.info(server)                
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
-
-rps=rp.ReportStructure(es)
-
 if __name__ == '__main__':    
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
+                    ,"heartbeats":(120000,120000),"earlyack":True}
+    logger.info(server)                
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    #conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
+    connectionparameters={"conn":conn}
+
+    #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
+    rps=rp.ReportStructure(es)
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)
