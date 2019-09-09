@@ -57,4 +57,5 @@ WORKDIR /opt/sources
 #CMD ["python", "biac_feedback_dispatcher.py"]
 #CMD ["python", "gtc_sites_data.py"]
 #CMD ["python", "gtc_import_onerp.py"]
-CMD ["python", "gtc_sites_computed.py"]
+# CMD ["python", "gtc_sites_computed.py"]
+CMD ["python", "biac_import_kpi102_lot4.py"]
