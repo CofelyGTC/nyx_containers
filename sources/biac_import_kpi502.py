@@ -66,6 +66,10 @@ QUEUE=["BIAC_EXCELS_KPI502"]
 goodmonth="NA"
 
 def computeOverdue(row):
+    """This functionb determines if a record is overdued. It depends on the lot and record type.
+    Returns:
+        String -- The month as string or overdue
+    """
     global goodmonth
     try:
         curmonth=datetime.strptime(row["Month"],"%Y-%m")
@@ -97,6 +101,10 @@ def computeOverdue(row):
         return "OVERDUE" 
 
 def computeShortStatus(status):
+    """Determines a status based on the flemish status.
+    Returns:
+        int -- 5 for Inbreuk,4 for Opmerkingen, 0 otherwise
+    """
     if status=="Inbreuk":
         return 5
     elif status=="Opmerking":
@@ -234,36 +242,6 @@ def messageReceived(destination,message,headers):
 
         dfdata["MonthFU"]=dfdata.apply(computeOverdue,axis=1)
 
-
-        #print(dfdata)
-        #A/0
-        #dfdata = dfdata.drop(0)
-        
-
-### DELETE PREVIOUS RECORDS
-        # deletequery={
-        #             "query":{
-        #                 "bool": {
-        #                     "must": [
-        #                     {
-        #                         "query_string": {
-        #                         "query": "filedate: "+filedate
-        #                         }
-        #                     }
-        #                     ]
-        #                 }            
-        #             }   
-        #         }
-        # logger.info("Deleting records")
-        # logger.info(deletequery)
-        # try:
-        #     resdelete=es.delete_by_query(body=deletequery,index="biac_month_kpi502")
-        #     logger.info(resdelete)
-        # except Exception as e3:            
-        #     logger.info(e3)   
-        #     logger.info("Unable to delete records.") 
-
-        # time.sleep(2)
 
         dfdata2 = dfdata.reset_index(drop=True)
         dfdata2.fillna('', inplace=True)
