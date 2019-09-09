@@ -21,7 +21,7 @@ Collections:
 * **biac_month_kpi103** (Computed Data) NOT IN USE ANYMORE
 
 VERSION HISTORY
-===============
+-------------------------------------
 
 * 20 May 2019 0.0.2 **AMA** First based on version 0.0.2 from VME KPI102
 * 28 May 2019 0.0.5 **AMA** Stats collection added first day skipped

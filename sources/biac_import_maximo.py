@@ -1,3 +1,32 @@
+"""
+BIAC IMPORT MAXIMO
+====================================
+Reads Maximo Excels files imported from MaxBI by mails to "maximorepport@cofelygtc.com" transfered to AQMC by Camelworker treated and stored into an ElasticSearch collection
+
+Sends:
+-------------------------------------
+
+* /topic/BIAC_MAXIMO_IMPORTED
+
+Listens to:
+-------------------------------------
+
+* /queue/MAXIMO_IMPORT
+
+Collections:
+-------------------------------------
+
+* **biac_maximo** (Raw Data / Modified when a new file append)
+* **biac_maximo_monthly** (Computed Data for Current Month / Modified when a new file append)
+* **biac_histo_maximo** (Raw Data historicly saved by day / Never Change)
+
+VERSION HISTORY
+-------------------------------------
+
+* 03 Jun 2019 1.0.20 **PDB** Finished version for basic applications
+* 01 Aug 2019 2.0.1 **AMA** Add Historical system
+"""
+
 import re
 import json
 import time
@@ -72,6 +101,15 @@ def getDisplayStart(now):
 ################################################################################
 
 def extract_screen_name(row):
+
+    """
+    Defined the screen where the data must be displayed based on lot and technic
+
+    Parameters
+    ----------
+    raw
+        All the row that conatins the workorder information
+    """
     
     lot = int(row['lot'])
     
@@ -159,6 +197,14 @@ def set_lot(contract):
 ################################################################################
 
 def getDisplayStop(now):
+    """
+    Defined the date until the workerorder must be displayed on the screens        
+
+    Parameters
+    ----------
+    now
+        unix timestamp taked at the start of importation
+    """
     datestop = now - timedelta(days=13)
     datestop = datestop.replace(hour=0)
     datestop = datestop.replace(minute=0)
@@ -171,6 +217,14 @@ def getDisplayStop(now):
 ##################################################################################
 
 def getDisplayKPI302(now):
+    """
+    Defined the date until the workerorder must be used in the calculation of KPI302   
+
+    Parameters
+    ----------
+    now
+        unix timestamp taked at the start of importation
+    """
     KPI302Start = datetime(now.year, now.month, 1, 0, 0, 0, 0)
     start = (int(KPI302Start.timestamp()) - 3601 )
     #logger.info('Start KPI 302:' + str(start))
@@ -178,6 +232,9 @@ def getDisplayKPI302(now):
 
 ################################################################################
 def messageReceived(destination,message,headers):
+    """
+    Main function that reads the Excel file.         
+    """
     global es
     starttime = time.time()
     logger.info("==> "*10)
@@ -450,54 +507,54 @@ def messageReceived(destination,message,headers):
 
     logger.info("<== "*10)
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"],"heartbeats":(120000,120000),"earlyack":True}
-logger.info(server)                
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
-
-
 if __name__ == '__main__':    
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"],"heartbeats":(120000,120000),"earlyack":True}
+    logger.info(server)                
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    #conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
+    connectionparameters={"conn":conn}
+
+    #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)

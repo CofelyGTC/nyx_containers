@@ -30,7 +30,7 @@ import dateutil.parser
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="1.0.4"
+VERSION="1.0.5"
 MODULE="GTC_SITES_DATA"
 QUEUE=["GTC_SITES_DATA_temp1"]
 
@@ -170,7 +170,8 @@ def messageReceived(destination,message,headers):
             logger.error(error)
             endtime = time.time()
             logger.error(e,exc_info=True)
-            log_message("Import of file [%s] failed. Duration: %d Exception: %s." % (headers["file"],(endtime-starttime),str(e)))        
+            log_message("Import of file [%s] failed. Duration: %d Exception: %s." % (headers["file"],(endtime-starttime),str(e)))   
+
 
     #if len(reserrors)>0:
     #   log_message("Import of file [%s] failed. Duration: %d. %d records were not imported." % (headers["file"],(endtime-starttime),len(reserrors)))        
@@ -329,6 +330,14 @@ def handleOneMessage(name,body):
               lastvaluecache[row[0]]= {"key": key, "value": 0}
               dayvaluecache[row[0]]= {"key": key2, "value": 0}
 
+
+          first_alarm_ts = getTimestamp(localdate)
+          obj = {
+                  'start_ts': int(first_alarm_ts),
+                  'area_name': area_name 
+              }
+          logger.info(obj)     
+          conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
         
 
         #logger.info("Final %s=" %(bulkbody))
