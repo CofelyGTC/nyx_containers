@@ -22,6 +22,7 @@ VERSION HISTORY
 ===============
 
 * 09 Sep 2019 0.0.1 **VME** First version
+* 11 Sep 2019 0.0.2 **VME** Bug fixing to got untill the end of the month (for th heatmap, not for the gauge)
 """  
 import re
 import sys
@@ -56,7 +57,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_LOT4_IMPORTER"
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 QUEUE   = ["KPI102_LOT4_IMPORT"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -119,7 +120,7 @@ def compute_kib_index(es, df_all):
     df_kib.loc[~df_kib['C'].isnull(),'C']= 1
     df_kib.fillna(0, inplace=True)
     df=pd.DataFrame(index=pd.date_range(start=min(df_kib.index) - timedelta(days=1) \
-                                        , end=max(df_kib.index), freq='W'))
+                                        , end=max(df_kib.index) + timedelta(days=30), freq='W'))
     df.index = df.index + timedelta(days=1)
     df.index.name='monday'
     df = df.merge(df_kib, how='left', left_index=True, right_index=True).fillna(0)
@@ -141,6 +142,10 @@ def compute_kib_index(es, df_all):
             if row[letter] == 0:
                 obj['done'] = 0
                 obj['globalpercentage'] = 0
+
+            max_date = max(df_kib.index)            
+            if obj['@timestamp'].to_pydatetime() > datetime(max_date.year, max_date.month, max_date.day):
+                del obj['globalpercentage']
         
             _id = 'heatmap_'+letter+'_'+str(index)
             _index = 'biac_kib_kpi102_lot4'
