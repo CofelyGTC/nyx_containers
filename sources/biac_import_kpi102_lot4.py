@@ -23,6 +23,7 @@ VERSION HISTORY
 
 * 09 Sep 2019 0.0.1 **VME** First version
 * 11 Sep 2019 0.0.2 **VME** Bug fixing to got untill the end of the month (for th heatmap, not for the gauge)
+* 18 Sep 2019 0.0.3 **VME** Change the way we request Kizeo. Using file export instead of the data endpoint
 """  
 import re
 import sys
@@ -57,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_LOT4_IMPORTER"
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 QUEUE   = ["KPI102_LOT4_IMPORT"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -97,10 +98,10 @@ def messageReceived(destination,message,headers):
 def compute_kib_index(es, df_all):
     df_week = df_all.copy()
     df_week['monday'] = df_week.apply( \
-            lambda row: datetime.date(row['create_time'] - timedelta(days=row['create_time'].weekday())) \
+            lambda row: datetime.date(row['@timestamp'] - timedelta(days=row['@timestamp'].weekday())) \
                                      , axis=1)
 
-    df_week[['create_time', 'monday']]
+    df_week[['@timestamp', 'monday']]
 
 
     df_kib = df_week[['monday', 'ronde_letter']]
@@ -201,36 +202,68 @@ def loadKPI102():
 
         df_all=pd.DataFrame()
         for i in form_list:
+    
+    
             if 'LOT 4 - HS Cabines ~ Wekelijkse Ronde ' in i['name']:
-                logger.info('MATCH')
                 logger.info(i['name'])
-                
                 form_id = i['id']
-                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/all?Authorization='+token)
+                start=(datetime.now()+timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
+                logger.info("Start %s" %(start))            
+                # end=(datetime.now()-timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
+                end = datetime(2019, 1, 1)
+                logger.info("End %s" %(end))
+                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+
+                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
 
                 if r.status_code != 200:
-                    print('something went wrong...')
-                    print(r.status_code, r.reason)
-        
-                
-                if len(r.content) >0 and len(r.json()['data'])>0:
-                    
-                    #print(r.content)
-                        
-                    df=pd.DataFrame(r.json()['data'])
-                    df['ronde'] = i['name']
-                    
-                    df_all=df_all.append(df)
+                    logger.info('something went wrong...')
+                    logger.info(r.status_code, r.reason)
+
+                logger.info(r.json())
+
+                ids=r.json()['data']["dataIds"]
+
+                logger.info(ids)
+                payload={
+                "data_ids": ids
+                }
+                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                headers = {'Content-type': 'application/json','Authorization':token}
+
+                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+
+                if r.status_code != 200:
+                    logger.info('something went wrong...')
+                    logger.info(r.status_code, r.reason)
+
+                logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                if len(r.content) >0:
+
+                    file = open("./tmp/excel.xlsx", "wb")
+                    file.write(r.content)
+                    file.close()
+
+                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
 
         if len(df_all) > 0:
+
+            df_all.columns = ['answer_time', 'date', 'date_2', 'record_number',
+                'ronde_1', 'ronde', 'modif_time']
+            df_all.loc[df_all['ronde'].isnull(), 'ronde'] = df_all.loc[df_all['ronde'].isnull(), 'ronde_1']
+            df_all.loc[df_all['date'].isnull(), 'date'] = df_all.loc[df_all['date'].isnull(), 'date_2']
+
+            df_all = df_all[['answer_time', 'date', 'record_number', 'ronde', 'modif_time']]
+
             df_all['ronde_letter'] = df_all['ronde'].str \
                                     .replace(' \(Rondier\)', '') \
-                                    .str.replace('LOT 4 - HS Cabines ~ Wekelijkse Ronde ','')
+                                    .str.replace('LOT 4 - HS Cabines - Wekelijkse Ronde ','')
                                 
 
             df_all['answer_time'] = pd.to_datetime(df_all['answer_time'], utc=False).dt.tz_localize('Europe/Paris')
-            df_all['create_time'] = pd.to_datetime(df_all['create_time'], utc=False).dt.tz_localize('Europe/Paris')
-            df_all['@timestamp'] = df_all['create_time']
+            df_all['modif_time'] = pd.to_datetime(df_all['modif_time'], utc=False).dt.tz_localize('Europe/Paris')
+            df_all['date'] = pd.to_datetime(df_all['date'], utc=False).dt.tz_localize('Europe/Paris')
+            df_all['@timestamp'] = df_all['date']
             df_all['_index'] = 'biac_kpi102_lot4'
             df_all['ts'] = df_all['@timestamp'].values.astype(np.int64)  // 10 ** 9
             df_all['_id'] = df_all['record_number'].astype(str) + '_' + df_all['ronde_letter'] + '_' +  df_all['ts'].astype(str)
