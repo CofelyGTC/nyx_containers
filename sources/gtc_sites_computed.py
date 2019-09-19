@@ -376,6 +376,9 @@ def create_obj(day, df_raw):
     total_biogaz_thiopaq_120_600 = total_biogaz_thiopaq_120 + total_biogaz_thiopaq_220 + total_biogaz_thiopaq_330
     obj_report_cogen['total_biogaz_thiopaq_120_600'] = total_biogaz_thiopaq_120_600
 
+
+    
+
     
     
     

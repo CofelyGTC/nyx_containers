@@ -45,6 +45,9 @@ Modules
 .. automodule:: biac_import_maximo
     :members:
 
+.. automodule:: biac_availabilities
+    :members:
+
 
 .. toctree::
    :maxdepth: 2
