@@ -48,6 +48,9 @@ Modules
 .. automodule:: biac_availabilities
     :members:
 
+.. automodule:: biac_month_availability
+    :members:
+
 
 .. toctree::
    :maxdepth: 2
