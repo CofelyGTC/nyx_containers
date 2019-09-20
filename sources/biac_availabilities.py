@@ -168,6 +168,8 @@ def messageReceived(destination,message,headers):
 
     dfdata = dfs[1] """
 
+
+
     badeq = [
     'gtx_ana',
     'gtx_aws',
