@@ -51,7 +51,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.9"
+VERSION = "0.0.16"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -102,6 +102,33 @@ def getCustomMin(minrow):
         return 0
     else:
         return minrow.min()
+
+def calc_dispo_thiopaq(raw):
+    condition = 0
+    if raw['value_debit'] >= 120 and raw['value_pression'] >= 15 and raw['value_pression'] < 36:
+        condition = 1
+        
+    return condition
+
+def get_dispo_thiopaq(df_raw):
+    df_debit_biogaz = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
+    df_debit_biogaz.columns = ['@timestamp', 'value_debit']
+    df_pression_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'][['@timestamp', 'value']]
+    df_pression_thiopaq.columns = ['@timestamp', 'value_pression']
+    df_fct_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Thiopaq_Fct'][['@timestamp', 'value']]
+    df_fct_thiopaq.columns = ['@timestamp', 'value_fct']
+
+    df_computed = df_debit_biogaz.set_index('@timestamp').join(df_pression_thiopaq.set_index('@timestamp').join(df_fct_thiopaq.set_index('@timestamp')))
+    df_computed['condition_fct'] = df_computed.apply(lambda raw: calc_dispo_thiopaq(raw), axis=1)
+
+    tps_total_fct = df_computed['value_fct'].sum()
+    tps_normal_dispo = df_computed['condition_fct'].sum()
+    dispo = tps_total_fct / tps_normal_dispo
+    if dispo > 1:
+        dispo = 1
+    
+    return dispo
+
 
 
 def compute_fct_thiopaq(df_raw):
@@ -195,6 +222,8 @@ def retrieve_raw_data(day):
                                            size=1000000)
 
     containertimezone=pytz.timezone(get_localzone().zone)
+    logger.info('Data retrieved')
+    logger.info(df_raw)
     df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
                                                unit='ms', utc=True).dt.tz_convert(containertimezone)
     df_raw=df_raw.sort_values('@timestamp') 
@@ -270,12 +299,16 @@ def create_obj(day, df_raw):
     
     entry_gaznat = compute_gaznat_entry(df_raw)
     obj_report_cogen['in_gaznat_cogen'] = entry_gaznat
-    obj_report_cogen['in_gaznat_cogen_kWh'] = obj_report_cogen['in_gaznat_cogen'] * 11.5
+    #obj_report_cogen['in_gaznat_cogen_kWh'] = obj_report_cogen['in_gaznat_cogen'] * 11.5
+    obj_report_cogen['in_gaznat_cogen_kWh'] = obj_report_cogen['in_gaznat_cogen'] * 10.42
+    obj_report_cogen['in_gaznat_cogen_MWh'] = obj_report_cogen['in_gaznat_cogen_kWh'] / 1000
     
     entry_biogaz_cogen, df_entree_biogaz = compute_entry_biogaz_cogen(df_raw)
     obj_report_cogen['in_biogaz_cogen'] = entry_biogaz_cogen
     obj_report_cogen['in_biogaz_chaudiere'] = obj_report_cogen['in_biogaz_thiopaq'] - obj_report_cogen['in_biogaz_cogen']
-    obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 5.98
+    #obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 5.98
+    obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 16.1656
+    obj_report_cogen['in_biogaz_cogen_MWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] / 1000
     
     obj_report_cogen['in_total_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] + obj_report_cogen['in_gaznat_cogen_kWh']
     
@@ -375,6 +408,12 @@ def create_obj(day, df_raw):
     obj_report_cogen['total_biogaz_thiopaq_330'] = total_biogaz_thiopaq_330 
     total_biogaz_thiopaq_120_600 = total_biogaz_thiopaq_120 + total_biogaz_thiopaq_220 + total_biogaz_thiopaq_330
     obj_report_cogen['total_biogaz_thiopaq_120_600'] = total_biogaz_thiopaq_120_600
+    
+
+    dispo_thiopaq = get_dispo_thiopaq(df_raw)
+    obj_report_cogen['dispo_thiopaq'] = dispo_thiopaq
+    obj_report_cogen['dispo_thiopaq_prct'] = dispo_thiopaq * 100
+
 
 
     
@@ -468,6 +507,22 @@ def save_tags_to_computed(es, obj):
     else:
         logger.info("BULK ERRORS.")
         logger.info(bulkres)
+
+def getSite(raw):
+    site = raw['client']
+    if raw['client'] == 'COGEN' or raw['client'] == 'cogenmail':
+        splits = raw['area_name'].split('_')
+        site = splits[1]
+
+    return site
+
+def removeStr(x):
+    response = x
+    if isinstance(x, str):
+        response = int(x)
+        
+    return response
+
         
 
 
@@ -478,36 +533,45 @@ def doTheWork(start):
 
     df = retrieve_raw_data(start)
 
-    obj_to_es = create_obj(start, df)
-    obj_to_es['@timestamp'] = containertimezone.localize(start)
-    obj_to_es['site'] = 'LUTOSA'
-    es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
+    try:
+        obj_to_es = create_obj(start, df)
+        obj_to_es['@timestamp'] = containertimezone.localize(start)
+        obj_to_es['site'] = 'LUTOSA'
+        es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
 
-    save_tags_to_computed(es, obj_to_es)
+        save_tags_to_computed(es, obj_to_es)
+    except Exception as er:
+        logger.error('Error During creating specifics data')
+        logger.error(er)
 
-    df = retrieve_raw_data(start)
-    df['value_min'] = df['value']
-    df['value_min_sec'] = df['value']
-    df['value_max'] = df['value']
-    df['value_avg'] = df['value']
-    df_grouped = df.groupby(['client_area_name', 'area_name', 'client', 'area']).agg({'@timestamp': 'min', 'value_min': 'min', 'value_max': 'max', 'value_avg': 'mean', 'value_min_sec':getCustomMin}).reset_index()
-    df_grouped['value_day'] = df_grouped['value_max'] - df_grouped['value_min']
-    df_grouped['conso_day'] = df_grouped['value_avg'] * 24
-    df_grouped['availability']= df_grouped['value_avg'] * 1440
-    df_grouped['availability_perc'] = df_grouped['value_avg'] * 100
-    df_grouped['value_day_sec'] = df_grouped['value_max'] - df_grouped['value_min_sec']
-    df_grouped['date'] = df_grouped['@timestamp'].apply(lambda x: getDate(x))
-    df_grouped['month'] = df_grouped['date'].apply(lambda x: getMonth(x))
-    df_grouped['year'] = df_grouped['date'].apply(lambda x: getYear(x))
-    df_grouped['_id'] = df_grouped['client_area_name'] +'-'+ df_grouped['date']
-    df_grouped['_index'] = df_grouped['date'].apply(lambda x : getIndex(x))
-        
+    try:
+        df = retrieve_raw_data(start)
+        df['value'] = df['value'].apply(lambda x: removeStr(x))
+        df['value_min'] = df['value']
+        df['value_min_sec'] = df['value']
+        df['value_max'] = df['value']
+        df['value_avg'] = df['value']
+        df_grouped = df.groupby(['client_area_name', 'area_name', 'client', 'area']).agg({'@timestamp': 'min', 'value_min': 'min', 'value_max': 'max', 'value_avg': 'mean', 'value_min_sec':getCustomMin}).reset_index()
+        df_grouped['value_day'] = df_grouped['value_max'] - df_grouped['value_min']
+        df_grouped['conso_day'] = df_grouped['value_avg'] * 24
+        df_grouped['availability']= df_grouped['value_avg'] * 1440
+        df_grouped['availability_perc'] = df_grouped['value_avg'] * 100
+        df_grouped['value_day_sec'] = df_grouped['value_max'] - df_grouped['value_min_sec']
+        df_grouped['date'] = df_grouped['@timestamp'].apply(lambda x: getDate(x))
+        df_grouped['month'] = df_grouped['date'].apply(lambda x: getMonth(x))
+        df_grouped['year'] = df_grouped['date'].apply(lambda x: getYear(x))
+        df_grouped['_id'] = df_grouped['client_area_name'] +'-'+ df_grouped['date']
+        df_grouped['_index'] = df_grouped['date'].apply(lambda x : getIndex(x))
+        df_grouped['site'] = df_grouped.apply(lambda raw: getSite(raw), axis=1)
+            
 
-    es_helper.dataframe_to_elastic(es, df_grouped)
-    print("data inserted for day " + str(start))
-        
-    print("finished")
-
+        es_helper.dataframe_to_elastic(es, df_grouped)
+        print("data inserted for day " + str(start))
+            
+        print("finished")
+    except Exception as er:
+        logger.error('Unable to compute data for ' + str(start))
+        logger.error(er)
 
 
 def messageReceived(destination,message,headers):
