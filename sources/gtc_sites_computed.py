@@ -307,7 +307,7 @@ def create_obj(day, df_raw):
     obj_report_cogen['in_biogaz_cogen'] = entry_biogaz_cogen
     obj_report_cogen['in_biogaz_chaudiere'] = obj_report_cogen['in_biogaz_thiopaq'] - obj_report_cogen['in_biogaz_cogen']
     #obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 5.98
-    obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 16.1656
+    obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 6.1656
     obj_report_cogen['in_biogaz_cogen_MWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] / 1000
     
     obj_report_cogen['in_total_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] + obj_report_cogen['in_gaznat_cogen_kWh']
