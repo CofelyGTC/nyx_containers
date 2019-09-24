@@ -2,6 +2,8 @@
 BIAC IMPORT FEEDBACK COMMENTS
 ====================================
 
+This process listens to two queues, decodes the file included in each message in order to create feedback result or comments.
+
 Listens to:
 -------------------------------------
 
@@ -32,6 +34,7 @@ VERSION HISTORY
 * 08 Aug 2019 0.0.4 **AMA** Feedback status added
 * 22 Aug 2019 0.0.5 **AMA** Fix a logging bug
 * 26 Aug 2019 0.0.6 **AMA** Fix a bug in the report entity / matching
+* 24 Sep 2019 0.0.7 **AMA** Message localized in NL
 """  
 import re
 import json
@@ -59,10 +62,10 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
-locale.setlocale(locale.LC_TIME, "nl_BE")
+
 
 
 def log_message(message):
@@ -205,6 +208,22 @@ def messageReceivedXLSX(destination,message,headers):
         reporttype=df.columns[8]
         reportdate=datetime.strptime(df.columns[7],"%d/%m/%Y")
 
+        maanden=['Januari',
+            'Februari',
+            'Maart',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Augustus',
+            'September',
+            'Oktober',
+            'November',
+            'December']
+        
+
+        reportdateNL=maanden[reportdate.month-1]
+
         entity=getEntityObjXLS(es,reporttype)
 
         logger.info(entity)
@@ -212,10 +231,10 @@ def messageReceivedXLSX(destination,message,headers):
         results=[{"kpi":int(x[1][0]),"result":x[1][1]} for x in nscore.iterrows()]
 
         
-        scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Result:</b>"+str(x["result"])+ "</li>" for x in results])
+        scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Resultaat:</b>"+str(x["result"])+ "</li>" for x in results])
         scorebody="<ul>"+scorebody+"</ul>"
 
-        returnmail={"mail":user_id, "results":results,"user":user,"reportdate":reportdate.strftime("%d/%m/%Y"),"scorebody":scorebody,"entity":entity}
+        returnmail={"mail":user_id, "results":results,"user":user,'reportdate_nl': reportdateNL,"reportdate":reportdate.strftime("%d/%m/%Y"),"scorebody":scorebody,"entity":entity}
         logger.info(json.dumps(returnmail))
 
         dict_comment=[]
@@ -229,7 +248,7 @@ def messageReceivedXLSX(destination,message,headers):
                 'lot': entity["lot"],
                 'contract': entity["contract"],
                 'technic': entity["technic"],
-                'report_date': reportdate,
+                'report_date': reportdate,                
                 'creation_date': datetime.now(),
                 'kpi': result["kpi"],
                 'result': result["result"],
@@ -355,6 +374,22 @@ def messageReceivedDOCX(destination,message,headers):
         logger.info('user     : '+str(user))
         logger.info('user_id  : '+str(user_id))
 
+        maanden=['Januari',
+            'Februari',
+            'Maart',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Augustus',
+            'September',
+            'Oktober',
+            'November',
+            'December']
+        
+
+        reportdateNL=maanden[report_date.month-1]
+
         results=[]
 
         if key != '':
@@ -397,16 +432,16 @@ def messageReceivedDOCX(destination,message,headers):
 
             es_helper.dataframe_to_elastic(es, df_comment)
 
-            scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Comment:</b>"+str(x["comment"])+ "</li>" for x in results])
+            scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Commentaar:</b>"+str(x["comment"])+ "</li>" for x in results])
             scorebody="<ul>"+scorebody+"</ul>"
-            returnmail={"mail":user_id, "results":results,"user":user,"reportdate":report_date.strftime("%d/%m/%Y"),"scorebody":scorebody,"title":title}
+            returnmail={"mail":user_id, "results":results,"user":user,'reportdate_nl': reportdateNL,"reportdate":report_date.strftime("%d/%m/%Y"),"scorebody":scorebody,"title":title}
             logger.info(json.dumps(returnmail))
 
             set_docx_status(es,user,key,report_date)
 
             conn.send_message("/queue/BAC_FEEDBACK_RETURNMAIL_DOCX",json.dumps(returnmail))
         else:
-            returnmail={"mail":user_id, "results":results,"user":user,"reportdate":report_date.strftime("%d/%m/%Y"),"scorebody":"<div>- No Remarks Found</div>","title":title}
+            returnmail={"mail":user_id, "results":results,"user":user,"reportdate":report_date.strftime("%d/%m/%Y"),'reportdate_nl': reportdateNL,"scorebody":"<div>- No Remarks Found</div>","title":title}
             set_docx_status(es,user,key,report_date)
 
             conn.send_message("/queue/BAC_FEEDBACK_RETURNMAIL_DOCX",json.dumps(returnmail))
@@ -425,55 +460,56 @@ def messageReceivedDOCX(destination,message,headers):
     
         
 
-
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
-logger.info(server)                
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
-
-
 if __name__ == '__main__':    
+    locale.setlocale(locale.LC_TIME, "nl_BE")
+
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
+    logger.info(server)                
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    #conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
+    connectionparameters={"conn":conn}
+
+    #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)

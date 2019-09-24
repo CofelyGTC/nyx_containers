@@ -32,6 +32,9 @@ VERSION HISTORY
 --------------------------------------
 
 * 09 Sep 2019 0.0.9 **AMA** Lot 4 overdue durations for Opmerkingen and Inbreuken moved from 12 months /6 months  to 6 months / 3 months
+* 16 Sep 2019 0.1.0 **AMA** Do no longer keep data below < Mai 2018
+* 19 Sep 2019 0.1.1 **AMA** Do no longer keep data below < Mai 2018
+* 23 Sep 2019 0.1.2 **AMA** Fix a bug that prevented the original collection to be erased properly
 """
 import re
 import json
@@ -59,7 +62,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.9"
+VERSION="0.1.2"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502"]
 
@@ -239,6 +242,8 @@ def messageReceived(destination,message,headers):
         newcols=['Month','SRid','Status','Opm. number','Definition','Building','Floor','Place','Technic','Sub-technic','materials','AssetCode','Device','BACid','Frequency','Control','Report','Report Date','Reference Date','Reference Year','Reference source date','Last shipment','Repeat','Point of interest','KPI timing','GroupNum','Type','FB Name','FB date','FB','Orig label','Orig Definition','Control organism','To','Cc 1','Cc 2','Cc 3','Cc 4','Cc 5','Cc 6','Cc 7','Cc 8','Cc 9','BAC Dept','BAC Sub Dept','BAC Service','Group','Contractor','Lot','KPI Type','ShortStatus','ShortStatusFU','ConcatShortStatus&OrigStatus','LongStatus','Classification nr (O/I)','Classification (O/I)','Show graph','Report link','Status (M-1)','Report Date (M-1)','FB Date (M-1)','Deleted vs M-1',"KPI Type Nr","CheckArchived",'Sheet']
         logger.info(newcols)
         dfdata.columns = newcols
+        dfdata["KPI Type Nr"]=502
+
 
         dfdata["MonthFU"]=dfdata.apply(computeOverdue,axis=1)
 
@@ -266,7 +271,18 @@ def messageReceived(destination,message,headers):
         dfdata2.drop_duplicates('_id', inplace=True)
 
         dfdata2["Month_"]=dfdata2["Month"]
+
+        logger.info("BEFORE CLEANING")
+        logger.info(dfdata2.shape)
+
+        for x in [str(x) for x in range(2010,2018)]:
+            dfdata2=dfdata2[~dfdata2["Month_"].str.contains(x)]
         
+        dfdata2=dfdata2[~dfdata2["Month_"].isin(["2018-01","2018-02","2018-03","2018-04"])]
+
+        logger.info("AFTER CLEANING")
+        logger.info(dfdata2.shape)
+
         dfdata2["Month"]=goodmonth 
         
         dfdata2["ValueCount"]=1   
@@ -310,9 +326,37 @@ def messageReceived(destination,message,headers):
                 res5table.append({"Month":goodmonth,"MonthFU":rec,"ShortStatus":5,"Status":5,"ValueCount":0,"_id":goodmonth+rec+"-S5-"+str(hash(key))
                                     ,"_index":"biac_kpi502","key":key,"filedate":filedate})
 
+
+
+# DELETE OLD DATA
+        deletequery={
+            "query":{
+                "bool": {
+                    "must": [
+                    {
+                        "query_string": {
+                        "query": "Month: \""+goodmonth+"\""
+                        }
+                    }
+                    ]
+                }            
+            }   
+        }
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Deleting ORIGINALS records")
+        logger.info(deletequery)
+        try:
+            resdelete=es.delete_by_query(body=deletequery,index="biac_kpi502")
+            logger.info(resdelete)
+        except Exception as e3:            
+            logger.info(e3)   
+            logger.info("Unable to delete records.") 
+        
+        logger.info("Waiting for deletion to finish")
+        time.sleep(3)
+
+# WRITE DATA
         res5tabledf=pd.DataFrame(res5table)  
         pte.pandas_to_elastic(es,res5tabledf)
-
         pte.pandas_to_elastic(es,dfdata2)
 
         ## NOW COMPUTE MONTH
