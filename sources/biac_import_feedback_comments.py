@@ -65,7 +65,7 @@ MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
 VERSION = "0.0.7"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
-locale.setlocale(locale.LC_TIME, "nl_BE")
+
 
 
 def log_message(message):
@@ -461,6 +461,7 @@ def messageReceivedDOCX(destination,message,headers):
         
 
 if __name__ == '__main__':    
+    locale.setlocale(locale.LC_TIME, "nl_BE")
 
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
     logger = logging.getLogger()
