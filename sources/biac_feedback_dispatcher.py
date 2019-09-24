@@ -2,6 +2,7 @@
 BIAC FEEDBACK DISPATCHER
 ====================================
 This modules checks the biac_feedback_status in order to find a final report that has not been sent.
+In order to be distributed, the docx and xlsx feedback files must have been received.
 
 Sends:
 -------------------------------------
@@ -23,6 +24,7 @@ VERSION HISTORY
 * 08 Aug 2019 0.0.1 **AMA** First Version
 * 19 Aug 2019 0.0.2 **AMA** Title of the report is set
 * 22 Aug 2019 0.0.3 **AMA** Rename the report type parameter
+* 11 Sep 2019 0.0.4 **AMA** Changed the result ready check duration
 """ 
 import json
 import time
@@ -48,7 +50,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.3"
+VERSION="0.0.4"
 MODULE="BIAC_FEEDBACK_DISPATCHER"
 QUEUE=[]
 
@@ -98,7 +100,7 @@ def log_message(message):
 
 def checkCommentsStatus():
     logger.info(">>>>>>>> CHECKING FEEDBACK STATUS")
-    start_dt,end_dt=get_month_day_range(datetime.now()-timedelta(days=31))
+    start_dt,end_dt=get_month_day_range(datetime.now()-timedelta(days=60))
     df = es_helper.elastic_to_dataframe(es,query="xlsx: true AND docx: true AND sent: false", index="biac_feedback_status", start=start_dt, end=end_dt,timestampfield="reportdate")
 
     if not df.empty:

@@ -42,6 +42,9 @@ Modules
 .. automodule:: biac_feedback_dispatcher
     :members:
 
+.. automodule:: biac_import_feedback_comments
+    :members:
+
 .. automodule:: biac_import_maximo
     :members:
 
