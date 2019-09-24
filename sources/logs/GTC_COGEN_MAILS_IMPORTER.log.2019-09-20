@@ -1,0 +1,31 @@
+2019-09-20 13:33:09,749.749 INFO gtc_import_cogen_mails - <module>: ==============================
+2019-09-20 13:33:09,749.749 INFO gtc_import_cogen_mails - <module>: Starting: GTC_COGEN_MAILS_IMPORTER
+2019-09-20 13:33:09,749.749 INFO gtc_import_cogen_mails - <module>: Module:   0.0.1
+2019-09-20 13:33:09,749.749 INFO gtc_import_cogen_mails - <module>: ==============================
+2019-09-20 13:33:09,749.749 INFO gtc_import_cogen_mails - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (120000, 120000), 'earlyack': True}
+2019-09-20 13:33:09,749.749 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 13:33:09,749.749 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 13:33:09,750.750 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 13:33:09,792.792 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 13:33:09,793.793 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 13:33:09,794.794 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_COGEN_MAILS_IMPORTER', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '120000,120000'}
+2019-09-20 13:33:09,836.836 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '120000,120000', 'session': 'GTC_COGEN_MAILS_IMPORTER', 'version': '1.1'}, len(body)=0
+2019-09-20 13:33:09,837.837 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'COGEN_MAILS', 'id': 1, 'ack': 'client'}
+2019-09-20 13:33:09,837.837 INFO gtc_import_cogen_mails - <module>: true
+2019-09-20 13:33:09,839.839 INFO gtc_import_cogen_mails - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 13:33:09,881.881 INFO transport - process_frame: Received frame: 'MESSAGE', headers={'content-length': '299', 'expires': '0', 'destination': '/queue/COGEN_MAILS', 'subscription': '1', 'priority': '4', 'Date': 'Fri, 20 Sep 2019 11:07:23 +0000', 'message-id': 'ID:3111f6f5f766-45190-1568977424810-3:1:1:1:1', 'persistent': 'true', 'timestamp': '1568977648283'}, len(body)=297
+2019-09-20 13:33:09,882.882 INFO transport - transmit: Sending frame: 'ACK', headers={'message-id': 'ID\\c3111f6f5f766-45190-1568977424810-3\\c1\\c1\\c1\\c1', 'subscription': '1'}
+2019-09-20 13:33:09,882.882 INFO gtc_import_cogen_mails - messageReceived: ==> ==> ==> ==> ==> ==> ==> ==> ==> ==> 
+2019-09-20 13:33:09,882.882 INFO gtc_import_cogen_mails - messageReceived: Message Received /queue/COGEN_MAILS
+2019-09-20 13:33:09,882.882 INFO gtc_import_cogen_mails - messageReceived: {'content-length': '299', 'expires': '0', 'destination': '/queue/COGEN_MAILS', 'subscription': '1', 'priority': '4', 'Date': 'Fri, 20 Sep 2019 11:07:23 +0000', 'message-id': 'ID:3111f6f5f766-45190-1568977424810-3:1:1:1:1', 'persistent': 'true', 'timestamp': '1568977648283'}
+2019-09-20 13:33:09,882.882 ERROR amqstompclient - on_message: ERROR:
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/amqstompclient/amqstompclient.py", line 220, in on_message
+    self.callback(destination, message, headers)
+  File "gtc_import_cogen_mails.py", line 283, in messageReceived
+    filename = headers["CamelFileAbsolutePath"]
+KeyError: 'CamelFileAbsolutePath'
+2019-09-20 13:33:09,884.884 ERROR amqstompclient - on_message: ERROR:<class 'KeyError'>'CamelFileAbsolutePath'<traceback object at 0x11d315b08>
+2019-09-20 13:33:14,839.839 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 377}
+2019-09-20 13:33:19,843.843 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 404}
+2019-09-20 13:33:24,849.849 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 404}

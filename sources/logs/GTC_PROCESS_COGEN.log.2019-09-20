@@ -1,0 +1,550 @@
+2019-09-20 16:54:12,960.960 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:54:12,960.960 INFO gtc_process_cogen - <module>: Starting: GTC_PROCESS_COGEN
+2019-09-20 16:54:12,960.960 INFO gtc_process_cogen - <module>: Module:   0.0.1
+2019-09-20 16:54:12,960.960 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:54:12,960.960 INFO gtc_process_cogen - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 16:54:12,960.960 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 16:54:12,960.960 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 16:54:12,960.960 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:54:13,003.003 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:54:13,003.003 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 16:54:13,004.004 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_PROCESS_COGEN', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 16:54:13,046.046 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_PROCESS_COGEN', 'version': '1.1'}, len(body)=0
+2019-09-20 16:54:13,047.047 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_PROCESS_COGEN_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 16:54:13,047.047 INFO gtc_process_cogen - <module>: true
+2019-09-20 16:54:13,048.048 INFO gtc_process_cogen - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 16:54:18,063.063 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 543}
+2019-09-20 16:54:18,063.063 INFO gtc_process_cogen - doTheWork: Do the work ...
+2019-09-20 16:54:18,063.063 INFO gtc_process_cogen - getCogenNames: GET ALL COGENS
+2019-09-20 16:55:57,929.929 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:55:57,930.930 INFO gtc_process_cogen - <module>: Starting: GTC_PROCESS_COGEN
+2019-09-20 16:55:57,930.930 INFO gtc_process_cogen - <module>: Module:   0.0.1
+2019-09-20 16:55:57,930.930 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:55:57,930.930 INFO gtc_process_cogen - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 16:55:57,930.930 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 16:55:57,930.930 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 16:55:57,930.930 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:55:57,973.973 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:55:57,973.973 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 16:55:57,973.973 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_PROCESS_COGEN', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 16:55:58,016.016 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_PROCESS_COGEN', 'version': '1.1'}, len(body)=0
+2019-09-20 16:55:58,016.016 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_PROCESS_COGEN_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 16:55:58,016.016 INFO gtc_process_cogen - <module>: true
+2019-09-20 16:55:58,017.017 INFO gtc_process_cogen - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 16:56:03,027.027 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 543}
+2019-09-20 16:56:03,028.028 INFO gtc_process_cogen - doTheWork: Do the work ...
+2019-09-20 16:56:03,028.028 INFO gtc_process_cogen - getCogenNames: GET ALL COGENS
+2019-09-20 16:56:13,036.036 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/cogen_parameters/doc/_search?size=1000 [status:N/A request:10.007s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+2019-09-20 16:56:13,044.044 ERROR gtc_process_cogen - <module>: Unable to load sites data.
+2019-09-20 16:56:13,044.044 ERROR gtc_process_cogen - <module>: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_process_cogen.py", line 976, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_process_cogen.py", line 862, in doTheWork
+    allcogens=getCogenNames()
+  File "gtc_process_cogen.py", line 668, in getCogenNames
+    cogens=es.search(index="cogen_parameters",doc_type="doc",size=1000)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/__init__.py", line 660, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/transport.py", line 318, in perform_request
+    status, headers_response, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 84, in perform_request
+    raise ConnectionTimeout('TIMEOUT', str(e), e)
+elasticsearch.exceptions.ConnectionTimeout: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/doc/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x11ac87d30>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+2019-09-20 16:56:18,054.054 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 16:57:34,653.653 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:57:34,654.654 INFO gtc_process_cogen - <module>: Starting: GTC_PROCESS_COGEN
+2019-09-20 16:57:34,654.654 INFO gtc_process_cogen - <module>: Module:   0.0.1
+2019-09-20 16:57:34,654.654 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 16:57:34,654.654 INFO gtc_process_cogen - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 16:57:34,654.654 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 16:57:34,654.654 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 16:57:34,654.654 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:57:34,696.696 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 16:57:34,696.696 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 16:57:34,697.697 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_PROCESS_COGEN', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 16:57:34,738.738 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_PROCESS_COGEN', 'version': '1.1'}, len(body)=0
+2019-09-20 16:57:34,738.738 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_PROCESS_COGEN_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 16:57:34,738.738 INFO gtc_process_cogen - <module>: true
+2019-09-20 16:57:34,739.739 INFO gtc_process_cogen - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 16:57:39,755.755 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 543}
+2019-09-20 16:57:39,755.755 INFO gtc_process_cogen - doTheWork: Do the work ...
+2019-09-20 16:57:39,756.756 INFO gtc_process_cogen - getCogenNames: GET ALL COGENS
+2019-09-20 16:57:49,765.765 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/cogen_parameters/_search?size=1000 [status:N/A request:10.009s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+2019-09-20 16:57:49,771.771 ERROR gtc_process_cogen - <module>: Unable to load sites data.
+2019-09-20 16:57:49,771.771 ERROR gtc_process_cogen - <module>: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_process_cogen.py", line 976, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_process_cogen.py", line 862, in doTheWork
+    allcogens=getCogenNames()
+  File "gtc_process_cogen.py", line 668, in getCogenNames
+    cogens=es.search(index="cogen_parameters",size=1000)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/__init__.py", line 660, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/transport.py", line 318, in perform_request
+    status, headers_response, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 84, in perform_request
+    raise ConnectionTimeout('TIMEOUT', str(e), e)
+elasticsearch.exceptions.ConnectionTimeout: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /cogen_parameters/_search?size=1000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x116a02be0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+2019-09-20 17:01:07,294.294 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 17:01:07,295.295 INFO gtc_process_cogen - <module>: Starting: GTC_PROCESS_COGEN
+2019-09-20 17:01:07,295.295 INFO gtc_process_cogen - <module>: Module:   0.0.1
+2019-09-20 17:01:07,295.295 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 17:01:07,295.295 INFO gtc_process_cogen - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 17:01:07,295.295 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 17:01:07,295.295 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 17:01:07,296.296 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 17:01:07,338.338 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 17:01:07,338.338 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 17:01:07,338.338 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_PROCESS_COGEN', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 17:01:07,386.386 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_PROCESS_COGEN', 'version': '1.1'}, len(body)=0
+2019-09-20 17:01:07,387.387 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_PROCESS_COGEN_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 17:01:07,387.387 INFO gtc_process_cogen - <module>: true
+2019-09-20 17:01:07,388.388 INFO gtc_process_cogen - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 17:01:12,401.401 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 542}
+2019-09-20 17:01:12,401.401 INFO gtc_process_cogen - doTheWork: Do the work ...
+2019-09-20 17:01:12,401.401 INFO gtc_process_cogen - getCogenNames: GET ALL COGENS
+2019-09-20 17:01:12,662.662 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/cogen_parameters/_search?size=1000 [status:200 request:0.260s]
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * stib_brel added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * nitto_genk added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * chirec_braine added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * huyzedepauw added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * stib_delta added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * solarec added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * dumoulin added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * lutosa added.
+2019-09-20 17:01:12,663.663 INFO gtc_process_cogen - getCogenNames: * cinquentenaire1 added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * cinquentenaire2 added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * hospitalalost added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * cogart added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * boetendael added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * namur_hospital added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * esseghem1 added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * mont_godinne added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * dieterenkortenberg added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * galactic added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * noh added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * sportoase_beringen added.
+2019-09-20 17:01:12,664.664 INFO gtc_process_cogen - getCogenNames: * ganshoren added.
+2019-09-20 17:01:12,665.665 INFO gtc_process_cogen - getCogenNames: * magnanerie added.
+2019-09-20 17:01:12,680.680 INFO gtc_process_cogen - getCogenNames: * irissud added.
+2019-09-20 17:01:12,680.680 INFO gtc_process_cogen - getCogenNames: * sportoase_braine added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * europe_consia added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * azklina added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * eupen added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * jetair added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * fondroy added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * hotel_bloom added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * forum_laeken added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * minac added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * esseghem2 added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - getCogenNames: * calypso added.
+2019-09-20 17:01:12,681.681 INFO gtc_process_cogen - loadCogen: LOAD COGEN:stib_brel ST:1565535672.681906 EN:1568991672.681919
+2019-09-20 17:01:12,682.682 INFO gtc_process_cogen - loadCogen: ----------------------------------------------------------------------------------------------------
+2019-09-20 17:01:12,730.730 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/cogen_parameters/doc/stib_brel [status:200 request:0.048s]
+2019-09-20 17:01:12,730.730 INFO gtc_process_cogen - setSearchQueryField: Value field:value_day
+2019-09-20 17:01:12,730.730 INFO gtc_process_cogen - loadCogen: Client:COGEN
+2019-09-20 17:01:12,730.730 INFO gtc_process_cogen - loadCogen: Area:Optimiz
+2019-09-20 17:01:12,730.730 INFO gtc_process_cogen - loadCurveGroup: #################
+2019-09-20 17:01:12,731.731 INFO gtc_process_cogen - loadCurveGroup: Loading:STIBBREL_Gaz_M3N
+2019-09-20 17:01:12,731.731 INFO gtc_process_cogen - loadCurve: ==============> Loading Curve:client: COGEN AND name: "STIBBREL_Gaz_M3N" AND area: Optimiz AND value_day:[0 1000000]
+2019-09-20 17:01:12,731.731 INFO gtc_process_cogen - loadCurve: {'size': 0, 'query': {'bool': {'must': [{'query_string': {'query': 'client: COGEN AND name: "STIBBREL_Gaz_M3N" AND area: Optimiz AND value_day:[0 1000000]', 'analyze_wildcard': True}}, {'range': {'@timestamp': {'gte': 1565535672681, 'lte': 1568991672681, 'format': 'epoch_millis'}}}], 'must_not': []}}, '_source': {'excludes': []}, 'aggs': {'1': {'date_histogram': {'field': '@timestamp', 'interval': '1d', 'time_zone': 'Europe/Berlin', 'min_doc_count': 1}, 'aggs': {'2': {'min': {'field': 'value_day'}}, '3': {'max': {'field': 'value_day'}}}}}}
+2019-09-20 17:01:12,815.815 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search [status:200 request:0.083s]
+2019-09-20 17:01:12,815.815 INFO gtc_process_cogen - loadCurveGroup: -----------------------------
+2019-09-20 17:01:12,815.815 INFO gtc_process_cogen - loadCurveGroup: - PCI SOURCE FOUND:brussels
+2019-09-20 17:01:12,861.861 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/scp/_search [status:400 request:0.045s]
+2019-09-20 17:01:12,861.861 ERROR gtc_process_cogen - <module>: Unable to load sites data.
+2019-09-20 17:01:12,861.861 ERROR gtc_process_cogen - <module>: RequestError(400, 'parsing_exception', '[match] query does not support [type]')
+Traceback (most recent call last):
+  File "gtc_process_cogen.py", line 976, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_process_cogen.py", line 871, in doTheWork
+    multires=loadCogen(cogenname, datetime.today() - timedelta(days=40),datetime.now())
+  File "gtc_process_cogen.py", line 538, in loadCogen
+    gazindf=loadCurveGroup(client,area,cog["_source"]["gaz_in"],st,et)
+  File "gtc_process_cogen.py", line 445, in loadCurveGroup
+    pcidf=loadPCICurve(gazin["pcisource"],starttime-(24*3600*122*1000),endtime)
+  File "gtc_process_cogen.py", line 386, in loadPCICurve
+    res=es.search(index="scp",body=pciquery)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/utils.py", line 76, in _wrapped
+    return func(*args, params=params, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/client/__init__.py", line 660, in search
+    doc_type, '_search'), params=params, body=body)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/transport.py", line 318, in perform_request
+    status, headers_response, data = connection.perform_request(method, url, params, body, headers=headers, ignore=ignore, timeout=timeout)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 90, in perform_request
+    self._raise_error(response.status_code, raw_data)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/base.py", line 125, in _raise_error
+    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)
+elasticsearch.exceptions.RequestError: RequestError(400, 'parsing_exception', '[match] query does not support [type]')
+2019-09-20 17:01:17,881.881 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:22,885.885 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:27,889.889 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:32,892.892 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:37,897.897 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:42,902.902 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:47,908.908 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:52,910.910 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:01:57,916.916 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 569}
+2019-09-20 17:02:02,919.919 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:07,924.924 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:12,928.928 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:17,932.932 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:22,934.934 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:27,935.935 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:32,938.938 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:37,944.944 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:42,947.947 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:47,952.952 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:52,957.957 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:02:57,960.960 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:02,964.964 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:07,969.969 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:12,972.972 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:17,976.976 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:22,981.981 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:27,984.984 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:32,989.989 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:37,995.995 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:42,997.997 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:48,003.003 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:53,008.008 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:03:58,012.012 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:03,015.015 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:08,019.019 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:13,023.023 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:18,025.025 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:23,027.027 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:28,030.030 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:33,034.034 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:38,038.038 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:43,044.044 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:48,047.047 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:53,053.053 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:04:58,058.058 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:03,063.063 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:08,064.064 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:13,066.066 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:18,066.066 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:23,067.067 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:28,068.068 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:33,071.071 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:38,075.075 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:43,081.081 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:48,086.086 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:53,088.088 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:05:58,094.094 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:03,100.100 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:08,101.101 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:13,105.105 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:18,109.109 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:23,113.113 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:28,117.117 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:33,123.123 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:38,125.125 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:43,129.129 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:48,130.130 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:53,132.132 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:06:58,133.133 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:07:03,137.137 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:07:08,138.138 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:07:13,141.141 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:08:32,787.787 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 17:08:32,787.787 INFO gtc_process_cogen - <module>: Starting: GTC_PROCESS_COGEN
+2019-09-20 17:08:32,787.787 INFO gtc_process_cogen - <module>: Module:   0.0.1
+2019-09-20 17:08:32,787.787 INFO gtc_process_cogen - <module>: ==============================
+2019-09-20 17:08:32,787.787 INFO gtc_process_cogen - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 17:08:32,787.787 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 17:08:32,787.787 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 17:08:32,787.787 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 17:08:32,829.829 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 17:08:32,830.830 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 17:08:32,830.830 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_PROCESS_COGEN', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 17:08:32,871.871 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_PROCESS_COGEN', 'version': '1.1'}, len(body)=0
+2019-09-20 17:08:32,871.871 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_PROCESS_COGEN_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 17:08:32,872.872 INFO gtc_process_cogen - <module>: true
+2019-09-20 17:08:32,873.873 INFO gtc_process_cogen - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 17:08:37,891.891 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 543}
+2019-09-20 17:08:37,892.892 INFO gtc_process_cogen - doTheWork: Do the work ...
+2019-09-20 17:08:37,892.892 INFO gtc_process_cogen - getCogenNames: GET ALL COGENS
+2019-09-20 17:08:38,123.123 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/cogen_parameters/_search?size=1000 [status:200 request:0.231s]
+2019-09-20 17:08:38,123.123 INFO gtc_process_cogen - getCogenNames: * stib_brel added.
+2019-09-20 17:08:38,123.123 INFO gtc_process_cogen - getCogenNames: * nitto_genk added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * chirec_braine added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * huyzedepauw added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * stib_delta added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * solarec added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * dumoulin added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * lutosa added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * cinquentenaire1 added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * cinquentenaire2 added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * hospitalalost added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * cogart added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * boetendael added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * namur_hospital added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * esseghem1 added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * mont_godinne added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * dieterenkortenberg added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * galactic added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * noh added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * sportoase_beringen added.
+2019-09-20 17:08:38,124.124 INFO gtc_process_cogen - getCogenNames: * ganshoren added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * magnanerie added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * irissud added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * sportoase_braine added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * europe_consia added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * azklina added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * eupen added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * jetair added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * fondroy added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * hotel_bloom added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * forum_laeken added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * minac added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * esseghem2 added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - getCogenNames: * calypso added.
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - loadCogen: LOAD COGEN:stib_brel ST:1565536118.125717 EN:1568992118.125725
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - loadCogen: ----------------------------------------------------------------------------------------------------
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - loadCogen: Unable to find COGEN:stib_brel
+2019-09-20 17:08:38,125.125 INFO gtc_process_cogen - computePerformance: Compute Performance
+2019-09-20 17:08:38,126.126 ERROR gtc_process_cogen - <module>: Unable to load sites data.
+2019-09-20 17:08:38,126.126 ERROR gtc_process_cogen - <module>: 'NoneType' object does not support item assignment
+Traceback (most recent call last):
+  File "gtc_process_cogen.py", line 976, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_process_cogen.py", line 876, in doTheWork
+    cogendf=computePerformance(cogendf)
+  File "gtc_process_cogen.py", line 686, in computePerformance
+    onecogendf["Total Out kWh"]=0
+TypeError: 'NoneType' object does not support item assignment
+2019-09-20 17:08:43,127.127 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:08:48,130.130 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:08:53,134.134 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:08:58,137.137 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:03,141.141 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:08,143.143 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:13,147.147 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:18,152.152 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:23,153.153 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 570}
+2019-09-20 17:09:28,159.159 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:33,162.162 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:38,163.163 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:43,167.167 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:48,168.168 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:53,170.170 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:09:58,171.171 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:03,176.176 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:08,179.179 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:13,180.180 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:18,185.185 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:23,187.187 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:28,191.191 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:33,195.195 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:38,197.197 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:43,199.199 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:48,204.204 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:53,206.206 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:10:58,207.207 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:03,213.213 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:08,214.214 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:13,215.215 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:18,220.220 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:23,223.223 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:28,226.226 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:33,229.229 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:38,234.234 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:43,236.236 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:48,239.239 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:53,244.244 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:11:58,250.250 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 17:12:03,254.254 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}

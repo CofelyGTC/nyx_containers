@@ -48,6 +48,12 @@ Modules
 .. automodule:: biac_import_maximo
     :members:
 
+.. automodule:: biac_availabilities
+    :members:
+
+.. automodule:: biac_month_availability
+    :members:
+
 
 .. toctree::
    :maxdepth: 2

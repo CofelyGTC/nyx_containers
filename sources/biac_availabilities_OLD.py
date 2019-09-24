@@ -21,7 +21,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.18"
+VERSION="1.0.11"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
 INDEX_PATTERN = "biac_availability"
@@ -99,7 +99,7 @@ def messageReceived(destination,message,headers):
     f.close()
 
     file = 'dataFile.xlsm'
-    """ ef = pd.ExcelFile(file)
+    ef = pd.ExcelFile(file)
     dfs = []
     for sheet in ef.sheet_names:
         # print(sheet)
@@ -109,68 +109,27 @@ def messageReceived(destination,message,headers):
 
     dfdef = dfs[0]
 
-    dfdata = dfs[1] """
-
-    badeq = [
-    'gtx_ana',
-    'gtx_aws',
-    'gtx_eac',
-    'gtx_eds',
-    'gtx_ema',
-    'gtx_eq',
-    'gtx_etd',
-    'gtx_kro',
-    'gtx_md',
-    'gtx_opt',
-    'gtx_rx',
-    'gtx_samd',
-    'gtx_td',
-    'gtx_trs'
-    ]
-
-
-    excel = pd.ExcelFile(file)
-
-    try:
-        dfdef = pd.read_excel(file, sheet_name='REPDEF')
-    except:
-        print('unable to read REPDEF sheet')
-        
-    try:
-        dfdata = pd.read_excel(file, sheet_name='REPORT', index_col=5, header=7)
-    except:
-        print('unable to read REPORT sheet')
-
+    dfdata = dfs[1]
+    dfdata = dfdata[6:]
+    dfdata.columns = dfdata.iloc[0]
+    #
     newcolumns = []
     for col in dfdata.columns:
-        if str(col) != "nan" and str(col) != "NaT" and str(col) != "EQT" and \
-        str(col) != "OBW" and str(col) != "KPI" and "AVERAGE" not in str(col) and \
-        "Unnamed" not in str(col):
+        if str(col) != "nan" and str(col) != "NaT" and str(col) != "EQT" and str(col) != "OBW" and str(col) != "KPI" and "AVERAGE" not in str(col):
             newcolumns.append(col)
 
 
-    dfdata    = dfdata[newcolumns]
-    serie_obj  = dfdata.loc['OBJ'].copy()
-    dfdata.drop(index='OBJ', inplace=True)
-
-    dfdata.dropna(axis=0, how='all', inplace=True)
-
-    if dfdata.index[0] != 1:
-        print('we expect the file to start at 1 day/week of year -> we drop the first line')
-        dfdata.drop(index=dfdata.index[0], inplace=True)
+    print(newcolumns)
 
 
-    print(dfdata)
-
-    if lot == '7':
-        dfdata = dfdata.fillna(100)
+    dfdata = dfdata[newcolumns]
+    dfdata = dfdata[1:]
 
     dfdata.dropna(inplace=True)
-    #objectives = dfdata.iloc[0]
-
-
+    objectives = dfdata.iloc[0]
+    dfdata = dfdata[1:]
     res = dfdata.to_json(orient="values")
-    #print(objectives)
+    print(objectives)
     idrepport = dfdef.get_value(0, 'id_report')
     interval = dfdef.get_value(0, 'interval')
     startDate = dfdef.get_value(0, 'g_start_date')
@@ -182,22 +141,24 @@ def messageReceived(destination,message,headers):
     first_day_year = startDate.to_pydatetime().replace(
         month=1, day=1, hour=0, minute=0, second=0)
 
-
-    dfdata.reset_index(inplace=True)
-
-    print(dfdata)
+    first_day_year = stopDate.to_pydatetime().replace(
+        month=1, day=1, hour=0, minute=0, second=0)
 
     if interval == 'week':
         dfdata['dt'] = dfdata['EQ'].apply(
             lambda x: first_day_year + ((x-1)*timedelta(days=7)))
-    elif interval == 'day' and lot=='6':
-        dfdata['dt'] = dfdata['EQ'].apply(
+    elif interval == 'day' and lot==6:
+        dfdata = dfdata.reset_index(drop=True, inplace=False).reset_index()
+        dfdata['dt'] = dfdata['index'].apply(
             lambda x: startDate + ((x)*timedelta(days=1)))
     elif interval == 'day':
-        dfdata['dt'] = dfdata['EQ'].apply(
+        dfdata = dfdata.reset_index(drop=True, inplace=False).reset_index()
+        dfdata['dt'] = dfdata['index'].apply(
             lambda x: startDate + ((x-1)*timedelta(days=1)))
-    dfdata.set_index('dt', inplace=True)
 
+    dfdata.drop_duplicates(subset='dt', inplace=True, keep='first')
+
+    dfdata.set_index('dt', inplace=True)
     dfdata = dfdata.resample('1d').pad()
 
     dfdata.reset_index(inplace=True)
@@ -212,29 +173,27 @@ def messageReceived(destination,message,headers):
 
     regex = r"^gt[zb]_"
 
-    if lot != '6':
+    if lot != 6:
         regex = r"^gt[xh]"
 
-    if lot == '6':
+    if lot == 6:
         for index, col in dfdata.iteritems():
-            lastwas0 = 0
             cpt = 0
             if re.match(regex, index):
                 print(len(col))
                 for item in col.iteritems():
                     td = item[0]
                     if item[1] == 0:
-                        lastwas0 = 1
                         dfdata.at[td, index] = 100
                         if cpt != 0:
                             dfdata.at[td-timedelta(days=1), index] = 100
-                    if cpt < (len(col)- 1) and lastwas0 == 1 and item[1] != 0:
-                        dfdata.at[td, index] = 100
-                        #item[1] = 100
-                        lastwas0 = 0
+                        if cpt < (len(col)- 1):
+                            dfdata.at[td+timedelta(days=1), index] = 100
                     cpt +=1
 
+    print('HERE WE ARE HERE WE ARE HERE WE ARE HERE WE ARE')
     print(dfdata)
+    print('HERE WE ARE HERE WE ARE HERE WE ARE HERE WE ARE')
 
     bulkbody = ''
     bulkres = ''
@@ -252,7 +211,7 @@ def messageReceived(destination,message,headers):
         for i in row.index:
             if re.match(regex, i):
                 equipment = i.replace('%', '')
-                #objective = objectives.get_value(1, i)
+                objective = objectives.get_value(1, i)
                 # print('it s an equipment: '+i+'  value: '+str(row[i])+'   objective: '+str(objective))
                 weekOfYear = week_of_year(ts)
 
@@ -267,13 +226,7 @@ def messageReceived(destination,message,headers):
                 if interval == 'week':
                     rowInterval = int(row['eq'])
                 elif interval == 'day':
-                    rowInterval = int(row['eq'])
-
-
-                displayReport = 1
-
-                if lot == '7' and i in badeq:
-                    displayReport = 0
+                    rowInterval = int(row['index'])
 
                 newrec = {
                     "@timestamp": ts,
@@ -287,14 +240,13 @@ def messageReceived(destination,message,headers):
                     "cleanEquipement": i[4:],
                     "lot": lot,
                     "filename": filename,
-                    "objective": 98,
+                    "objective": objective,
                     "numInterval": rowInterval,
-                    "value": round(float(row[i]),2),
+                    "value": int(row[i]),
                     "year_month": row['year_month'],
                     "weekOfMonth": week_of_the_month,
                     "weekOfYear": weekOfYear,
-                    "lastWeek": 0,
-                    "displayReport": displayReport
+                    "lastWeek": 0
                 }
 
                 bulkbody += json.dumps(action)+"\r\n"
@@ -332,7 +284,6 @@ def messageReceived(destination,message,headers):
                         {"error": item["index"]["error"], "id": item["index"]["_id"]})
 
 
-    time.sleep(3)
     first_alarm_ts = int(dfdata['@timestamp'].min())
     last_alarm_ts = int(dfdata['@timestamp'].max())+10800000
     obj = {
@@ -352,13 +303,13 @@ def messageReceived(destination,message,headers):
     logger.info('sending message to /topic/BIAC_AVAILABILITY_IMPORTED')
     logger.info(obj)
 
+        
     if lot == '5':
         conn.send_message('/topic/BIAC_AVAILABILITY_LOT5_IMPORTED', json.dumps(obj))
     elif lot == '7':
         conn.send_message('/topic/BIAC_AVAILABILITY_LOT7_IMPORTED', json.dumps(obj))
     else:
         conn.send_message('/topic/BIAC_AVAILABILITY_IMPORTED', json.dumps(obj))
-
 
 
 

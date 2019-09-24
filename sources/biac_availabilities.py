@@ -1,3 +1,38 @@
+"""
+BIAC IMPORT AVAILABILITIES
+====================================
+Reads Honeywell Availabilities Excels files sended by Honeywell by mails to "bacavailabilities@cofelygtc.com", 
+transfered to AQMC by BiacMails module, sorted by a NodeRed flow treated and stored into an ElasticSearch collection
+
+Sends:
+-------------------------------------
+
+* /topic/BIAC_AVAILABILITY_IMPORTED
+* /topic/BIAC_AVAILABILITY_LOT5_IMPORTED
+* /topic/BIAC_AVAILABILITY_LOT7_IMPORTED
+
+Listens to:
+-------------------------------------
+
+* /queue/BIAC_FILE_6_BoardingBridge
+* /queue/BIAC_FILE_6_PCA
+* /queue/BIAC_FILE_6_400HZ
+* /queue/BIAC_FILE_5_tri
+* /queue/BIAC_FILE_7_screening
+
+Collections:
+-------------------------------------
+
+* **biac_availability-yyyy.mm** (Raw Data)
+* **biac_month_availability-yyyy** (Computed Data for Current Month / Modified when a new file append)
+
+VERSION HISTORY
+-------------------------------------
+
+* Feb 2019 1.0.1 **PDB** First Version
+* Jun 2019 1.0.18 **PDB** Add Lot7 importation
+"""
+
 import json
 import time
 import uuid
@@ -21,7 +56,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.11"
+VERSION="1.0.18"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
 INDEX_PATTERN = "biac_availability"
@@ -45,6 +80,11 @@ def log_message(message):
 
 def week_of_month(dt):
     """ Returns the week of the month for the specified date.
+
+    Parameters
+    ----------
+    dt
+        Date on datetime format
     """
 
     first_day = dt.replace(day=1)
@@ -56,6 +96,13 @@ def week_of_month(dt):
 
 
 def week_of_year(ts):
+    """ Returns the week of the year for the specified date.
+
+    Parameters
+    ----------
+    ts
+        Unix timestamp
+    """
     #print('Timestamp:' + str(ts))
     ts = int(ts) / 1000
     dt = datetime.utcfromtimestamp(ts)
@@ -64,6 +111,13 @@ def week_of_year(ts):
 
 
 def getTimestamp(timeD):
+    """ Returns the Unix timestamp of a datetime
+
+    Parameters
+    ----------
+    dt
+        Date on datetime format
+    """
     dtt = timeD.timetuple()
     ts = int(time.mktime(dtt))
     return ts
@@ -72,6 +126,9 @@ def getTimestamp(timeD):
 
 ################################################################################
 def messageReceived(destination,message,headers):
+    """
+    Main function that reads the Excel file.         
+    """
     global es
     records=0
     starttime = time.time()
@@ -99,7 +156,7 @@ def messageReceived(destination,message,headers):
     f.close()
 
     file = 'dataFile.xlsm'
-    ef = pd.ExcelFile(file)
+    """ ef = pd.ExcelFile(file)
     dfs = []
     for sheet in ef.sheet_names:
         # print(sheet)
@@ -109,27 +166,70 @@ def messageReceived(destination,message,headers):
 
     dfdef = dfs[0]
 
-    dfdata = dfs[1]
-    dfdata = dfdata[6:]
-    dfdata.columns = dfdata.iloc[0]
-    #
+    dfdata = dfs[1] """
+
+
+
+    badeq = [
+    'gtx_ana',
+    'gtx_aws',
+    'gtx_eac',
+    'gtx_eds',
+    'gtx_ema',
+    'gtx_eq',
+    'gtx_etd',
+    'gtx_kro',
+    'gtx_md',
+    'gtx_opt',
+    'gtx_rx',
+    'gtx_samd',
+    'gtx_td',
+    'gtx_trs'
+    ]
+
+
+    excel = pd.ExcelFile(file)
+
+    try:
+        dfdef = pd.read_excel(file, sheet_name='REPDEF')
+    except:
+        print('unable to read REPDEF sheet')
+        
+    try:
+        dfdata = pd.read_excel(file, sheet_name='REPORT', index_col=5, header=7)
+    except:
+        print('unable to read REPORT sheet')
+
     newcolumns = []
     for col in dfdata.columns:
-        if str(col) != "nan" and str(col) != "NaT" and str(col) != "EQT" and str(col) != "OBW" and str(col) != "KPI" and "AVERAGE" not in str(col):
+        if str(col) != "nan" and str(col) != "NaT" and str(col) != "EQT" and \
+        str(col) != "OBW" and str(col) != "KPI" and "AVERAGE" not in str(col) and \
+        "Unnamed" not in str(col):
             newcolumns.append(col)
 
 
-    print(newcolumns)
+    dfdata    = dfdata[newcolumns]
+    serie_obj  = dfdata.loc['OBJ'].copy()
+    dfdata.drop(index='OBJ', inplace=True)
+
+    dfdata.dropna(axis=0, how='all', inplace=True)
+
+    if dfdata.index[0] != 1:
+        print('we expect the file to start at 1 day/week of year -> we drop the first line')
+        dfdata.drop(index=dfdata.index[0], inplace=True)
 
 
-    dfdata = dfdata[newcolumns]
-    dfdata = dfdata[1:]
+    print(dfdata)
+
+    if lot == '7':
+        dfdata = dfdata.fillna(100)
 
     dfdata.dropna(inplace=True)
-    objectives = dfdata.iloc[0]
-    dfdata = dfdata[1:]
+    #objectives = dfdata.iloc[0]
+
+
     res = dfdata.to_json(orient="values")
-    print(objectives)
+    #print(objectives)
     idrepport = dfdef.get_value(0, 'id_report')
     interval = dfdef.get_value(0, 'interval')
     startDate = dfdef.get_value(0, 'g_start_date')
@@ -141,24 +241,22 @@ def messageReceived(destination,message,headers):
     first_day_year = startDate.to_pydatetime().replace(
         month=1, day=1, hour=0, minute=0, second=0)
 
-    first_day_year = stopDate.to_pydatetime().replace(
-        month=1, day=1, hour=0, minute=0, second=0)
+
+    dfdata.reset_index(inplace=True)
+
+    print(dfdata)
 
     if interval == 'week':
         dfdata['dt'] = dfdata['EQ'].apply(
             lambda x: first_day_year + ((x-1)*timedelta(days=7)))
-    elif interval == 'day' and lot==6:
-        dfdata = dfdata.reset_index(drop=True, inplace=False).reset_index()
-        dfdata['dt'] = dfdata['index'].apply(
+    elif interval == 'day' and lot=='6':
+        dfdata['dt'] = dfdata['EQ'].apply(
             lambda x: startDate + ((x)*timedelta(days=1)))
     elif interval == 'day':
-        dfdata = dfdata.reset_index(drop=True, inplace=False).reset_index()
-        dfdata['dt'] = dfdata['index'].apply(
+        dfdata['dt'] = dfdata['EQ'].apply(
             lambda x: startDate + ((x-1)*timedelta(days=1)))
-
-    dfdata.drop_duplicates(subset='dt', inplace=True, keep='first')
-
     dfdata.set_index('dt', inplace=True)
+
     dfdata = dfdata.resample('1d').pad()
 
     dfdata.reset_index(inplace=True)
@@ -173,27 +271,29 @@ def messageReceived(destination,message,headers):
 
     regex = r"^gt[zb]_"
 
-    if lot != 6:
+    if lot != '6':
         regex = r"^gt[xh]"
 
-    if lot == 6:
+    if lot == '6':
         for index, col in dfdata.iteritems():
+            lastwas0 = 0
             cpt = 0
             if re.match(regex, index):
                 print(len(col))
                 for item in col.iteritems():
                     td = item[0]
                     if item[1] == 0:
+                        lastwas0 = 1
                         dfdata.at[td, index] = 100
                         if cpt != 0:
                             dfdata.at[td-timedelta(days=1), index] = 100
-                        if cpt < (len(col)- 1):
-                            dfdata.at[td+timedelta(days=1), index] = 100
+                    if cpt < (len(col)- 1) and lastwas0 == 1 and item[1] != 0:
+                        dfdata.at[td, index] = 100
+                        #item[1] = 100
+                        lastwas0 = 0
                     cpt +=1
 
-    print('HERE WE ARE HERE WE ARE HERE WE ARE HERE WE ARE')
     print(dfdata)
-    print('HERE WE ARE HERE WE ARE HERE WE ARE HERE WE ARE')
 
     bulkbody = ''
     bulkres = ''
@@ -211,7 +311,7 @@ def messageReceived(destination,message,headers):
         for i in row.index:
             if re.match(regex, i):
                 equipment = i.replace('%', '')
-                objective = objectives.get_value(1, i)
+                #objective = objectives.get_value(1, i)
                 # print('it s an equipment: '+i+'  value: '+str(row[i])+'   objective: '+str(objective))
                 weekOfYear = week_of_year(ts)
 
@@ -226,7 +326,13 @@ def messageReceived(destination,message,headers):
                 if interval == 'week':
                     rowInterval = int(row['eq'])
                 elif interval == 'day':
-                    rowInterval = int(row['index'])
+                    rowInterval = int(row['eq'])
+
+
+                displayReport = 1
+
+                if lot == '7' and i in badeq:
+                    displayReport = 0
 
                 newrec = {
                     "@timestamp": ts,
@@ -240,13 +346,14 @@ def messageReceived(destination,message,headers):
                     "cleanEquipement": i[4:],
                     "lot": lot,
                     "filename": filename,
-                    "objective": objective,
+                    "objective": 98,
                     "numInterval": rowInterval,
-                    "value": int(row[i]),
+                    "value": round(float(row[i]),2),
                     "year_month": row['year_month'],
                     "weekOfMonth": week_of_the_month,
                     "weekOfYear": weekOfYear,
-                    "lastWeek": 0
+                    "lastWeek": 0,
+                    "displayReport": displayReport
                 }
 
                 bulkbody += json.dumps(action)+"\r\n"
@@ -284,6 +391,7 @@ def messageReceived(destination,message,headers):
                         {"error": item["index"]["error"], "id": item["index"]["_id"]})
 
 
+    time.sleep(3)
     first_alarm_ts = int(dfdata['@timestamp'].min())
     last_alarm_ts = int(dfdata['@timestamp'].max())+10800000
     obj = {
@@ -303,7 +411,6 @@ def messageReceived(destination,message,headers):
     logger.info('sending message to /topic/BIAC_AVAILABILITY_IMPORTED')
     logger.info(obj)
 
-        
     if lot == '5':
         conn.send_message('/topic/BIAC_AVAILABILITY_LOT5_IMPORTED', json.dumps(obj))
     elif lot == '7':
@@ -313,56 +420,59 @@ def messageReceived(destination,message,headers):
 
 
 
+
     logger.info("<== "*10)
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
-logger.info(server)
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
-
-
 if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
+    logger.info(server)
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    #conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
+    connectionparameters={"conn":conn}
+
+    #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
+
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)

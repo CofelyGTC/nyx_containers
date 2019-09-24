@@ -397,7 +397,7 @@ def messageReceived(destination,message,headers):
             dfdata["Month"]=dfdata["Month"].apply(reorderMonth)
             dfdata["key"]=dfdata.apply(computeReport,axis=1)
 
-            regex = r"Lot[0-3]"
+            regex = r"Lot[0-4]"
             
             matches = re.finditer(regex, orgfile, re.MULTILINE)
             lot="NA"
