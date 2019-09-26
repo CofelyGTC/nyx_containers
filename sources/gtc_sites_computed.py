@@ -13,6 +13,7 @@ VERSION HISTORY
 * 04 Sep 2019 0.0.3 **PDE** Adding **VME**'s functions
 * 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
+* 26 Sep 2019 0.0.17 **VME** totally change of daily object (daily_cogen_lutosa)  
 
 """  
 import re
@@ -51,7 +52,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.16"
+VERSION = "0.0.17"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -554,10 +555,7 @@ def retrieve_raw_data(day):
 
 
 def save_tags_to_computed(es, obj):
-    list_of_tag = ['in_biogaz_thiopaq', 'in_gaznat_cogen', 
-               'in_gaznat_cogen_kWh', 'in_biogaz_cogen', 'in_biogaz_chaudiere', 'in_biogaz_cogen_kWh', 
-               'in_total_cogen_kWh', 'out_elec_kWh', 
-               'out_moteur_kWh', 'out_total_kWh']
+    list_of_tag = ['entry_biogas_cogen_MWh', 'entry_gasnat_cogen_MWh']
 
 
     bulkbody = ''
@@ -586,21 +584,21 @@ def save_tags_to_computed(es, obj):
         bulkbody+=json.dumps(new_obj, cls=DateTimeEncoder)+"\r\n"
 
     diff_list = [
-        {
-            'name': 'INminusOUT',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_total_kWh',
-        },
-        {
-            'name': 'INminusHEAT',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_moteur_kWh',
-        },
-        {
-            'name': 'INminusELEC',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_elec_kWh',
-        },
+        # {
+        #     'name': 'INminusOUT',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_total_kWh',
+        # },
+        # {
+        #     'name': 'INminusHEAT',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_moteur_kWh',
+        # },
+        # {
+        #     'name': 'INminusELEC',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_elec_kWh',
+        # },
     ]
 
     for i in diff_list:
@@ -667,10 +665,11 @@ def doTheWork(start):
         obj_to_es['site'] = 'LUTOSA'
         es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
 
-        # save_tags_to_computed(es, obj_to_es)
+        save_tags_to_computed(es, obj_to_es)
     except Exception as er:
         logger.error('Error During creating specifics data')
-        logger.error(er)
+        error = traceback.format_exc()
+        logger.error(error)
 
     try:
         # df = retrieve_raw_data(start)
@@ -699,7 +698,8 @@ def doTheWork(start):
         print("finished")
     except Exception as er:
         logger.error('Unable to compute data for ' + str(start))
-        logger.error(er)
+        error = traceback.format_exc()
+        logger.error(error)
 
 
 def messageReceived(destination,message,headers):
