@@ -49,7 +49,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -1057,7 +1057,7 @@ if __name__ == '__main__':
                     start = datetime.now()
                     start = start.replace(hour=0,minute=0,second=0, microsecond=0)
                     nextload=datetime.now()+timedelta(seconds=SECONDSBETWEENCHECKS)
-                    #doTheWork(start)
+                    doTheWork(start)
                 except Exception as e2:
                     logger.error("Unable to load sites data.")
                     logger.error(e2,exc_info=True)
