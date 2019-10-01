@@ -49,7 +49,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_OPTIBOX_COMPUTED"
-VERSION = "0.0.1"
+VERSION = "0.0.4"
 QUEUE   = ["GTC_OPTIBOX_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -112,7 +112,7 @@ def getYear(dateStr):
     return year
 
 def getIndex(dateStr):
-    _index = 'opt_sites_computed-'+dateStr[:-3]
+    _index = 'opt_computed_optibox-'+dateStr[:-3]
     return _index
 
 def getCustomMin(minrow):
@@ -128,6 +128,10 @@ def removeStr(x):
         response = int(x)
         
     return response
+
+def buildDate(ts):
+    newts = datetime(ts.year, ts.month, ts.day, 0,0,0,0)
+    return newts
 
         
 def doTheWork(start):
@@ -162,19 +166,25 @@ def doTheWork(start):
 
         df_grouped = pd.concat( [df1, df2],axis=0,ignore_index=True)
 
+        logger.info(df_grouped)
+
         df_grouped['value_day'] = df_grouped['value_max'] - df_grouped['value_min']
         df_grouped['conso_day'] = df_grouped['value_avg'] * 24
         df_grouped['availability']= df_grouped['value_avg'] * 1440
         df_grouped['availability_perc'] = df_grouped['value_avg'] * 100
         df_grouped['value_day_sec'] = df_grouped['value_max'] - df_grouped['value_min_sec']
+        df_grouped['@timestamp'] = df_grouped['@timestamp'].apply(lambda x: buildDate(x))
+        df_grouped['@timestamp'] = pd.to_datetime(df_grouped['@timestamp'], \
+                                               unit='ms', utc=True).dt.tz_convert(containertimezone)
         df_grouped['date'] = df_grouped['@timestamp'].apply(lambda x: getDate(x))
         df_grouped['month'] = df_grouped['date'].apply(lambda x: getMonth(x))
         df_grouped['year'] = df_grouped['date'].apply(lambda x: getYear(x))
         df_grouped['pinStr'] = df_grouped['pin'].apply(lambda x: 'Cpt'+str(x))
         df_grouped['client_area_name'] = df_grouped['client'] + '-' + df_grouped['area'] + '-' + df_grouped['pinStr']
-        df_grouped['_id'] = df_grouped['client_area_name'] +'-'+ df_grouped['date']
+        df_grouped['_id'] = df_grouped['client_area_name']+ '-' +df_grouped['id'] +'-'+ df_grouped['date']
         df_grouped['_index'] = df_grouped['date'].apply(lambda x : getIndex(x))
 
+        logger.info(df_grouped)
 
         res = es_helper.dataframe_to_elastic(es, df_grouped)
 
@@ -197,7 +207,13 @@ def messageReceived(destination,message,headers):
     stop = datetime.fromtimestamp(int(msg['stop']))
 
     while start <= stop:
-        doTheWork(start)
+        try:    
+            doTheWork(start)
+        except Exception as er:
+            logger.error('Unable to compute data for ' + str(start))
+            error = traceback.format_exc()
+            logger.error(error)
+
         start = start + timedelta(1)
 
 
@@ -270,7 +286,7 @@ if __name__ == '__main__':
                     start = datetime.now()
                     start = start.replace(hour=0,minute=0,second=0, microsecond=0)
                     nextload=datetime.now()+timedelta(seconds=SECONDSBETWEENCHECKS)
-                    #doTheWork(start-timedelta(1))
+                    doTheWork(start-timedelta(1))
                     doTheWork(start)
                 except Exception as e2:
                     logger.error("Unable to load sites data.")

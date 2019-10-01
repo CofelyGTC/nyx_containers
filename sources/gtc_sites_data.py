@@ -140,6 +140,18 @@ def log_message(message):
     logger.info(message_to_send)
     conn.send_message("/queue/NYX_LOG",json.dumps(message_to_send))
 
+def getTimestamp(timeD):
+    """ Returns the Unix timestamp of a datetime
+
+    Parameters
+    ----------
+    dt
+        Date on datetime format
+    """
+    dtt = timeD.timetuple()
+    ts = int(time.mktime(dtt))
+    return ts
+
 
 ################################################################################
 def messageReceived(destination,message,headers):
@@ -331,19 +343,20 @@ def handleOneMessage(name,body):
               dayvaluecache[row[0]]= {"key": key2, "value": 0}
 
 
-          first_alarm_ts = getTimestamp(localdate)
-          obj = {
-                  'start_ts': int(first_alarm_ts),
-                  'area_name': area_name 
-              }
-          logger.info(obj)     
-          conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
+            first_alarm_ts = getTimestamp(localdate)
+            obj = {
+                    'start_ts': int(first_alarm_ts),
+                    'area_name': area_name 
+                }
+            logger.info(obj)     
+            conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
         
 
         #logger.info("Final %s=" %(bulkbody))
         logger.info("Bulk ready.")
         if(bulkbody != ""):
-            es.bulk(body=bulkbody)
+            res = es.bulk(body=bulkbody)
+            logger.info(res)
         else:
             logger.error("No BODY !!!")
         logger.info("Bulk gone.")

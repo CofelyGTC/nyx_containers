@@ -52,7 +52,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.17"
+VERSION = "0.0.18"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
