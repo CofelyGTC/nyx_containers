@@ -60,6 +60,6 @@ WORKDIR /opt/sources
 #CMD ["python", "gtc_sites_computed.py"]
 CMD ["python", "biac_import_kpi102_lot4.py"]
 #CMD ["python", "gtc_import_cogen_mails.py"]
-#CMD ["python", "gtc_process_cogen.py"]
+CMD ["python", "gtc_process_cogen.py"]
 #CMD ["python", "gtc_load_scp.py"]
-# CMD ["python", "gtc_optibox_computed.py"]
+#CMD ["python", "gtc_optibox_computed.py"]

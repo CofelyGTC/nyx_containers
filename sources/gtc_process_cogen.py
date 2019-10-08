@@ -49,7 +49,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.5"
+VERSION = "0.0.7"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -487,7 +487,7 @@ def loadCurveGroup(client,area,group,starttime,endtime):
     for i in range(1,len(gazinlabels)):
         gazindf2=pd.DataFrame(data=gazincurves[i],columns=["date",gazinlabels[i]])
         gazindf2.index=gazindf2["date"]
-        del gazindf2["date"];
+        del gazindf2["date"]
         gazindf= pd.concat([gazindf,gazindf2], join='inner', axis=1)
 
     if(len(pciinlabels)>0):
@@ -929,6 +929,41 @@ def computeLastLifeSign():
     res2=es.bulk(messagebody)
     #logger.info(res2)
 
+def calcCogen():
+    global es
+    logger.info("Calc Cogen ...")
+    end = datetime.now()
+    start = end - timedelta(days=30)
+
+    cogens = es_helper.elastic_to_dataframe(es, 'cogen_computed', query='*', start=start, end=end)
+    cogengrouped = cogens.groupby(['Contract', 'client', 'name']).agg({'@timestamp': 'max', 'Hours_Index': 'max', 'Starts_Index': 'max'}).reset_index()
+    cogengrouped = cogengrouped.set_index('name')
+    params = es.search("cogen_parameters", size='10000')
+
+    for cog in params['hits']['hits']:
+        name = cog['_source']['name']
+        if name in cogengrouped.index:
+            cogstats = cogengrouped.loc[name, :]
+            cog['_source']['Hours'] = cogstats['Hours_Index']
+            cog['_source']['Starts'] = cogstats['Starts_Index']
+            cog['_source']['LastUpdate'] = int(time.time()*1000)
+            cog['_source']['modifyBy'] = 'GTC'
+
+    bulkbody = ''
+    action={}
+    for cog in params['hits']['hits']:
+        action["index"]={"_index":cog['_index'],"_type":"doc","_id":cog['_id']}
+        print(action)
+        newrec = cog['_source']
+        print(newrec)
+        bulkbody+=json.dumps(action)+"\r\n"
+        bulkbody+=json.dumps(newrec)+"\r\n"
+
+    res = es.bulk(body=bulkbody)
+    logger.info(res)
+
+
+
 
 
 def doTheWork(start):
@@ -1048,6 +1083,7 @@ if __name__ == '__main__':
                 try:
                     keepalivenextload=datetime.now()+timedelta(seconds=SECONDSBETWEENKEEPALIVE)
                     computeLastLifeSign()
+                    calcCogen()
                 except Exception as e2:
                     logger.error("Unable to check keepalive.")
                     logger.error(e2,exc_info=True)
