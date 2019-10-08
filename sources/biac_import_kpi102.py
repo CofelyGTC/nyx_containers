@@ -5,8 +5,6 @@ BIAC KPI 102
 Sends:
 -------------------------------------
 
-* /topic/BIAC_KPI102_IMPORTED
-
 Listens to:
 -------------------------------------
 
@@ -24,6 +22,7 @@ VERSION HISTORY
 
 * 29 May 2019 0.0.3 **AMA** Heat map added
 * 04 Jun 2019 0.0.4 **AMA** Synchronized with VME
+* 08 Oct 2019 0.0.5 **VME** Adding lot 3. Big code refactoring for handling multi-lot
 """  
 import re
 import sys
@@ -48,8 +47,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
+from elastic_helper import es_helper 
 from amqstompclient import amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
@@ -58,7 +56,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -83,66 +81,63 @@ def messageReceived(destination,message,headers):
         
 #################################################
 
-def computeStats102():
+def compute_kib_heatmap(df_stats):
+    global es
     """
     Compute KPI 102 stats. It first deletes the collection biac_kib_kpi102 and then recreates it.
     """
 
     try:
-        start,end=get_month_day_range(datetime.now())
+        df_stats['month'] = pd.to_datetime(df_stats['_timestamp'], unit='ms').dt.strftime('%Y-%m')
 
-        logger.info(">>> Compute Stats 102")
+        df_index = pd.date_range(start=min(df_stats['month']), end=max(df_stats['month']), freq='MS')   
+        df_index=df_index.strftime('%Y-%m')
+
         es_index="biac_kib_kpi102"
 
         es.indices.delete(index=es_index, ignore=[400, 404]) 
-        
-        query={
-            "size":1000,
-            "query": {
-                "bool": {
-                "must": [
-                    {
-                    "match_all": {}
-                    },
-                    {
-                    "range": {
-                        "@timestamp": {
-                        "gte": start.timestamp()*1000,
-                        "lte": end.timestamp()*1000,
-                        "format": "epoch_millis"
-                        }
-                    }
-                    }
-                ]
-                }
+
+        lots = [
+            {
+                'lot': 2, 
+                'rondes': [_ for _ in range(1,17)]
+            }, 
+            {
+                'lot': 3, 
+                'rondes': [_ for _ in range(1,7)]
             }
-        }
+        ]
 
-        rondes=['1','2']
-        rondestats={"1":{"done":0},"2":{"done":0}}    
-
-        res=es.search(body=query,index="biac_kpi102*")
-        logger.info("========+>"*10)
-
-        dones=[0 for i in range(0,16)]
-
-        if "hits" in res and "hits" in res["hits"]:
-            for rec in res["hits"]["hits"]:
-                if "ronde_number" in rec["_source"]:
-                    print(rec["_source"]["ronde_number"])
-                    dones[int(rec["_source"]["ronde_number"])-1]=1
 
         bulkbody=[]
 
-        for i in range(0,16):
-            action = {}
-            action["index"] = {"_index": es_index,"_type": "doc"}
-            bulkbody.append(json.dumps(action))  
-            obj={"@timestamp":datetime.now().date().isoformat(),"done":dones[i],"ronde":i+1,"rec_type":"heatmap"}
-            bulkbody.append(json.dumps(obj))  
-
-        bulkbody
-                        
+        for i in df_index:
+            for lot in lots:
+                for rond in lot['rondes']:
+                    if len(df_stats.loc[(df_stats['month']==i) & 
+                                        (df_stats['lot']==lot['lot']) & 
+                                        (df_stats['ronde_number']==str(rond))]) == 0:
+                        obj = {
+                            'rec_type': 'heatmap',
+                            'done': 0, 
+                            '@timestamp': i,
+                            'lot': lot['lot'],
+                            'ronde': rond,
+                        }
+                    else:
+                        obj = {
+                            'rec_type': 'heatmap',
+                            'done': 1, 
+                            '@timestamp': i,
+                            'lot': lot['lot'],
+                            'ronde': rond,
+                        }
+                    
+                    action = {}
+                    action["index"] = {"_index": es_index,"_type": "doc"}
+                    bulkbody.append(json.dumps(action))  
+                    bulkbody.append(json.dumps(obj))  
+                    
         res=es.bulk("\r\n".join(bulkbody))
     except:
         logger.error("Unable to compute stats.",exc_info=True)
@@ -168,6 +163,7 @@ def get_month_day_range(date):
 
 #################################################
 def loadKPI102():
+    global es
     try:
         starttime = time.time()
         logger.info(">>> LOADING KPI102")
@@ -202,80 +198,77 @@ def loadKPI102():
 
         df_all=pd.DataFrame()
         for i in form_list:
-            if re.findall("LOT 2 - Maandelijkse ronde N° [0-9]*$", i['name'].strip()):
-                logger.info('MATCH')
-                logger.info(i['name'])
+            if 'LOT 3 - Maandelijkse ronde N°' in i['name'] or 'LOT 2 - Maandelijkse ronde N°' in i['name']:
+                print(i['name'])
                 
+                
+
                 form_id = i['id']
                 start=(datetime.now()+timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
                 logger.info("Start %s" %(start))            
-                end=(datetime.now()-timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
+                
+                end = datetime(2019, 1, 1)
                 logger.info("End %s" %(end))
                 post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
 
                 r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
 
                 if r.status_code != 200:
-                    logger.error('something went wrong...')
-                    logger.error(r.status_code, r.reason)
-                    
+                    logger.info('something went wrong...')
+                    logger.info(r.status_code, r.reason)
+
+                logger.info(r.json())
+
                 ids=r.json()['data']["dataIds"]
-                
+
                 logger.info(ids)
                 payload={
-                    "data_ids": ids
+                "data_ids": ids
                 }
-
                 posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
                 headers = {'Content-type': 'application/json','Authorization':token}
 
                 r=requests.post(posturl,data=json.dumps(payload),headers=headers)
 
                 if r.status_code != 200:
-                    logger.error('something went wrong...')
-                    logger.error(r.status_code, r.reason)
+                    logger.info('something went wrong...')
+                    logger.info(r.status_code, r.reason)
 
                 logger.info("Handling Form. Content Size:"+str(len(r.content)))
                 if len(r.content) >0:
-                    file = open("./tmp/"+i['name']+".xlsx", "wb")
+
+                    file = open("./tmp/excel.xlsx", "wb")
                     file.write(r.content)
                     file.close()
-                
-                    df = pd.read_excel("./tmp/"+i['name']+".xlsx")
-                    
-                    logger.info(df)
-                    df_all=df_all.append(df)
+
+                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
+
 
         if len(df_all) > 0:
-            df_all['ronde_number'] = df_all['Ronde'].apply(lambda x: x.lower().replace('lot 2 - maandelijkse ronde n° ',''))
-            print(df_all.columns)
-            if len(df_all.columns)==4:
-                df_all.columns=['ronde', '_timestamp', 'record_number', 'ronde_number']
-            else:
-                df_all.columns=['ronde', '_timestamp','answer_date','record_number', 'ronde_number']
-            df_all
+            df_all['Datum/Date'].fillna(df_all['Datum / Date'], inplace=True)
+            df_all['Ronde'].fillna(df_all['Lot 3'], inplace=True)
+            del df_all['Datum / Date']
+            del df_all['Lot 3']
+            df_all['lot'] = 3
+            df_all.loc[df_all['Ronde'].str.contains('Lot 2'), 'lot'] = 2
+            df_all['ronde_number']=df_all['Ronde'].str.extract(r'N° ([0-9]*)')
 
-            df_all['_id'] = df_all['_timestamp'].astype(str) +'_'+ df_all['ronde_number']
+            df_all.columns=['answer_date', '_timestamp', 'record_number', 'ronde', 'lot', 'ronde_number']
+            df_all['_id'] = df_all['_timestamp'].astype(str) +'_lot'+ df_all['lot'].astype(str) +'_'+ df_all['ronde_number']
             df_all['_index'] = 'biac_kpi102'
 
+            es.indices.delete(index='biac_kpi102', ignore=[400, 404]) 
+            es_helper.dataframe_to_elastic(es, df_all)
 
-            pte.pandas_to_elastic(es, df_all)
 
-            obj={
-                'start': min(df_all['_timestamp']),
-                'end': max(df_all['_timestamp']),
-            }
-
-            conn.send_message('/topic/BIAC_KPI102_IMPORTED', str(obj))
-
-            time.sleep(3)
-            compute_kpi102_monthly(obj['start'], obj['end'])
+            compute_kpi102_monthly(df_all)
+            compute_kib_heatmap(df_all)
 
             endtime = time.time()
             log_message("Import of KPI102 from Kizeo finished. Duration: %d Records: %d." % (endtime-starttime, df_all.shape[0]))       
 
 
-    
+
 
 
     except Exception as e:
@@ -288,32 +281,26 @@ def loadKPI102():
 
 
 
-def compute_kpi102_monthly(start, end):
+def compute_kpi102_monthly(df_kpi102):
+    global es
     starttime = time.time()
     
-    logger.info(start)
-    logger.info(end)
+    df_kpi102['month'] = pd.to_datetime(df_kpi102['_timestamp'], unit='ms').dt.strftime('%Y-%m')
+    df_kpi102=df_kpi102.groupby(['month', 'ronde_number', 'lot']).count()[['_timestamp']] \
+                                            .rename(columns={'_timestamp': 'count'}).reset_index()
 
+    df_kpi102=df_kpi102.groupby(['month', 'lot']).count().reset_index()[['month', 'lot', 'count']]
 
-    start = mkFirstOfMonth(start)
-    end = mkLastOfMonth(end)
-
-    logger.info(start)
-    logger.info(end)
-
-    df_kpi102 = etp.genericIntervalSearch(es, 'biac_kpi102', query='*', start=start, end=end)
-    
-    df_kpi102['month'] = pd.to_datetime(df_kpi102['@timestamp'], unit='ms').dt.strftime('%Y-%m')
-    df_kpi102=df_kpi102.groupby(['month', 'ronde_number']).count()[['@timestamp']].rename(columns={'@timestamp': 'count'}).reset_index()
-    df_kpi102=df_kpi102.groupby('month').count().reset_index()[['month', 'count']]
-    df_kpi102['percent'] = round((df_kpi102['count']/16)*100, 2)
+    df_kpi102.loc[df_kpi102['lot']==2, 'percent'] = round((df_kpi102['count']/16)*100, 2)
+    df_kpi102.loc[df_kpi102['lot']==3, 'percent'] = round((df_kpi102['count']/6 )*100, 2)
     df_kpi102['percent'] = df_kpi102['percent'].apply(lambda x: '{0:g}'.format(float(x)))
+
     df_kpi102['_timestamp'] = pd.to_datetime(df_kpi102['month'], format='%Y-%m')
     df_kpi102['_index'] = 'biac_month_kpi102'
-    df_kpi102['_id'] = df_kpi102['month']
-    
-    pte.pandas_to_elastic(es, df_kpi102)
+    df_kpi102['_id'] = df_kpi102['month']+'_lot'+df_kpi102['lot'].astype(str)
 
+    es.indices.delete(index='biac_month_kpi102', ignore=[400, 404]) 
+    es_helper.dataframe_to_elastic(es, df_kpi102)
 
     endtime = time.time()
     log_message("Compute monthly KPI102 (process biac_import_kpi102.py) finished. Duration: %d Records: %d." % (endtime-starttime, df_kpi102.shape[0]))   
@@ -423,8 +410,6 @@ if __name__ == '__main__':
                 try:
                     nextload=datetime.now()+timedelta(seconds=SECONDSBETWEENCHECKS)
                     loadKPI102()
-                    time.sleep(1)
-                    computeStats102()
                 except Exception as e2:
                     logger.error("Unable to load kizeo.")
                     logger.error(e2,exc_info=True)
