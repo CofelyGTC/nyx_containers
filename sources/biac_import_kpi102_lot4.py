@@ -22,8 +22,9 @@ VERSION HISTORY
 ===============
 
 * 09 Sep 2019 0.0.1 **VME** First version
-* 11 Sep 2019 0.0.2 **VME** Bug fixing to got untill the end of the month (for th heatmap, not for the gauge)
+* 11 Sep 2019 0.0.2 **VME** Bug fixing - to go untill the end of the month (for th heatmap, not for the gauge)
 * 18 Sep 2019 0.0.3 **VME** Change the way we request Kizeo. Using file export instead of the data endpoint
+* 07 Oct 2019 0.0.4 **VME** Bug fixing - excluding the "LOT 4 - HS Cabines ~ Wekelijkse Ronde A (Rondier) (test cindy) (recovered)" form 
 """  
 import re
 import sys
@@ -97,24 +98,23 @@ def messageReceived(destination,message,headers):
 
 def compute_kib_index(es, df_all):
     df_week = df_all.copy()
+
+
     df_week['monday'] = df_week.apply( \
             lambda row: datetime.date(row['@timestamp'] - timedelta(days=row['@timestamp'].weekday())) \
                                      , axis=1)
 
     df_week[['@timestamp', 'monday']]
 
-
     df_kib = df_week[['monday', 'ronde_letter']]
     df_kib.drop_duplicates(inplace=True)
     df_kib.set_index('monday', inplace=True)
-
 
     df_kib=df_kib.pivot(columns='ronde_letter', values='ronde_letter')
 
     df_kib=df_kib.reset_index().rename_axis(None, axis=1).set_index('monday')
 
     df_kib#.loc[~df_kib.isnull()] = 1
-
 
     df_kib.loc[~df_kib['A'].isnull(),'A']= 1
     df_kib.loc[~df_kib['B'].isnull(),'B']= 1
@@ -149,8 +149,7 @@ def compute_kib_index(es, df_all):
                 del obj['globalpercentage']
         
             _id = 'heatmap_'+letter+'_'+str(index)
-            _index = 'biac_kib_kpi102_lot4'
-            
+            _index = 'biac_kib_kpi102_lot4' 
             
             action = {}
             action["index"] = {"_index": _index, "_type": "doc", "_id": _id}
@@ -204,7 +203,7 @@ def loadKPI102():
         for i in form_list:
     
     
-            if 'LOT 4 - HS Cabines ~ Wekelijkse Ronde ' in i['name']:
+            if 'LOT 4 - HS Cabines ~ Wekelijkse Ronde ' in i['name'] and 'test' not in i['name']:
                 logger.info(i['name'])
                 form_id = i['id']
                 start=(datetime.now()+timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
