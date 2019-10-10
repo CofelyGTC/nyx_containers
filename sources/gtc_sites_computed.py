@@ -13,7 +13,7 @@ VERSION HISTORY
 * 04 Sep 2019 0.0.3 **PDE** Adding **VME**'s functions
 * 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
-* 26 Sep 2019 0.0.17 **VME** totally change of daily object (daily_cogen_lutosa)  
+* 26 Sep 2019 0.0.17 **VME** Change totally the daily object (daily_cogen_lutosa)  
 
 """  
 import re

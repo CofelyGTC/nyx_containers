@@ -23,6 +23,7 @@ VERSION HISTORY
 * 29 May 2019 0.0.3 **AMA** Heat map added
 * 04 Jun 2019 0.0.4 **AMA** Synchronized with VME
 * 08 Oct 2019 0.0.5 **VME** Adding lot 3. Big code refactoring for handling multi-lot
+* 09 Oct 2019 0.0.6 **VME** Default value if no data
 """  
 import re
 import sys
@@ -41,10 +42,11 @@ import os,logging
 import numpy as np
 import pandas as pd
 
-from functools import wraps
 
 from datetime import date
+from functools import wraps
 from datetime import datetime
+from itertools import product
 from datetime import timedelta
 
 from elastic_helper import es_helper 
@@ -56,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -286,6 +288,13 @@ def compute_kpi102_monthly(df_kpi102):
     starttime = time.time()
     
     df_kpi102['month'] = pd.to_datetime(df_kpi102['_timestamp'], unit='ms').dt.strftime('%Y-%m')
+
+    df_index = pd.date_range(start=min(df_kpi102['month']), end=max(df_kpi102['month']), freq='MS')   
+    df_index = df_index.strftime('%Y-%m')
+    df_empty = pd.DataFrame(df_index)
+    df_empty = pd.DataFrame(list(product(df_index, [2, 3])))
+    df_empty.columns = ['month', 'lot']
+
     df_kpi102=df_kpi102.groupby(['month', 'ronde_number', 'lot']).count()[['_timestamp']] \
                                             .rename(columns={'_timestamp': 'count'}).reset_index()
 
@@ -295,9 +304,14 @@ def compute_kpi102_monthly(df_kpi102):
     df_kpi102.loc[df_kpi102['lot']==3, 'percent'] = round((df_kpi102['count']/6 )*100, 2)
     df_kpi102['percent'] = df_kpi102['percent'].apply(lambda x: '{0:g}'.format(float(x)))
 
+
+    df_kpi102 = df_empty.merge(df_kpi102, how='left', left_on=['month', 'lot'], right_on=['month', 'lot'])
+    df_kpi102.fillna(0, inplace=True)
+
     df_kpi102['_timestamp'] = pd.to_datetime(df_kpi102['month'], format='%Y-%m')
     df_kpi102['_index'] = 'biac_month_kpi102'
     df_kpi102['_id'] = df_kpi102['month']+'_lot'+df_kpi102['lot'].astype(str)
+
 
     es.indices.delete(index='biac_month_kpi102', ignore=[400, 404]) 
     es_helper.dataframe_to_elastic(es, df_kpi102)
