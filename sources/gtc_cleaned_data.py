@@ -171,34 +171,39 @@ def messageReceived(destination,message,headers):
     stop = datetime.fromtimestamp(int(msg['stop']))
 
     while start < stop:
-        df=retrieve_raw_data(start)
-        print(start)
-        for datestr, df_date in df.groupby('date'):
-            tempdf = df_date[['name']]
-            tempdf[1] = df_date[['date']]
-            tempdf[2] = 2
-            tempdf[3] = df_date[['value']]
-            tempdf[4] = 0
-            tempdf = tempdf.reset_index(drop= True)
-            tempdf = tempdf.rename({'name': 0}, axis='columns')
-            datestr = datestr.replace('-','')
-            datestr = datestr.replace(':','')
-            datestr = datestr.replace(' ','_')
-            filename = 'LUTOSA_ExportNyxAWS_'+datestr+'.CSV'
-            try:    
-                cleanData(filename, tempdf)
-            except Exception as er:
-                logger.error('Cannot cleaned data for datetime : '+ datestr)
-                logger.error(er)
-            
+        
+        try:
+            df=retrieve_raw_data(start)
+            print(start)
+            for datestr, df_date in df.groupby('date'):
+                tempdf = df_date[['name']]
+                tempdf[1] = df_date[['date']]
+                tempdf[2] = 2
+                tempdf[3] = df_date[['value']]
+                tempdf[4] = 0
+                tempdf = tempdf.reset_index(drop= True)
+                tempdf = tempdf.rename({'name': 0}, axis='columns')
+                datestr = datestr.replace('-','')
+                datestr = datestr.replace(':','')
+                datestr = datestr.replace(' ','_')
+                filename = 'COGEN_NyxAWS_'+datestr+'.CSV'
+                try:    
+                    cleanData(filename, tempdf)
+                except Exception as er:
+                    logger.error('Cannot cleaned data for datetime : '+ datestr)
+                    logger.error(er)
+        except Exception as er:
+            logger.error('Cannot cleaned data for datetime : '+ str(start))
+            logger.error(er)
+
         start = start + timedelta(1)
     
 def retrieve_raw_data(day):
-    start_dt = datetime(day.year, day.month, day.day)
-    end_dt   = datetime(start_dt.year, start_dt.month, start_dt.day, 23, 59, 59)
+    start_dt = datetime(day.year, day.month, day.day, 14, 30, 0)
+    end_dt   = datetime(start_dt.year, start_dt.month, start_dt.day, 20, 59, 59)
 
     df_raw=es_helper.elastic_to_dataframe(es, index='opt_sites_data*', 
-                                           query='client: COGLTS', 
+                                           query='client: COGLTS AND area_name: *CH4*', 
                                            start=start_dt, 
                                            end=end_dt,
                                            size=1000000)
@@ -207,6 +212,8 @@ def retrieve_raw_data(day):
     df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
                                                unit='ms', utc=True).dt.tz_convert(containertimezone)
     df_raw=df_raw.sort_values('@timestamp') 
+
+    logger.info(df_raw)
     
     return df_raw
 
@@ -275,8 +282,9 @@ def condType3(var1, var2, var3):
     cond1 = var1 > 0
     cond2 = (var1-(var1 - 1)) < var3
     cond3 = var2 > 10
+    cond4 = var1 < 100
     
-    if cond1 and cond2 and cond3:
+    if cond1 and cond2 and cond3 and cond4:
         return var1
     else:
         return 0
@@ -307,8 +315,8 @@ def cleanData(filename, mes):
     df = mes
     
     dfindexed = df.set_index(0)
-    site = 'LUTOSA_ExportNyxAWS'
-    contract = 'COGLTS'
+    site = 'H5BANI_ExportNyxAWS'
+    contract = 'H5BANI'
 
     if contract == 'COGLTS':
         dfindexed = df.set_index(0)
@@ -382,26 +390,29 @@ def cleanData(filename, mes):
               {0: 'LUTOSA_Cond_Fct_5_Cogen',1:datefile, 2:param1, 3:fctCogenCond5, 4:param2},
               {0: 'LUTOSA_Cond_Fct_Global_Cogen',1:datefile, 2:param1, 3:fctCogenCondGlobal, 4:param2}]
         dffinal = dffinal.append(data,ignore_index=True,sort=True)
-        dffinal = dffinal[[0,1,3]]
-        dffinal.columns = ['name', 'date', 'value']
-        #site = 'LUTOSA_ExportNyxAWS'
-        #contract = 'COGLTS'
+    else:
+        dffinal = dfindexed.reset_index()    
+        
+    dffinal = dffinal[[0,1,3]]
+    dffinal.columns = ['name', 'date', 'value']
+    #site = 'LUTOSA_ExportNyxAWS'
+    #contract = 'COGLTS'
 
 
-        dffinal['src'] = 'gtc'
-        dffinal['area_name'] = site +'_'+ dffinal['name']
-        dffinal['client_area_name'] = contract + '_' + dffinal['area_name']
-        dffinal['client'] = contract
-        dffinal['area'] = site
-        dffinal["date"]=dffinal['date'].apply(convertToDate)
-        #dffinal["date"]=dffinal['date'].apply(lambda x: utc_to_local(x))
-        dffinal['@timestamp'] = dffinal['date'].apply(lambda x: getTimestamp(x)*1000)
-        dffinal['date'] = dffinal['date'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:00'))
-        dffinal['_index'] = dffinal['date'].apply(lambda x: getIndex(x))
-        dffinal['_id'] = dffinal.apply(lambda row: getId(row), axis=1)
+    dffinal['src'] = 'gtc'
+    dffinal['area_name'] = site +'_'+ dffinal['name']
+    dffinal['client_area_name'] = contract + '_' + dffinal['area_name']
+    dffinal['client'] = contract
+    dffinal['area'] = site
+    dffinal["date"]=dffinal['date'].apply(convertToDate)
+    #dffinal["date"]=dffinal['date'].apply(lambda x: utc_to_local(x))
+    dffinal['@timestamp'] = dffinal['date'].apply(lambda x: getTimestamp(x)*1000)
+    dffinal['date'] = dffinal['date'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:00'))
+    dffinal['_index'] = dffinal['date'].apply(lambda x: getIndex(x))
+    dffinal['_id'] = dffinal.apply(lambda row: getId(row), axis=1)
 
-        es_helper.dataframe_to_elastic(es, dffinal)
-        #return dffinal
+    es_helper.dataframe_to_elastic(es, dffinal)
+    #return dffinal
 
 
 

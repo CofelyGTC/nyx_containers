@@ -52,7 +52,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.18"
+VERSION = "0.0.20"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -536,7 +536,7 @@ def retrieve_raw_data(day):
     start_dt = datetime(day.year, day.month, day.day)
     end_dt   = datetime(start_dt.year, start_dt.month, start_dt.day, 23, 59, 59)
 
-    df_raw=es_helper.elastic_to_dataframe(es, index='opt_sites_data*', 
+    df_raw=es_helper.elastic_to_dataframe(es, index='opt_cleaned_data*', 
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
@@ -715,7 +715,6 @@ def messageReceived(destination,message,headers):
     while start <= stop:
         doTheWork(start)
         start = start + timedelta(1)
-
 
 
 

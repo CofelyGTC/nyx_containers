@@ -33,7 +33,7 @@ from elastic_helper import es_helper
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="1.0.6"
+VERSION="1.1.1"
 MODULE="GTC_SITES_DATA"
 QUEUE=["GTC_SITES_DATA_temp1"]
 
@@ -403,25 +403,26 @@ def cleanData(filename, mes):
               {0: 'LUTOSA_Cond_Fct_5_Cogen',1:datefile, 2:param1, 3:fctCogenCond5, 4:param2},
               {0: 'LUTOSA_Cond_Fct_Global_Cogen',1:datefile, 2:param1, 3:fctCogenCondGlobal, 4:param2}]
         dffinal = dffinal.append(data,ignore_index=True,sort=True)
-        dffinal = dffinal[[0,1,3]]
-        dffinal.columns = ['name', 'date', 'value']
-        #site = 'LUTOSA_ExportNyxAWS'
-        #contract = 'COGLTS'
+    else:
+        dffinal = dfindexed.reset_index()
+    
+    dffinal = dffinal[[0,1,3]]
+    dffinal.columns = ['name', 'date', 'value']
 
+    dffinal['src'] = 'gtc'
+    dffinal['area_name'] = site +'_'+ dffinal['name']
+    dffinal['client_area_name'] = contract + '_' + dffinal['area_name']
+    dffinal['client'] = contract
+    dffinal['area'] = site
+    dffinal["date"]=dffinal['date'].apply(convertToDate)
+    dffinal["date"]=dffinal['date'].apply(lambda x: utc_to_local(x))
+    dffinal['@timestamp'] = dffinal['date'].apply(lambda x: getTimestamp(x)*1000)
+    dffinal['date'] = dffinal['date'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:00'))
+    dffinal['_index'] = dffinal['date'].apply(lambda x: getIndex(x))
+    dffinal['_id'] = dffinal.apply(lambda row: getId(row), axis=1)
 
-        dffinal['src'] = 'gtc'
-        dffinal['area_name'] = site +'_'+ dffinal['name']
-        dffinal['client_area_name'] = contract + '_' + dffinal['area_name']
-        dffinal['client'] = contract
-        dffinal['area'] = site
-        dffinal["date"]=dffinal['date'].apply(convertToDate)
-        dffinal["date"]=dffinal['date'].apply(lambda x: utc_to_local(x))
-        dffinal['@timestamp'] = dffinal['date'].apply(lambda x: getTimestamp(x)*1000)
-        dffinal['date'] = dffinal['date'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:00'))
-        dffinal['_index'] = dffinal['date'].apply(lambda x: getIndex(x))
-        dffinal['_id'] = dffinal.apply(lambda row: getId(row), axis=1)
-
-        es_helper.dataframe_to_elastic(es, dffinal)
+    es_helper.dataframe_to_elastic(es, dffinal)
+    
 
 
 
