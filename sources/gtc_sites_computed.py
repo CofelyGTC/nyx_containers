@@ -14,6 +14,7 @@ VERSION HISTORY
 * 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
 * 26 Sep 2019 0.0.17 **VME** Change totally the daily object (daily_cogen_lutosa)  
+* 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
 
 """  
 import re
@@ -52,7 +53,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.20"
+VERSION = "0.0.21"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -453,24 +454,25 @@ def create_obj(df_raw, start):
                                                                 + obj_report_cogen['entry_gasnat_cogen_MWh'], 2)
     
 
-
+    start = containertimezone.localize(start)
     start_year, end_year = datetime(start.year, 1, 1), datetime(start.year, 12, 31, 23, 59, 59)
 
+
+
+
     df_calendar = es_helper.elastic_to_dataframe(es, 
-                                                 start=start_year, 
-                                                 end=end_year, 
-                                                 index='nyx_calendar', 
-                                                 query='type:LUTOSA',
-                                                 timestampfield='date')
+                                                    start=start_year, 
+                                                    end=end_year, 
+                                                    index='nyx_calendar', 
+                                                    query='type:LUTOSA',
+                                                    datecolumns=['date'],
+                                                    timestampfield='date')
     
     open_days = 365
     
     logger.info('size df_calendar: '+str(len(df_calendar)))
     if len(df_calendar) > 0:
         open_days = df_calendar.loc[df_calendar['on'], 'on'].count()
-        df_calendar['date']     = pd.to_datetime(df_calendar['date']).dt.date
-        del df_calendar['_id']
-        del df_calendar['_index']
     
     logger.info('opening days: '+str(open_days))
 
@@ -484,38 +486,68 @@ def create_obj(df_raw, start):
     daily_target_prod_heat     = target_prod_heat     / open_days
     daily_target_runtime_cogen = target_runtime_cogen / open_days
 
-
+    day_on = True
+    try:
+        day_on = df_calendar[df_calendar['date']==start]['on'].iloc[0]
+    except:
+        pass
 
     #HEURES DE FCT (DE ROTATION) COGEN
     percent_value = compute_avail_moteur(df_raw)
     obj_report_cogen['daily_avail_motor'] = round(percent_value, 2)
     obj_report_cogen['daily_avail_motor_hour'] = round(percent_value*24, 2)
-    obj_report_cogen['daily_avail_motor_target_hour'] = daily_target_runtime_cogen
-    obj_report_cogen['daily_avail_motor_ratio_target'] = round((obj_report_cogen['daily_avail_motor_hour']/daily_target_runtime_cogen), 2)
+
+    if day_on:
+        obj_report_cogen['daily_avail_motor_target_hour'] = daily_target_runtime_cogen
+        obj_report_cogen['daily_avail_motor_ratio_target'] = round((obj_report_cogen['daily_avail_motor_hour']/daily_target_runtime_cogen), 2)
+    else:
+        obj_report_cogen['daily_avail_motor_target_hour'] = 0
+        
+
 
 
     #PROD ELEC COGEN
     prod_elec_cogen = compute_prod_elec_cogen(df_raw)
     obj_report_cogen['out_elec_cogen_kWh'] = round(prod_elec_cogen, 2)
     obj_report_cogen['out_elec_cogen_MWh'] = round(prod_elec_cogen / 1000, 2)
-    obj_report_cogen['out_elec_cogen_target_MWh'] = daily_target_prod_elec
-    obj_report_cogen['out_elec_cogen_ratio_target'] = round(obj_report_cogen['out_elec_cogen_MWh'] 
-                                                            / obj_report_cogen['out_elec_cogen_target_MWh'], 2) 
+
+
+    if day_on:
+        obj_report_cogen['out_elec_cogen_target_MWh'] = daily_target_prod_elec
+        obj_report_cogen['out_elec_cogen_ratio_target'] = round(obj_report_cogen['out_elec_cogen_MWh'] 
+                                                                / obj_report_cogen['out_elec_cogen_target_MWh'], 2) 
+    else:
+        obj_report_cogen['out_elec_cogen_target_MWh'] = 0
+        
     
     #PROD THERM COGEN
     prod_therm_cogen = compute_prod_therm_cogen(df_raw)
     obj_report_cogen['out_therm_cogen_kWh'] = round(prod_therm_cogen, 2)
     obj_report_cogen['out_therm_cogen_MWh'] = round(prod_therm_cogen / 1000, 2)
 
-    obj_report_cogen['out_therm_cogen_target_MWh'] = daily_target_prod_heat
-    obj_report_cogen['out_therm_cogen_ratio_target'] = round(obj_report_cogen['out_therm_cogen_MWh'] 
-                                                            / obj_report_cogen['out_therm_cogen_target_MWh'], 2) 
+    if day_on:
+        obj_report_cogen['out_therm_cogen_target_MWh'] = daily_target_prod_heat
+        obj_report_cogen['out_therm_cogen_ratio_target'] = round(obj_report_cogen['out_therm_cogen_MWh'] 
+                                                                / obj_report_cogen['out_therm_cogen_target_MWh'], 2) 
+    else:
+        obj_report_cogen['out_therm_cogen_target_MWh'] = 0
+        
+
 
 
     obj_report_cogen['out_total_cogen_kWh'] = round(obj_report_cogen['out_therm_cogen_kWh']
                                                                 + obj_report_cogen['out_elec_cogen_kWh'], 2)
     obj_report_cogen['out_total_cogen_MWh'] = round(obj_report_cogen['out_therm_cogen_MWh']
                                                                 + obj_report_cogen['out_elec_cogen_MWh'], 2)
+
+
+    if day_on:
+        obj_report_cogen['entry_biogas_thiopaq_target_MWh'] = daily_target_prod_biogaz
+        obj_report_cogen['entry_biogas_thiopaq_ratio_target'] = round((obj_report_cogen['entry_biogas_thiopaq_MWh'] / 
+                                                                obj_report_cogen['entry_biogas_thiopaq_target_MWh']), 2)
+    else:
+        obj_report_cogen['entry_biogas_thiopaq_target_MWh'] = 0
+    
 
     
     #RENDEMENTS
