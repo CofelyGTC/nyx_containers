@@ -396,7 +396,7 @@ def compute_dispo_cogen(df_raw):
 
 
 
-def create_obj(df_raw):
+def create_obj(df_raw, start):
 
     #DISPO DEBIT ENTREE THIOPAQ + ZOOM
     obj = compute_avail_debit_entry_thiopac(df_raw)
@@ -452,20 +452,53 @@ def create_obj(df_raw):
     obj_report_cogen['entry_total_cogen_MWh'] = round(obj_report_cogen['entry_biogas_cogen_MWh']
                                                                 + obj_report_cogen['entry_gasnat_cogen_MWh'], 2)
     
+
+
+    start_year, end_year = datetime(start.year, 1, 1), datetime(start.year, 12, 31, 23, 59, 59)
+
+    df_calendar = es_helper.elastic_to_dataframe(es, 
+                                                 start=start_year, 
+                                                 end=end_year, 
+                                                 index='nyx_calendar', 
+                                                 query='type:LUTOSA',
+                                                 timestampfield='date')
+    
+    open_days = 365
+    
+    logger.info('size df_calendar: '+str(len(df_calendar)))
+    if len(df_calendar) > 0:
+        open_days = df_calendar.loc[df_calendar['on'], 'on'].count()
+        df_calendar['date']     = pd.to_datetime(df_calendar['date']).dt.date
+        del df_calendar['_id']
+        del df_calendar['_index']
+    
+    logger.info('opening days: '+str(open_days))
+
+    target_prod_biogaz   = 9808
+    target_prod_elec     = 4400
+    target_prod_heat     = 4180
+    target_runtime_cogen = 1800
+    
+    daily_target_prod_biogaz   = target_prod_biogaz   / open_days
+    daily_target_prod_elec     = target_prod_elec     / open_days
+    daily_target_prod_heat     = target_prod_heat     / open_days
+    daily_target_runtime_cogen = target_runtime_cogen / open_days
+
+
+
     #HEURES DE FCT (DE ROTATION) COGEN
     percent_value = compute_avail_moteur(df_raw)
-
     obj_report_cogen['daily_avail_motor'] = round(percent_value, 2)
     obj_report_cogen['daily_avail_motor_hour'] = round(percent_value*24, 2)
-    obj_report_cogen['daily_avail_motor_target_hour'] = 5
-    obj_report_cogen['daily_avail_motor_ratio_target'] = round((obj_report_cogen['daily_avail_motor_hour']/5), 2)
+    obj_report_cogen['daily_avail_motor_target_hour'] = daily_target_runtime_cogen
+    obj_report_cogen['daily_avail_motor_ratio_target'] = round((obj_report_cogen['daily_avail_motor_hour']/daily_target_runtime_cogen), 2)
 
 
     #PROD ELEC COGEN
     prod_elec_cogen = compute_prod_elec_cogen(df_raw)
     obj_report_cogen['out_elec_cogen_kWh'] = round(prod_elec_cogen, 2)
     obj_report_cogen['out_elec_cogen_MWh'] = round(prod_elec_cogen / 1000, 2)
-    obj_report_cogen['out_elec_cogen_target_MWh'] = 13
+    obj_report_cogen['out_elec_cogen_target_MWh'] = daily_target_prod_elec
     obj_report_cogen['out_elec_cogen_ratio_target'] = round(obj_report_cogen['out_elec_cogen_MWh'] 
                                                             / obj_report_cogen['out_elec_cogen_target_MWh'], 2) 
     
@@ -474,7 +507,7 @@ def create_obj(df_raw):
     obj_report_cogen['out_therm_cogen_kWh'] = round(prod_therm_cogen, 2)
     obj_report_cogen['out_therm_cogen_MWh'] = round(prod_therm_cogen / 1000, 2)
 
-    obj_report_cogen['out_therm_cogen_target_MWh'] = 12
+    obj_report_cogen['out_therm_cogen_target_MWh'] = daily_target_prod_heat
     obj_report_cogen['out_therm_cogen_ratio_target'] = round(obj_report_cogen['out_therm_cogen_MWh'] 
                                                             / obj_report_cogen['out_therm_cogen_target_MWh'], 2) 
 
@@ -660,7 +693,7 @@ def doTheWork(start):
 
     try:
         df = retrieve_raw_data(start)
-        obj_to_es = create_obj(df)
+        obj_to_es = create_obj(df, start)
         obj_to_es['@timestamp'] = containertimezone.localize(start)
         obj_to_es['site'] = 'LUTOSA'
         es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)

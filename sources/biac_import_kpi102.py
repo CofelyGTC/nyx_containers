@@ -24,6 +24,7 @@ VERSION HISTORY
 * 04 Jun 2019 0.0.4 **AMA** Synchronized with VME
 * 08 Oct 2019 0.0.5 **VME** Adding lot 3. Big code refactoring for handling multi-lot
 * 09 Oct 2019 0.0.6 **VME** Default value if no data
+* 14 Oct 2019 0.0.7 **VME** Bug fixing when no ronde for lot
 """  
 import re
 import sys
@@ -58,7 +59,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -247,15 +248,22 @@ def loadKPI102():
 
 
         if len(df_all) > 0:
-            df_all['Datum/Date'].fillna(df_all['Datum / Date'], inplace=True)
-            df_all['Ronde'].fillna(df_all['Lot 3'], inplace=True)
-            del df_all['Datum / Date']
-            del df_all['Lot 3']
+            if 'Datum / Date' in df_all.columns:
+                df_all['Datum/Date'].fillna(df_all['Datum / Date'], inplace=True)
+                del df_all['Datum / Date']
+            if 'Lot 3' in df_all.columns:
+                df_all['Ronde'].fillna(df_all['Lot 3'], inplace=True)
+                del df_all['Lot 3']
+            
             df_all['lot'] = 3
             df_all.loc[df_all['Ronde'].str.contains('Lot 2'), 'lot'] = 2
             df_all['ronde_number']=df_all['Ronde'].str.extract(r'N° ([0-9]*)')
 
-            df_all.columns=['answer_date', '_timestamp', 'record_number', 'ronde', 'lot', 'ronde_number']
+            df_all.rename(columns={'Ronde': 'ronde', 
+                       'Datum/Date': '_timestamp', 
+                       'Answer date': 'answer_date', 
+                       'Record number': 'record_number'}, inplace=True)
+
             df_all['_id'] = df_all['_timestamp'].astype(str) +'_lot'+ df_all['lot'].astype(str) +'_'+ df_all['ronde_number']
             df_all['_index'] = 'biac_kpi102'
 
