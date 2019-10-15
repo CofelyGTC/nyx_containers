@@ -1,0 +1,1493 @@
+2019-09-20 10:44:19,540.540 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:44:19,541.541 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 10:44:19,541.541 INFO gtc_sites_computed - <module>: Module:   0.0.9
+2019-09-20 10:44:19,541.541 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:44:19,541.541 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 10:44:19,541.541 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 10:44:19,541.541 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 10:44:19,541.541 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:44:19,626.626 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:44:19,627.627 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 10:44:19,627.627 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 10:44:19,681.681 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 10:44:19,681.681 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 10:44:19,682.682 INFO gtc_sites_computed - <module>: true
+2019-09-20 10:44:19,683.683 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 10:44:24,692.692 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 544}
+2019-09-20 10:44:32,743.743 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.050s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x11632ada0>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632ada0>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632ada0>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:44:41,927.927 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.172s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x11632ad68>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632ad68>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632ad68>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:44:52,972.972 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.038s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x11632af60>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632af60>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11632af60>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:45:08,018.018 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.043s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x11634e128>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11634e128>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11634e128>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:45:08,020.020 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 10:45:08,020.020 ERROR es_helper - elastic_to_dataframe: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11634e128>: Failed to establish a new connection: [Errno 60] Operation timed out'))) caused by: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11634e128>: Failed to establish a new connection: [Errno 60] Operation timed out')))
+2019-09-20 10:45:08,027.027 ERROR gtc_sites_computed - <module>: Unable to load sites data.
+2019-09-20 10:45:08,027.027 ERROR gtc_sites_computed - <module>: '@timestamp'
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_sites_computed.py", line 634, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_sites_computed.py", line 516, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 225, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 10:45:13,038.038 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:18,043.043 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:23,044.044 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:28,046.046 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:33,049.049 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:38,052.052 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:43,054.054 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:48,057.057 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:53,062.062 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:45:58,065.065 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 572}
+2019-09-20 10:47:53,218.218 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:47:53,218.218 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 10:47:53,218.218 INFO gtc_sites_computed - <module>: Module:   0.0.9
+2019-09-20 10:47:53,218.218 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:47:53,218.218 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 10:47:53,218.218 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 10:47:53,219.219 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 10:47:53,219.219 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:47:53,260.260 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:47:53,261.261 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 10:47:53,261.261 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 10:47:53,303.303 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 10:47:53,304.304 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 10:47:53,304.304 INFO gtc_sites_computed - <module>: true
+2019-09-20 10:47:53,305.305 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 10:47:58,314.314 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 544}
+2019-09-20 10:48:06,471.471 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.156s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x1201aff98>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x1201aff98>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x1201aff98>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:48:15,517.517 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.042s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121a050b8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a050b8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a050b8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:48:26,693.693 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.173s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x1201afdd8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x1201afdd8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x1201afdd8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:48:41,831.831 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.133s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121a05198>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05198>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05198>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:48:41,832.832 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 10:48:41,832.832 ERROR es_helper - elastic_to_dataframe: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05198>: Failed to establish a new connection: [Errno 60] Operation timed out'))) caused by: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05198>: Failed to establish a new connection: [Errno 60] Operation timed out')))
+2019-09-20 10:48:41,834.834 ERROR gtc_sites_computed - <module>: Unable to load sites data.
+2019-09-20 10:48:41,834.834 ERROR gtc_sites_computed - <module>: '@timestamp'
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_sites_computed.py", line 634, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_sites_computed.py", line 516, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 225, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 10:48:46,848.848 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:48:51,850.850 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:48:56,856.856 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 571}
+2019-09-20 10:48:58,982.982 INFO transport - process_frame: Received frame: 'MESSAGE', headers={'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:341:-1:1:1', 'timestamp': '1568969338961'}, len(body)=42
+2019-09-20 10:48:58,983.983 INFO transport - transmit: Sending frame: 'ACK', headers={'message-id': 'ID\\c0d5d27c5f64f-36057-1566978049660-5\\c341\\c-1\\c1\\c1', 'subscription': '1'}
+2019-09-20 10:48:58,983.983 INFO gtc_sites_computed - messageReceived: ==> ==> ==> ==> ==> ==> ==> ==> ==> ==> 
+2019-09-20 10:48:58,983.983 INFO gtc_sites_computed - messageReceived: Message Received /queue/GTC_SITES_COMPUTED_RANGE
+2019-09-20 10:48:58,983.983 INFO gtc_sites_computed - messageReceived: {'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:341:-1:1:1', 'timestamp': '1568969338961'}
+2019-09-20 10:49:01,858.858 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:06,861.861 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:08,987.987 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:10.004s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05908>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05908>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05908>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+2019-09-20 10:49:08,988.988 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 10:49:08,988.988 ERROR es_helper - elastic_to_dataframe: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x121a05908>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+2019-09-20 10:49:08,989.989 ERROR amqstompclient - on_message: ERROR:
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/amqstompclient/amqstompclient.py", line 220, in on_message
+    self.callback(destination, message, headers)
+  File "gtc_sites_computed.py", line 561, in messageReceived
+    doTheWork(start)
+  File "gtc_sites_computed.py", line 516, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 225, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 10:49:09,002.002 ERROR amqstompclient - on_message: ERROR:<class 'KeyError'>'@timestamp'<traceback object at 0x121b68f48>
+2019-09-20 10:49:11,864.864 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:16,868.868 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:21,873.873 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:26,878.878 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:49:31,883.883 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:49:36,887.887 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:49:41,893.893 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:49:46,894.894 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:49:51,897.897 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:49:56,900.900 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:01,901.901 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:06,907.907 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:11,909.909 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:16,914.914 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:21,916.916 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:26,920.920 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:31,926.926 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:50:36,928.928 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 608}
+2019-09-20 10:51:28,346.346 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:51:28,346.346 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 10:51:28,346.346 INFO gtc_sites_computed - <module>: Module:   0.0.9
+2019-09-20 10:51:28,346.346 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:51:28,346.346 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 10:51:28,346.346 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 10:51:28,346.346 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 10:51:28,347.347 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:51:28,418.418 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:51:28,419.419 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 10:51:28,419.419 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 10:51:28,461.461 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 10:51:28,461.461 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 10:51:28,461.461 INFO gtc_sites_computed - <module>: true
+2019-09-20 10:51:28,462.462 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 10:51:33,474.474 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 544}
+2019-09-20 10:51:41,626.626 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.151s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d30>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d30>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d30>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:51:50,645.645 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.017s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d68>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d68>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6d68>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:51:56,388.388 INFO transport - process_frame: Received frame: 'MESSAGE', headers={'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:341:-1:1:2', 'timestamp': '1568969516366'}, len(body)=42
+2019-09-20 10:51:56,389.389 INFO transport - transmit: Sending frame: 'ACK', headers={'message-id': 'ID\\c0d5d27c5f64f-36057-1566978049660-5\\c341\\c-1\\c1\\c2', 'subscription': '1'}
+2019-09-20 10:51:56,389.389 INFO gtc_sites_computed - messageReceived: ==> ==> ==> ==> ==> ==> ==> ==> ==> ==> 
+2019-09-20 10:51:56,389.389 INFO gtc_sites_computed - messageReceived: Message Received /queue/GTC_SITES_COMPUTED_RANGE
+2019-09-20 10:51:56,390.390 INFO gtc_sites_computed - messageReceived: {'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:341:-1:1:2', 'timestamp': '1568969516366'}
+2019-09-20 10:52:01,691.691 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.042s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117be6f28>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6f28>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117be6f28>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:52:04,424.424 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.034s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a630>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a630>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a630>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:52:13,569.569 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.143s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a6d8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a6d8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0a6d8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:52:16,839.839 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.143s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117c0aa58>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0aa58>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0aa58>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:52:16,841.841 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 10:52:16,841.841 ERROR es_helper - elastic_to_dataframe: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0aa58>: Failed to establish a new connection: [Errno 60] Operation timed out'))) caused by: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0aa58>: Failed to establish a new connection: [Errno 60] Operation timed out')))
+2019-09-20 10:52:16,844.844 ERROR gtc_sites_computed - <module>: Unable to load sites data.
+2019-09-20 10:52:16,844.844 ERROR gtc_sites_computed - <module>: '@timestamp'
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_sites_computed.py", line 635, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_sites_computed.py", line 517, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 226, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 10:52:21,855.855 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:52:24,672.672 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.099s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x117c0acf8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0acf8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x117c0acf8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:52:26,860.860 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:52:31,866.866 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 607}
+2019-09-20 10:58:58,921.921 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:58:58,921.921 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 10:58:58,921.921 INFO gtc_sites_computed - <module>: Module:   0.0.9
+2019-09-20 10:58:58,921.921 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 10:58:58,921.921 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 10:58:58,921.921 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 10:58:58,921.921 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 10:58:58,922.922 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:58:58,994.994 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 10:58:58,994.994 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 10:58:58,995.995 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 10:58:59,036.036 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 10:58:59,037.037 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 10:58:59,037.037 INFO gtc_sites_computed - <module>: true
+2019-09-20 10:58:59,038.038 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 10:59:04,051.051 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 544}
+2019-09-20 10:59:12,229.229 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.177s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e73e48>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e73e48>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e73e48>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:21,284.284 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.049s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e73d30>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e73d30>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e73d30>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:21,664.664 INFO transport - process_frame: Received frame: 'MESSAGE', headers={'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:358:-1:1:1', 'timestamp': '1568969961638'}, len(body)=42
+2019-09-20 10:59:21,665.665 INFO transport - transmit: Sending frame: 'ACK', headers={'message-id': 'ID\\c0d5d27c5f64f-36057-1566978049660-5\\c358\\c-1\\c1\\c1', 'subscription': '1'}
+2019-09-20 10:59:21,665.665 INFO gtc_sites_computed - messageReceived: ==> ==> ==> ==> ==> ==> ==> ==> ==> ==> 
+2019-09-20 10:59:21,665.665 INFO gtc_sites_computed - messageReceived: Message Received /queue/GTC_SITES_COMPUTED_RANGE
+2019-09-20 10:59:21,665.665 INFO gtc_sites_computed - messageReceived: {'content-length': '42', 'expires': '0', 'destination': '/queue/GTC_SITES_COMPUTED_RANGE', 'subscription': '1', 'priority': '4', 'message-id': 'ID:0d5d27c5f64f-36057-1566978049660-5:358:-1:1:1', 'timestamp': '1568969961638'}
+2019-09-20 10:59:29,842.842 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.176s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e986a0>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e986a0>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e986a0>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:32,470.470 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.181s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e987b8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e987b8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e987b8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:38,885.885 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.037s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e98940>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98940>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98940>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:47,646.646 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.172s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e98ba8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98ba8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98ba8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 10:59:47,648.648 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 10:59:47,648.648 ERROR es_helper - elastic_to_dataframe: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98ba8>: Failed to establish a new connection: [Errno 60] Operation timed out'))) caused by: ConnectionError(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98ba8>: Failed to establish a new connection: [Errno 60] Operation timed out')))
+2019-09-20 10:59:47,651.651 ERROR gtc_sites_computed - <module>: Unable to load sites data.
+2019-09-20 10:59:47,652.652 ERROR gtc_sites_computed - <module>: '@timestamp'
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_sites_computed.py", line 635, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_sites_computed.py", line 517, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 226, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 10:59:50,057.057 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.170s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x121e98dd8>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98dd8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x121e98dd8>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 11:01:52,229.229 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 11:01:52,229.229 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 11:01:52,229.229 INFO gtc_sites_computed - <module>: Module:   0.0.9
+2019-09-20 11:01:52,229.229 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 11:01:52,229.229 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 11:01:52,229.229 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 11:01:52,229.229 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 11:01:52,229.229 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 11:01:52,301.301 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 11:01:52,301.301 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 11:01:52,302.302 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 11:01:52,343.343 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 11:01:52,343.343 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 11:01:52,343.343 INFO gtc_sites_computed - <module>: true
+2019-09-20 11:01:52,344.344 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 11:01:57,354.354 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 544}
+2019-09-20 11:02:05,518.518 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:8.164s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+TimeoutError: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 180, in _new_conn
+    self, "Failed to establish a new connection: %s" % e)
+urllib3.exceptions.NewConnectionError: <urllib3.connection.VerifiedHTTPSConnection object at 0x11435de80>: Failed to establish a new connection: [Errno 60] Operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11435de80>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 513, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x11435de80>: Failed to establish a new connection: [Errno 60] Operation timed out'))
+2019-09-20 11:59:17,130.130 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 11:59:17,131.131 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-09-20 11:59:17,131.131 INFO gtc_sites_computed - <module>: Module:   0.0.11
+2019-09-20 11:59:17,131.131 INFO gtc_sites_computed - <module>: ==============================
+2019-09-20 11:59:17,131.131 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-09-20 11:59:17,131.131 INFO amqstompclient - __init__: Early ack set to true.
+2019-09-20 11:59:17,131.131 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-09-20 11:59:17,131.131 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 11:59:17,173.173 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-09-20 11:59:17,173.173 INFO transport - __receiver_loop: Starting receiver loop
+2019-09-20 11:59:17,173.173 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-09-20 11:59:17,215.215 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-09-20 11:59:17,215.215 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-09-20 11:59:17,215.215 INFO gtc_sites_computed - <module>: true
+2019-09-20 11:59:17,216.216 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-09-20 11:59:22,231.231 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 545}
+2019-09-20 11:59:32,243.243 WARNING base - log_request_fail: GET https://nyxaws.cofelygtc.com:9200/opt_sites_data*/_search?scroll=2m&size=10000 [status:N/A request:10.010s]
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 343, in _make_request
+    self._validate_conn(conn)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 849, in _validate_conn
+    conn.connect()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 314, in connect
+    conn = self._new_conn()
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<urllib3.connection.VerifiedHTTPSConnection object at 0x1130da0f0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 445, in send
+    timeout=timeout
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/urllib3/util/retry.py", line 398, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x1130da0f0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/elasticsearch/connection/http_requests.py", line 76, in perform_request
+    response = self.session.send(prepared_request, **send_kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/sessions.py", line 622, in send
+    r = adapter.send(request, **kwargs)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/requests/adapters.py", line 501, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x1130da0f0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)'))
+2019-09-20 11:59:32,252.252 ERROR es_helper - elastic_to_dataframe: Unable to load data.
+2019-09-20 11:59:32,252.252 ERROR es_helper - elastic_to_dataframe: ConnectionTimeout caused by - ConnectTimeout(HTTPSConnectionPool(host='nyxaws.cofelygtc.com', port=9200): Max retries exceeded with url: /opt_sites_data*/_search?scroll=2m&size=10000 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x1130da0f0>, 'Connection to nyxaws.cofelygtc.com timed out. (connect timeout=10)')))
+2019-09-20 11:59:32,254.254 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-09-20 11:59:32,255.255 INFO gtc_sites_computed - retrieve_raw_data: Empty DataFrame
+Columns: []
+Index: []
+2019-09-20 11:59:32,258.258 ERROR gtc_sites_computed - <module>: Unable to load sites data.
+2019-09-20 11:59:32,258.258 ERROR gtc_sites_computed - <module>: '@timestamp'
+Traceback (most recent call last):
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2657, in get_loc
+    return self._engine.get_loc(key)
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "gtc_sites_computed.py", line 650, in <module>
+    doTheWork(start-timedelta(1))
+  File "gtc_sites_computed.py", line 527, in doTheWork
+    df = retrieve_raw_data(start)
+  File "gtc_sites_computed.py", line 227, in retrieve_raw_data
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/frame.py", line 2927, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/pierredebock/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexes/base.py", line 2659, in get_loc
+    return self._engine.get_loc(self._maybe_cast_indexer(key))
+  File "pandas/_libs/index.pyx", line 108, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 132, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1601, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 1608, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: '@timestamp'
+2019-09-20 11:59:37,270.270 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 572}
+2019-09-20 11:59:42,271.271 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 572}
+2019-09-20 11:59:47,272.272 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 572}
+2019-09-20 11:59:52,278.278 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 572}
