@@ -15,6 +15,7 @@ VERSION HISTORY
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
 * 26 Sep 2019 0.0.17 **VME** Change totally the daily object (daily_cogen_lutosa)  
 * 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
+* 17 Oct 2019 0.0.22 **VME** Add on field on daily_cogen
 
 """  
 import re
@@ -53,7 +54,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.21"
+VERSION = "0.0.22"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -283,6 +284,18 @@ def compute_avail_moteur(df_raw):
     
     return percent_value
 
+def compute_starts_and_stops(df_raw):
+    tag_name = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
+
+    df_fct = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']] 
+
+    df_fct['edge']=df_fct.value.diff().fillna(0)
+
+    starts = df_fct.loc[df_fct['edge']==1, 'value'].count()
+    stops = df_fct.loc[df_fct['edge']==-1, 'value'].count()
+    
+    return starts, stops
+
 
 def compute_prod_elec_cogen(df_raw):
     tag_name_1 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_IntoMoteur'
@@ -488,9 +501,12 @@ def create_obj(df_raw, start):
 
     day_on = True
     try:
-        day_on = df_calendar[df_calendar['date']==start]['on'].iloc[0]
+        day_on = bool(df_calendar[df_calendar['date']==start]['on'].iloc[0])
     except:
         pass
+
+
+    obj_report_cogen['on'] = day_on
 
     #HEURES DE FCT (DE ROTATION) COGEN
     percent_value = compute_avail_moteur(df_raw)
@@ -594,6 +610,11 @@ def create_obj(df_raw, start):
     obj_report_cogen['max_theorical_avail_cogen_hour'] = obj['max_theorical_avail_cogen_hour']
     obj_report_cogen['avail_cogen_hour'] = obj['avail_cogen_hour']
     obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
+
+    #STARTS AND STOPS
+    starts, stops = compute_starts_and_stops(df_raw)
+    obj_report_cogen['starts'] = starts
+    obj_report_cogen['stops'] = stops
         
     return obj_report_cogen
 
@@ -605,15 +626,10 @@ def retrieve_raw_data(day):
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
+                                           datecolumns=['@timestamp'],
+                                           sort='@timestamp',
                                            scrollsize=10000,
                                            size=1000000)
-
-    containertimezone=pytz.timezone(get_localzone().zone)
-    logger.info('Data retrieved')
-    logger.info(df_raw)
-    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
-                                               unit='ms', utc=True).dt.tz_convert(containertimezone)
-    df_raw=df_raw.sort_values('@timestamp') 
     
     return df_raw
 
@@ -737,7 +753,6 @@ def doTheWork(start):
         logger.error(error)
 
     try:
-        # df = retrieve_raw_data(start)
         df['value'] = df['value'].apply(lambda x: removeStr(x))
         df['value_min'] = df['value']
         df['value_min_sec'] = df['value']

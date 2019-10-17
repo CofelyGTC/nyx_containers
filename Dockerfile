@@ -58,6 +58,7 @@ WORKDIR /opt/sources
 #CMD ["python", "gtc_sites_data.py"]
 #CMD ["python", "gtc_import_onerp.py"]
 CMD ["python", "gtc_sites_computed.py"]
+# CMD ["python", "gtc_recompute_target_lutosa.py"]
 #CMD ["python", "biac_import_kpi102.py"]
 #CMD ["python", "gtc_import_cogen_mails.py"]
 #CMD ["python", "gtc_process_cogen.py"]

@@ -1,0 +1,1246 @@
+2019-10-15 17:02:00,613.613 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:02:00,615.615 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:02:00,615.615 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:02:00,616.616 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:02:00,617.617 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:02:00,618.618 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:02:00,619.619 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:02:00,620.620 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:02:00,680.680 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:02:00,682.682 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:02:00,683.683 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:02:00,709.709 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:02:00,710.710 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:02:00,711.711 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:02:00,713.713 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:02:05,720.720 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 540}
+2019-10-15 17:02:05,875.875 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.152s]
+2019-10-15 17:02:07,741.741 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:1.860s]
+2019-10-15 17:02:10,404.404 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.569s]
+2019-10-15 17:02:10,464.464 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:10,464.464 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:12,889.889 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.406s]
+2019-10-15 17:02:12,947.947 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:12,948.948 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:14,654.654 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.685s]
+2019-10-15 17:02:14,712.712 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:14,713.713 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:16,762.762 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.030s]
+2019-10-15 17:02:16,818.818 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:16,819.819 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:18,489.489 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.650s]
+2019-10-15 17:02:18,577.577 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:18,577.577 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:21,083.083 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.481s]
+2019-10-15 17:02:21,142.142 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:21,143.143 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:22,997.997 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.831s]
+2019-10-15 17:02:23,061.061 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:23,062.062 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:24,913.913 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.830s]
+2019-10-15 17:02:24,986.986 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:24,987.987 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:27,254.254 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.238s]
+2019-10-15 17:02:27,319.319 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:27,320.320 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:30,190.190 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.847s]
+2019-10-15 17:02:30,278.278 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:30,279.279 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:32,281.281 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.982s]
+2019-10-15 17:02:32,349.349 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:32,350.350 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:34,209.209 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.835s]
+2019-10-15 17:02:34,273.273 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:34,274.274 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:36,582.582 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.288s]
+2019-10-15 17:02:36,642.642 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:36,643.643 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:38,819.819 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.152s]
+2019-10-15 17:02:38,878.878 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:38,879.879 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:38,950.950 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.044s]
+2019-10-15 17:02:38,955.955 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:02:38,956.956 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:02:38,993.993 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.036s]
+2019-10-15 17:02:38,994.994 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:02:38,995.995 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:02:39,800.800 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:02:39,801.801 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571004120000  clean_h5bani_h5bani_exportnyxaws_t_amb_mag1571...  opt_cleaned_data-2019-10      ...                                               T_Amb_Mag  gtc  2.010000e+01
+1       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ch11571004...  opt_cleaned_data-2019-10      ...                                                  Et_Ch1  gtc  0.000000e+00
+2       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+3       1571004120000  clean_h5bani_h5bani_exportnyxaws_pos_van_frgp1...  opt_cleaned_data-2019-10      ...                                            Pos_Van_FrGP  gtc  0.000000e+00
+4       1571004120000  clean_h5bani_h5bani_exportnyxaws_press_pul_gp1...  opt_cleaned_data-2019-10      ...                                            Press_Pul_GP  gtc  2.450000e+02
+5       1571004120000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.790000e+01
+6       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_rez_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Gauche  gtc  6.000000e+00
+7       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_1er_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_1er_Gauche  gtc  4.130000e+02
+8       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_07_PosVan_Ch  gtc  0.000000e+00
+9       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_06_PosVan_Ch  gtc  0.000000e+00
+10      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_06_Fenetre  gtc  1.000000e+00
+11      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+12      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_05_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_05_Fenetre  gtc  1.000000e+00
+13      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_12_Fenetre  gtc  1.000000e+00
+14      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+15      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.660000e+02
+16      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_17_PosVAV  gtc  0.000000e+00
+17      1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+18      1571004120000  clean_h5bani_h5bani_exportnyxaws_press_rep_ge_...  opt_cleaned_data-2019-10      ...                                       Press_Rep_GE_Labo  gtc  4.510000e+02
+19      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+20      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_asc1571...  opt_cleaned_data-2019-10      ...                                               Conso_Asc  gtc  2.400425e+04
+21      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_ecl_ext...  opt_cleaned_data-2019-10      ...                                           Conso_Ecl_Ext  gtc  2.036821e+04
+22      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_vent...  opt_cleaned_data-2019-10      ...                                           Conso_TD_Vent  gtc  5.288272e+05
+23      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                      Conso_TD_Rdc_Droit  gtc  9.458283e+05
+24      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+25      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_04_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_04_Fenetre  gtc  1.000000e+00
+26      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+27      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_18_PosVAV  gtc  0.000000e+00
+28      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_20_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_20_PosVan_Ch  gtc  0.000000e+00
+29      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_21_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_21_Fenetre  gtc  1.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150067  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc  1.920000e+02
+150068  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  9.700000e+00
+150069  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150070  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu02_...  opt_cleaned_data-2019-10      ...                        LUTOSA_CPU02_Thiopaq_def_liaison  gtc  0.000000e+00
+150071  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.160000e+01
+150073  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+150074  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_th...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Ther_Drycooler  gtc  1.210968e+06
+150075  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                              LUTOSA_Cpt_Elec_IntoMoteur  gtc  8.202773e+04
+150076  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_hr...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Hres_FctMoteur  gtc  1.342600e+04
+150077  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150078  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  0.000000e+00
+150079  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_tempso...  opt_cleaned_data-2019-10      ...                             LUTOSA_TempSortie_Boucle_HT  gtc  5.633000e+01
+150080  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991217e+03
+150081  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836400e+03
+150082  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.000882e+07
+150083  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150084  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+150085  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_surpre...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Surpresseur_Alm  gtc  0.000000e+00
+150086  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150087  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+150088  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150089  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150090  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150091  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150092  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150093  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150095  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:02:40,424.424 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.091s]
+2019-10-15 17:02:40,462.462 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.034s]
+2019-10-15 17:02:40,463.463 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:02:40,464.464 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:02:40,471.471 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:02:40,482.482 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:02:41,074.074 INFO base - log_request_success: PUT https://nyxaws.cofelygtc.com:9200/daily_cogen_lutosa/doc/1571004000 [status:200 request:0.041s]
+2019-10-15 17:02:41,117.117 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.041s]
+2019-10-15 17:02:41,118.118 INFO gtc_sites_computed - save_tags_to_computed: BULK done without errors.
+2019-10-15 17:02:48,123.123 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.375s]
+2019-10-15 17:02:48,127.127 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:02:50,432.432 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:2.228s]
+2019-10-15 17:02:52,544.544 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.040s]
+2019-10-15 17:02:52,602.602 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:52,603.603 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:54,824.824 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.202s]
+2019-10-15 17:02:54,876.876 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:54,876.876 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:56,936.936 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.039s]
+2019-10-15 17:02:56,987.987 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:56,988.988 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:02:58,941.941 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.932s]
+2019-10-15 17:02:59,026.026 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:02:59,026.026 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:00,660.660 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.613s]
+2019-10-15 17:03:00,716.716 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:03:00,716.716 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:02,871.871 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.136s]
+2019-10-15 17:03:02,930.930 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:03:02,931.931 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:05,426.426 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.476s]
+2019-10-15 17:03:05,487.487 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:03:05,488.488 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:07,837.837 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.330s]
+2019-10-15 17:03:07,906.906 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:03:07,907.907 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:10,276.276 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.348s]
+2019-10-15 17:03:10,370.370 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:03:10,370.370 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:03:11,975.975 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.581s]
+2019-10-15 17:03:12,023.023 INFO es_helper - elastic_to_dataframe: scroll size: 6923
+2019-10-15 17:03:12,024.024 INFO es_helper - elastic_to_dataframe: Next page:6923
+2019-10-15 17:03:12,093.093 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.056s]
+2019-10-15 17:03:12,094.094 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:03:12,095.095 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:03:12,763.763 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:03:12,764.764 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index     ...                                                    name  src        value
+0       1571090520000  clean_h5bani_h5bani_exportnyxaws_t_ext15710905...  opt_cleaned_data-2019-10     ...                                                   T_Ext  gtc       19.900
+1       1571090520000  clean_h5bani_h5bani_exportnyxaws_hr_ext1571090...  opt_cleaned_data-2019-10     ...                                                  HR_Ext  gtc       64.800
+2       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cirvav1571...  opt_cleaned_data-2019-10     ...                                               Et_CirVAV  gtc        0.000
+3       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge15710905...  opt_cleaned_data-2019-10     ...                                                   Et_GE  gtc        1.000
+4       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_var_gp157...  opt_cleaned_data-2019-10     ...                                              Pos_VAR_GP  gtc        0.000
+5       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cir_rec_gp...  opt_cleaned_data-2019-10     ...                                           Et_Cir_Rec_GP  gtc        0.000
+6       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_reg_gp157...  opt_cleaned_data-2019-10     ...                                              Pos_Reg_GP  gtc        0.000
+7       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_rez_droit...  opt_cleaned_data-2019-10     ...                                          CO2_Rez_Droite  gtc        5.000
+8       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_2eme_droi...  opt_cleaned_data-2019-10     ...                                         CO2_2eme_Droite  gtc      447.000
+9       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_elec157...  opt_cleaned_data-2019-10     ...                                              Et_GE_Elec  gtc        0.000
+10      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_tamb157...  opt_cleaned_data-2019-10     ...                                              R0_08_TAmb  gtc       24.300
+11      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvan_...  opt_cleaned_data-2019-10     ...                                         R0_08_PosVan_Ch  gtc        0.000
+12      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvav1...  opt_cleaned_data-2019-10     ...                                            R0_08_PosVAV  gtc        0.000
+13      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_07_fenetre...  opt_cleaned_data-2019-10     ...                                           R0_07_Fenetre  gtc        1.000
+14      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_10_tamb157...  opt_cleaned_data-2019-10     ...                                              R0_10_TAmb  gtc     -208.300
+15      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_05_posvan_...  opt_cleaned_data-2019-10     ...                                         R0_05_PosVan_Ch  gtc        0.000
+16      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_03_fenetre...  opt_cleaned_data-2019-10     ...                                           R0_03_Fenetre  gtc        1.000
+17      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_01_posvan_...  opt_cleaned_data-2019-10     ...                                         R0_01_PosVan_Ch  gtc        0.000
+18      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_posvav1...  opt_cleaned_data-2019-10     ...                                            R0_14_PosVAV  gtc        0.000
+19      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_fenetre...  opt_cleaned_data-2019-10     ...                                           R0_14_Fenetre  gtc        1.000
+20      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10     ...                                            R0_15_PosVAV  gtc        0.000
+21      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10     ...                                               R0_15_CO2  gtc      454.000
+22      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvan_...  opt_cleaned_data-2019-10     ...                                         R0_17_PosVan_Ch  gtc        0.000
+23      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_co21571...  opt_cleaned_data-2019-10     ...                                               R0_17_CO2  gtc      458.000
+24      1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10     ...                                              Et_GE_Labo  gtc        1.000
+25      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10     ...                                     Conso_TD_RDC_Gauche  gtc    85765.770
+26      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_+2_d...  opt_cleaned_data-2019-10     ...                                       Conso_TD_+2_Droit  gtc   258086.600
+27      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_mag1...  opt_cleaned_data-2019-10     ...                                            Conso_TD_Mag  gtc    87956.510
+28      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_07_tamb157...  opt_cleaned_data-2019-10     ...                                              R1_07_TAmb  gtc       24.200
+29      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10     ...                                              R1_18_TAmb  gtc     -208.500
+...               ...                                                ...                       ...     ...                                                     ...  ...          ...
+106893  1571151720000  clean_h5bani_h5bani_exportnyxaws_r1_22_split_m...  opt_cleaned_data-2019-10     ...                                        R1_22_Split_Mode  gtc        3.000
+106894  1571151720000  clean_h5bani_h5bani_exportnyxaws_r0_15_split_m...  opt_cleaned_data-2019-10     ...                                        R0_15_Split_Mode  gtc        3.000
+106895  1571151720000  clean_h5bani_h5bani_exportnyxaws_r0_17_split_m...  opt_cleaned_data-2019-10     ...                                        R0_17_Split_Mode  gtc        3.000
+106896  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_03_tamb157...  opt_cleaned_data-2019-10     ...                                              R2_03_TAmb  gtc       23.500
+106897  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_07_posvan_...  opt_cleaned_data-2019-10     ...                                         R2_07_PosVan_Ch  gtc        0.000
+106898  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_19_tamb157...  opt_cleaned_data-2019-10     ...                                              R2_19_TAmb  gtc       22.700
+106899  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_19_fenetre...  opt_cleaned_data-2019-10     ...                                           R2_19_Fenetre  gtc        1.000
+106900  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_08_tamb157...  opt_cleaned_data-2019-10     ...                                              R2_08_TAmb  gtc       21.400
+106901  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_10_fenetre...  opt_cleaned_data-2019-10     ...                                           R2_10_Fenetre  gtc        1.000
+106902  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_11_tamb157...  opt_cleaned_data-2019-10     ...                                              R2_11_TAmb  gtc       22.300
+106903  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_12_tamb157...  opt_cleaned_data-2019-10     ...                                              R2_12_TAmb  gtc       23.800
+106904  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_12_posvav1...  opt_cleaned_data-2019-10     ...                                            R2_12_PosVAV  gtc        0.000
+106905  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_14_posvan_...  opt_cleaned_data-2019-10     ...                                         R2_14_PosVan_Ch  gtc        0.000
+106906  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_15_posvav1...  opt_cleaned_data-2019-10     ...                                            R2_15_PosVAV  gtc        0.000
+106907  1571151720000  clean_h5bani_h5bani_exportnyxaws_r2_29_posvav1...  opt_cleaned_data-2019-10     ...                                            R2_29_PosVAV  gtc        0.000
+106908  1571151720000  clean_h5bani_h5bani_exportnyxaws_r1_22_fenetre...  opt_cleaned_data-2019-10     ...                                           R1_22_Fenetre  gtc        1.000
+106909  1571151720000  clean_h5bani_h5bani_exportnyxaws_h5_eau1571151...  opt_cleaned_data-2019-10     ...                                                  H5_Eau  gtc    25739.000
+106910  1571151720000  clean_h5bani_h5bani_exportnyxaws_h5_td_rdc_pm2...  opt_cleaned_data-2019-10     ...                                       H5_TD_rdc_PM2_001  gtc    85799.830
+106911  1571151720000  clean_h5bani_h5bani_exportnyxaws_h5_td+1_droit...  opt_cleaned_data-2019-10     ...                                      H5_TD+1_droit_PM11  gtc    48143.930
+106912  1571151720000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_a...  opt_cleaned_data-2019-10     ...                                  LUTOSA_Etat_Autor_Biog  gtc        1.000
+106913  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit1Seui...  gtc     2650.917
+106914  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc     1507.767
+106915  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...           COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Chaufferie  gtc   440169.000
+106916  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...                COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Cogen  gtc   610575.000
+106917  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...              COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Thiopaq  gtc  1259286.000
+106918  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1279135.000
+106919  1571151720000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10     ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc      228.000
+106920  1571151720000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10     ...                                    LUTOSA_O2_Av_Thiopaq  gtc        0.000
+106921  1571151720000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10     ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc        1.000
+106922  1571151720000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10     ...                            LUTOSA_Cond_Fct_Global_Cogen  gtc        1.000
+
+[106923 rows x 11 columns]
+2019-10-15 17:03:13,321.321 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.110s]
+2019-10-15 17:03:13,358.358 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:03:13,359.359 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:03:13,359.359 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:22:05,733.733 INFO transport - transmit: Sending frame: 'heartbeat', headers={}
+2019-10-15 17:43:26,898.898 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:43:26,903.903 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:43:26,903.903 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:43:26,904.904 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:43:26,905.905 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:43:26,905.905 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:43:26,906.906 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:43:26,907.907 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:43:26,934.934 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:43:26,936.936 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:43:26,937.937 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:43:26,962.962 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:43:26,966.966 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:43:26,967.967 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:43:26,971.971 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:43:31,975.975 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 540}
+2019-10-15 17:43:32,116.116 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.140s]
+2019-10-15 17:43:34,151.151 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:2.030s]
+2019-10-15 17:43:36,309.309 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.046s]
+2019-10-15 17:43:36,385.385 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:36,386.386 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:39,358.358 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.945s]
+2019-10-15 17:43:39,503.503 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:39,504.504 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:42,254.254 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.715s]
+2019-10-15 17:43:42,317.317 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:42,317.317 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:44,832.832 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.486s]
+2019-10-15 17:43:44,914.914 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:44,914.914 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:47,102.102 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.156s]
+2019-10-15 17:43:47,206.206 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:47,207.207 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:50,069.069 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.832s]
+2019-10-15 17:43:50,127.127 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:50,128.128 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:52,948.948 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.802s]
+2019-10-15 17:43:53,005.005 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:53,006.006 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:54,952.952 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.925s]
+2019-10-15 17:43:55,009.009 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:55,010.010 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:57,589.589 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.556s]
+2019-10-15 17:43:57,646.646 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:57,646.646 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:43:59,583.583 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.917s]
+2019-10-15 17:43:59,669.669 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:43:59,670.670 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:02,403.403 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.713s]
+2019-10-15 17:44:02,462.462 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:02,463.463 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:05,427.427 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.943s]
+2019-10-15 17:44:05,486.486 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:05,487.487 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:07,825.825 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.318s]
+2019-10-15 17:44:07,887.887 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:07,888.888 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:10,451.451 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.542s]
+2019-10-15 17:44:10,510.510 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:10,511.511 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:10,578.578 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.047s]
+2019-10-15 17:44:10,583.583 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:44:10,583.583 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:44:10,620.620 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.035s]
+2019-10-15 17:44:10,621.621 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:44:10,622.622 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:44:11,431.431 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:44:11,431.431 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571004120000  clean_h5bani_h5bani_exportnyxaws_t_amb_mag1571...  opt_cleaned_data-2019-10      ...                                               T_Amb_Mag  gtc  2.010000e+01
+1       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ch11571004...  opt_cleaned_data-2019-10      ...                                                  Et_Ch1  gtc  0.000000e+00
+2       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+3       1571004120000  clean_h5bani_h5bani_exportnyxaws_pos_van_frgp1...  opt_cleaned_data-2019-10      ...                                            Pos_Van_FrGP  gtc  0.000000e+00
+4       1571004120000  clean_h5bani_h5bani_exportnyxaws_press_pul_gp1...  opt_cleaned_data-2019-10      ...                                            Press_Pul_GP  gtc  2.450000e+02
+5       1571004120000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.790000e+01
+6       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_rez_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Gauche  gtc  6.000000e+00
+7       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_1er_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_1er_Gauche  gtc  4.130000e+02
+8       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_07_PosVan_Ch  gtc  0.000000e+00
+9       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_06_PosVan_Ch  gtc  0.000000e+00
+10      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_06_Fenetre  gtc  1.000000e+00
+11      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+12      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_05_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_05_Fenetre  gtc  1.000000e+00
+13      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_12_Fenetre  gtc  1.000000e+00
+14      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+15      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.660000e+02
+16      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_17_PosVAV  gtc  0.000000e+00
+17      1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+18      1571004120000  clean_h5bani_h5bani_exportnyxaws_press_rep_ge_...  opt_cleaned_data-2019-10      ...                                       Press_Rep_GE_Labo  gtc  4.510000e+02
+19      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+20      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_asc1571...  opt_cleaned_data-2019-10      ...                                               Conso_Asc  gtc  2.400425e+04
+21      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_ecl_ext...  opt_cleaned_data-2019-10      ...                                           Conso_Ecl_Ext  gtc  2.036821e+04
+22      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_vent...  opt_cleaned_data-2019-10      ...                                           Conso_TD_Vent  gtc  5.288272e+05
+23      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                      Conso_TD_Rdc_Droit  gtc  9.458283e+05
+24      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+25      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_04_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_04_Fenetre  gtc  1.000000e+00
+26      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+27      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_18_PosVAV  gtc  0.000000e+00
+28      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_20_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_20_PosVan_Ch  gtc  0.000000e+00
+29      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_21_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_21_Fenetre  gtc  1.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150067  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc  1.920000e+02
+150068  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  9.700000e+00
+150069  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150070  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu02_...  opt_cleaned_data-2019-10      ...                        LUTOSA_CPU02_Thiopaq_def_liaison  gtc  0.000000e+00
+150071  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.160000e+01
+150073  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+150074  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_th...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Ther_Drycooler  gtc  1.210968e+06
+150075  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                              LUTOSA_Cpt_Elec_IntoMoteur  gtc  8.202773e+04
+150076  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_hr...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Hres_FctMoteur  gtc  1.342600e+04
+150077  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150078  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  0.000000e+00
+150079  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_tempso...  opt_cleaned_data-2019-10      ...                             LUTOSA_TempSortie_Boucle_HT  gtc  5.633000e+01
+150080  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991217e+03
+150081  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836400e+03
+150082  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.000882e+07
+150083  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150084  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+150085  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_surpre...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Surpresseur_Alm  gtc  0.000000e+00
+150086  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150087  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+150088  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150089  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150090  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150091  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150092  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150093  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150095  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:44:12,001.001 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.090s]
+2019-10-15 17:44:12,039.039 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:44:12,041.041 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:44:12,042.042 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:44:12,064.064 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:44:12,073.073 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:44:12,077.077 ERROR gtc_sites_computed - doTheWork: Error During creating specifics data
+2019-10-15 17:44:12,082.082 ERROR gtc_sites_computed - doTheWork: Traceback (most recent call last):
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 727, in doTheWork
+    obj_to_es = create_obj(df, start)
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 491, in create_obj
+    day_on = df_calendar[df_calendar['date']==start]['on'].iloc[0]
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexing.py", line 1478, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexing.py", line 2102, in _getitem_axis
+    self._validate_integer(key, axis)
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/venv/lib/python3.7/site-packages/pandas/core/indexing.py", line 2009, in _validate_integer
+    raise IndexError("single positional indexer is out-of-bounds")
+IndexError: single positional indexer is out-of-bounds
+
+2019-10-15 17:44:19,261.261 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.403s]
+2019-10-15 17:44:19,276.276 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:44:21,717.717 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:2.365s]
+2019-10-15 17:44:23,522.522 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.739s]
+2019-10-15 17:44:23,573.573 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:23,574.574 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:25,906.906 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.313s]
+2019-10-15 17:44:25,958.958 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:25,959.959 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:28,236.236 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.257s]
+2019-10-15 17:44:28,301.301 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:28,302.302 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:30,177.177 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.840s]
+2019-10-15 17:44:30,261.261 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:30,261.261 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:45,855.855 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:44:45,857.857 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:44:45,858.858 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:44:45,858.858 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:44:45,859.859 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:44:45,860.860 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:44:45,860.860 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:44:45,861.861 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:44:45,888.888 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:44:45,889.889 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:44:45,890.890 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:44:45,914.914 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:44:45,916.916 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:44:45,917.917 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:44:45,919.919 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:44:50,921.921 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 540}
+2019-10-15 17:44:51,098.098 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.175s]
+2019-10-15 17:44:54,360.360 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:3.257s]
+2019-10-15 17:44:56,728.728 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.270s]
+2019-10-15 17:44:56,817.817 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:56,817.817 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:44:59,003.003 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.148s]
+2019-10-15 17:44:59,100.100 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:44:59,102.102 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:01,574.574 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.437s]
+2019-10-15 17:45:01,632.632 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:01,632.632 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:04,314.314 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.656s]
+2019-10-15 17:45:04,380.380 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:04,381.381 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:07,004.004 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.598s]
+2019-10-15 17:45:07,093.093 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:07,094.094 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:09,293.293 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.171s]
+2019-10-15 17:45:09,357.357 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:09,362.362 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:12,069.069 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.685s]
+2019-10-15 17:45:12,131.131 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:12,132.132 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:14,485.485 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.327s]
+2019-10-15 17:45:14,565.565 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:14,566.566 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:16,537.537 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.931s]
+2019-10-15 17:45:16,595.595 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:16,596.596 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:19,238.238 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.619s]
+2019-10-15 17:45:19,527.527 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:19,539.539 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:22,759.759 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.132s]
+2019-10-15 17:45:22,822.822 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:22,823.823 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:25,278.278 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.435s]
+2019-10-15 17:45:25,340.340 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:25,341.341 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:27,657.657 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.295s]
+2019-10-15 17:45:27,727.727 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:27,727.727 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:29,715.715 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.964s]
+2019-10-15 17:45:29,780.780 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:45:29,780.780 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:45:29,850.850 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.043s]
+2019-10-15 17:45:29,855.855 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:45:29,856.856 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:45:29,896.896 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.039s]
+2019-10-15 17:45:29,897.897 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:45:29,898.898 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:45:30,770.770 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:45:30,772.772 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571004120000  clean_h5bani_h5bani_exportnyxaws_t_amb_mag1571...  opt_cleaned_data-2019-10      ...                                               T_Amb_Mag  gtc  2.010000e+01
+1       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ch11571004...  opt_cleaned_data-2019-10      ...                                                  Et_Ch1  gtc  0.000000e+00
+2       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+3       1571004120000  clean_h5bani_h5bani_exportnyxaws_pos_van_frgp1...  opt_cleaned_data-2019-10      ...                                            Pos_Van_FrGP  gtc  0.000000e+00
+4       1571004120000  clean_h5bani_h5bani_exportnyxaws_press_pul_gp1...  opt_cleaned_data-2019-10      ...                                            Press_Pul_GP  gtc  2.450000e+02
+5       1571004120000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.790000e+01
+6       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_rez_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Gauche  gtc  6.000000e+00
+7       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_1er_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_1er_Gauche  gtc  4.130000e+02
+8       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_07_PosVan_Ch  gtc  0.000000e+00
+9       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_06_PosVan_Ch  gtc  0.000000e+00
+10      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_06_Fenetre  gtc  1.000000e+00
+11      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+12      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_05_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_05_Fenetre  gtc  1.000000e+00
+13      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_12_Fenetre  gtc  1.000000e+00
+14      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+15      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.660000e+02
+16      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_17_PosVAV  gtc  0.000000e+00
+17      1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+18      1571004120000  clean_h5bani_h5bani_exportnyxaws_press_rep_ge_...  opt_cleaned_data-2019-10      ...                                       Press_Rep_GE_Labo  gtc  4.510000e+02
+19      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+20      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_asc1571...  opt_cleaned_data-2019-10      ...                                               Conso_Asc  gtc  2.400425e+04
+21      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_ecl_ext...  opt_cleaned_data-2019-10      ...                                           Conso_Ecl_Ext  gtc  2.036821e+04
+22      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_vent...  opt_cleaned_data-2019-10      ...                                           Conso_TD_Vent  gtc  5.288272e+05
+23      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                      Conso_TD_Rdc_Droit  gtc  9.458283e+05
+24      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+25      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_04_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_04_Fenetre  gtc  1.000000e+00
+26      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+27      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_18_PosVAV  gtc  0.000000e+00
+28      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_20_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_20_PosVan_Ch  gtc  0.000000e+00
+29      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_21_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_21_Fenetre  gtc  1.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150067  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc  1.920000e+02
+150068  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  9.700000e+00
+150069  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150070  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu02_...  opt_cleaned_data-2019-10      ...                        LUTOSA_CPU02_Thiopaq_def_liaison  gtc  0.000000e+00
+150071  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.160000e+01
+150073  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+150074  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_th...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Ther_Drycooler  gtc  1.210968e+06
+150075  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                              LUTOSA_Cpt_Elec_IntoMoteur  gtc  8.202773e+04
+150076  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_hr...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Hres_FctMoteur  gtc  1.342600e+04
+150077  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150078  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  0.000000e+00
+150079  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_tempso...  opt_cleaned_data-2019-10      ...                             LUTOSA_TempSortie_Boucle_HT  gtc  5.633000e+01
+150080  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991217e+03
+150081  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836400e+03
+150082  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.000882e+07
+150083  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150084  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+150085  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_surpre...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Surpresseur_Alm  gtc  0.000000e+00
+150086  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150087  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+150088  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150089  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150090  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150091  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150092  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150093  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150095  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:45:31,365.365 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.097s]
+2019-10-15 17:45:31,403.403 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:45:31,404.404 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:45:31,405.405 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:45:31,425.425 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:45:31,431.431 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:46:34,327.327 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:46:34,329.329 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:46:34,329.329 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:46:34,330.330 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:46:34,330.330 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:46:34,331.331 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:46:34,332.332 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:46:34,333.333 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:46:34,385.385 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:46:34,386.386 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:46:34,387.387 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:46:34,413.413 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:46:34,416.416 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:46:34,418.418 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:46:34,422.422 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:46:39,428.428 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 540}
+2019-10-15 17:46:39,574.574 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.137s]
+2019-10-15 17:46:41,470.470 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:1.891s]
+2019-10-15 17:46:44,596.596 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.022s]
+2019-10-15 17:46:44,663.663 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:44,664.664 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:46:46,633.633 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.939s]
+2019-10-15 17:46:46,700.700 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:46,701.701 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:46:49,524.524 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.796s]
+2019-10-15 17:46:49,587.587 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:49,588.588 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:46:51,629.629 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.012s]
+2019-10-15 17:46:51,694.694 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:51,694.694 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:46:54,879.879 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.159s]
+2019-10-15 17:46:54,984.984 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:54,985.985 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:46:57,759.759 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.741s]
+2019-10-15 17:46:57,826.826 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:46:57,827.827 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:00,211.211 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.362s]
+2019-10-15 17:47:00,305.305 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:00,306.306 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:02,051.051 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.699s]
+2019-10-15 17:47:02,122.122 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:02,122.122 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:04,150.150 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.999s]
+2019-10-15 17:47:04,207.207 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:04,208.208 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:05,964.964 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.735s]
+2019-10-15 17:47:06,048.048 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:06,048.048 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:08,062.062 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.994s]
+2019-10-15 17:47:08,123.123 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:08,124.124 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:10,327.327 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.184s]
+2019-10-15 17:47:10,385.385 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:10,385.385 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:12,250.250 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.843s]
+2019-10-15 17:47:12,308.308 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:12,309.309 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:14,869.869 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.537s]
+2019-10-15 17:47:14,947.947 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:47:14,948.948 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:47:15,026.026 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.046s]
+2019-10-15 17:47:15,032.032 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:47:15,033.033 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:47:15,260.260 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.226s]
+2019-10-15 17:47:15,261.261 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:47:15,262.262 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:47:16,202.202 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:47:16,203.203 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571005020000  clean_h5bani_h5bani_exportnyxaws_t_ext15710050...  opt_cleaned_data-2019-10      ...                                                   T_Ext  gtc  1.730000e+01
+1       1571005020000  clean_h5bani_h5bani_exportnyxaws_pdc_t_ch11571...  opt_cleaned_data-2019-10      ...                                               PDC_T_Ch1  gtc  0.000000e+00
+2       1571005020000  clean_h5bani_h5bani_exportnyxaws_et_ouv_vpap_c...  opt_cleaned_data-2019-10      ...                                         Et_Ouv_VPap_Ch2  gtc  1.000000e+00
+3       1571005020000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+4       1571005020000  clean_h5bani_h5bani_exportnyxaws_pos_reg_gp157...  opt_cleaned_data-2019-10      ...                                              Pos_Reg_GP  gtc  0.000000e+00
+5       1571005020000  clean_h5bani_h5bani_exportnyxaws_t_rep_ge15710...  opt_cleaned_data-2019-10      ...                                                T_Rep_GE  gtc  2.030000e+01
+6       1571005020000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.800000e+01
+7       1571005020000  clean_h5bani_h5bani_exportnyxaws_co2_2eme_droi...  opt_cleaned_data-2019-10      ...                                         CO2_2eme_Droite  gtc  4.470000e+02
+8       1571005020000  clean_h5bani_h5bani_exportnyxaws_et_ge_san1571...  opt_cleaned_data-2019-10      ...                                               Et_GE_San  gtc  0.000000e+00
+9       1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_07_PosVAV  gtc  0.000000e+00
+10      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+11      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_05_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_05_PosVan_Ch  gtc  0.000000e+00
+12      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_01_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_01_Fenetre  gtc  1.000000e+00
+13      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_12_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_12_TAmb  gtc  2.500000e+01
+14      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_12_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_12_PosVan_Ch  gtc  0.000000e+00
+15      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_14_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_14_PosVan_Ch  gtc  0.000000e+00
+16      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_14_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_14_PosVAV  gtc  0.000000e+00
+17      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_15_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_15_TAmb  gtc  2.270000e+01
+18      1571005020000  clean_h5bani_h5bani_exportnyxaws_r0_17_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_17_Fenetre  gtc  1.000000e+00
+19      1571005020000  clean_h5bani_h5bani_exportnyxaws_conso_eau1571...  opt_cleaned_data-2019-10      ...                                               Conso_Eau  gtc  2.569800e+04
+20      1571005020000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+21      1571005020000  clean_h5bani_h5bani_exportnyxaws_conso_gf15710...  opt_cleaned_data-2019-10      ...                                                Conso_GF  gtc  3.346949e+05
+22      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+23      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_07_PosVan_Ch  gtc  0.000000e+00
+24      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_07_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_07_PosVAV  gtc  0.000000e+00
+25      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_12_Fenetre  gtc  1.000000e+00
+26      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_08_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_08_TAmb  gtc  2.310000e+01
+27      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_08_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_08_PosVAV  gtc  0.000000e+00
+28      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_16_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_16_PosVan_Ch  gtc  0.000000e+00
+29      1571005020000  clean_h5bani_h5bani_exportnyxaws_r1_16_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_16_PosVAV  gtc  0.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571089920000  clean_cogen_nyxaws_cogolv_db201_m1_nbrstart157...  opt_cleaned_data-2019-10      ...                                COGOLV_DB201_M1_NbrStart  gtc  7.110000e+02
+150067  1571089920000  clean_cogen_nyxaws_cognitto_db201_puissance157...  opt_cleaned_data-2019-10      ...                                COGNITTO_DB201_PUISSANCE  gtc  1.499000e+03
+150068  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150069  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150070  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150071  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150073  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150074  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+150075  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                             LUTOSA_Cpt_Elec_OutToMoteur  gtc  1.080884e+07
+150076  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150077  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_bi...  opt_cleaned_data-2019-10      ...                LUTOSA_Cpt_Biogaz_Av_Thiopaq_Sup600_Mois  gtc  0.000000e+00
+150078  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991284e+03
+150079  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...        COGLTS_BIOLTS_Index_Cpt_Hre_Moteur_Autoristation  gtc  9.306569e+03
+150080  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836467e+03
+150081  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc  1.497701e+03
+150082  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718129e+05
+150083  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Debit_Biogaz_Chaufferie  gtc  1.680000e+02
+150084  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                 COGLTS_BIOLTS_Valeur_Debit_Biogaz_Cogen  gtc  0.000000e+00
+150085  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_GazNat_Thiopaq  gtc  0.000000e+00
+150086  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree  gtc  2.760000e+01
+150087  1571090340000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.676000e+02
+150088  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_arret_...  opt_cleaned_data-2019-10      ...                                LUTOSA_Arret_Urgence_Alm  gtc  0.000000e+00
+150089  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150090  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150091  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_indist...  opt_cleaned_data-2019-10      ...                         LUTOSA_IndisThiopConsInf_120Nm3  gtc  0.000000e+00
+150092  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_dispo_...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Dispo_Valogaz  gtc  1.000000e+00
+150093  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                          LUTOSA_Cond_Fct_Global_Thiopaq  gtc  1.000000e+00
+150095  1571090340000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:47:16,774.774 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.091s]
+2019-10-15 17:47:16,811.811 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:47:16,812.812 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:47:16,813.813 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:47:16,831.831 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:47:16,832.832 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:48:29,228.228 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:48:29,230.230 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:48:29,231.231 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:48:29,231.231 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:48:29,232.232 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:48:29,233.233 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:48:29,233.233 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:48:29,234.234 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:48:29,260.260 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:48:29,262.262 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:48:29,264.264 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:48:29,287.287 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:48:29,290.290 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:48:29,291.291 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:48:29,296.296 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:48:34,301.301 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 539}
+2019-10-15 17:48:34,437.437 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.134s]
+2019-10-15 17:48:35,988.988 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:1.546s]
+2019-10-15 17:48:38,312.312 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.196s]
+2019-10-15 17:48:38,390.390 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:38,390.390 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:40,168.168 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.745s]
+2019-10-15 17:48:40,232.232 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:40,232.232 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:41,860.860 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.604s]
+2019-10-15 17:48:41,922.922 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:41,923.923 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:44,612.612 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.663s]
+2019-10-15 17:48:44,673.673 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:44,673.673 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:46,981.981 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.288s]
+2019-10-15 17:48:47,062.062 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:47,063.063 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:49,052.052 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.970s]
+2019-10-15 17:48:49,111.111 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:49,112.112 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:51,045.045 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.912s]
+2019-10-15 17:48:51,100.100 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:51,101.101 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:53,224.224 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.103s]
+2019-10-15 17:48:53,281.281 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:53,281.281 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:56,652.652 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.348s]
+2019-10-15 17:48:56,739.739 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:56,740.740 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:48:58,654.654 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.892s]
+2019-10-15 17:48:58,750.750 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:48:58,751.751 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:00,374.374 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.595s]
+2019-10-15 17:49:00,430.430 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:00,431.431 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:02,389.389 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.935s]
+2019-10-15 17:49:02,463.463 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:02,464.464 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:04,523.523 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.030s]
+2019-10-15 17:49:04,578.578 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:04,578.578 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:06,586.586 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.988s]
+2019-10-15 17:49:06,642.642 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:06,642.642 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:06,710.710 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.047s]
+2019-10-15 17:49:06,715.715 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:49:06,716.716 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:49:06,759.759 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.042s]
+2019-10-15 17:49:06,760.760 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:49:06,761.761 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:49:07,837.837 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:49:07,838.838 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571004120000  clean_h5bani_h5bani_exportnyxaws_t_amb_mag1571...  opt_cleaned_data-2019-10      ...                                               T_Amb_Mag  gtc  2.010000e+01
+1       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ch11571004...  opt_cleaned_data-2019-10      ...                                                  Et_Ch1  gtc  0.000000e+00
+2       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+3       1571004120000  clean_h5bani_h5bani_exportnyxaws_pos_van_frgp1...  opt_cleaned_data-2019-10      ...                                            Pos_Van_FrGP  gtc  0.000000e+00
+4       1571004120000  clean_h5bani_h5bani_exportnyxaws_press_pul_gp1...  opt_cleaned_data-2019-10      ...                                            Press_Pul_GP  gtc  2.450000e+02
+5       1571004120000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.790000e+01
+6       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_rez_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Gauche  gtc  6.000000e+00
+7       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_1er_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_1er_Gauche  gtc  4.130000e+02
+8       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_07_PosVan_Ch  gtc  0.000000e+00
+9       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_06_PosVan_Ch  gtc  0.000000e+00
+10      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_06_Fenetre  gtc  1.000000e+00
+11      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+12      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_05_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_05_Fenetre  gtc  1.000000e+00
+13      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_12_Fenetre  gtc  1.000000e+00
+14      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+15      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.660000e+02
+16      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_17_PosVAV  gtc  0.000000e+00
+17      1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+18      1571004120000  clean_h5bani_h5bani_exportnyxaws_press_rep_ge_...  opt_cleaned_data-2019-10      ...                                       Press_Rep_GE_Labo  gtc  4.510000e+02
+19      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+20      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_asc1571...  opt_cleaned_data-2019-10      ...                                               Conso_Asc  gtc  2.400425e+04
+21      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_ecl_ext...  opt_cleaned_data-2019-10      ...                                           Conso_Ecl_Ext  gtc  2.036821e+04
+22      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_vent...  opt_cleaned_data-2019-10      ...                                           Conso_TD_Vent  gtc  5.288272e+05
+23      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                      Conso_TD_Rdc_Droit  gtc  9.458283e+05
+24      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+25      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_04_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_04_Fenetre  gtc  1.000000e+00
+26      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+27      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_18_PosVAV  gtc  0.000000e+00
+28      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_20_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_20_PosVan_Ch  gtc  0.000000e+00
+29      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_21_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_21_Fenetre  gtc  1.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150067  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc  1.920000e+02
+150068  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  9.700000e+00
+150069  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150070  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu02_...  opt_cleaned_data-2019-10      ...                        LUTOSA_CPU02_Thiopaq_def_liaison  gtc  0.000000e+00
+150071  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.160000e+01
+150073  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+150074  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_th...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Ther_Drycooler  gtc  1.210968e+06
+150075  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                              LUTOSA_Cpt_Elec_IntoMoteur  gtc  8.202773e+04
+150076  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_hr...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Hres_FctMoteur  gtc  1.342600e+04
+150077  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150078  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  0.000000e+00
+150079  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_tempso...  opt_cleaned_data-2019-10      ...                             LUTOSA_TempSortie_Boucle_HT  gtc  5.633000e+01
+150080  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991217e+03
+150081  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836400e+03
+150082  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.000882e+07
+150083  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150084  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+150085  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_surpre...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Surpresseur_Alm  gtc  0.000000e+00
+150086  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150087  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+150088  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150089  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150090  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150091  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150092  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150093  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150095  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:49:08,580.580 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.101s]
+2019-10-15 17:49:08,617.617 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:49:08,619.619 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:49:08,619.619 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:49:08,639.639 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:49:08,643.643 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:49:08,788.788 ERROR gtc_sites_computed - doTheWork: Error During creating specifics data
+2019-10-15 17:49:08,790.790 ERROR gtc_sites_computed - doTheWork: Traceback (most recent call last):
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 727, in doTheWork
+    obj_to_es = create_obj(df, start)
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 544, in create_obj
+    df_daily_lutosa.loc[df_daily_lutosa['on'], 'entry_biogas_thiopaq_target_MWh'] = daily_target_prod_biogaz
+NameError: name 'df_daily_lutosa' is not defined
+
+2019-10-15 17:49:16,148.148 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.364s]
+2019-10-15 17:49:16,153.153 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:49:18,158.158 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:1.933s]
+2019-10-15 17:49:20,149.149 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.928s]
+2019-10-15 17:49:20,199.199 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:20,200.200 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:22,483.483 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.264s]
+2019-10-15 17:49:22,534.534 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:22,534.534 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:24,519.519 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.963s]
+2019-10-15 17:49:24,569.569 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:24,570.570 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:27,043.043 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.446s]
+2019-10-15 17:49:27,120.120 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:27,121.121 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:30,335.335 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.165s]
+2019-10-15 17:49:30,420.420 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:30,421.421 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:33,164.164 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.712s]
+2019-10-15 17:49:33,228.228 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:33,230.230 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:34,951.951 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.697s]
+2019-10-15 17:49:35,008.008 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:35,008.008 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:37,004.004 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.976s]
+2019-10-15 17:49:37,062.062 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:37,062.062 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:38,913.913 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.829s]
+2019-10-15 17:49:39,003.003 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:39,004.004 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:40,764.764 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.738s]
+2019-10-15 17:49:40,840.840 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:49:40,840.840 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:49:41,295.295 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.426s]
+2019-10-15 17:49:41,310.310 INFO es_helper - elastic_to_dataframe: scroll size: 1701
+2019-10-15 17:49:41,311.311 INFO es_helper - elastic_to_dataframe: Next page:1701
+2019-10-15 17:49:41,352.352 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.035s]
+2019-10-15 17:49:41,353.353 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:49:41,354.354 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:49:41,981.981 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:49:41,982.982 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571090520000  clean_h5bani_h5bani_exportnyxaws_t_ext15710905...  opt_cleaned_data-2019-10      ...                                                   T_Ext  gtc  1.990000e+01
+1       1571090520000  clean_h5bani_h5bani_exportnyxaws_hr_ext1571090...  opt_cleaned_data-2019-10      ...                                                  HR_Ext  gtc  6.480000e+01
+2       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cirvav1571...  opt_cleaned_data-2019-10      ...                                               Et_CirVAV  gtc  0.000000e+00
+3       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge15710905...  opt_cleaned_data-2019-10      ...                                                   Et_GE  gtc  1.000000e+00
+4       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_var_gp157...  opt_cleaned_data-2019-10      ...                                              Pos_VAR_GP  gtc  0.000000e+00
+5       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cir_rec_gp...  opt_cleaned_data-2019-10      ...                                           Et_Cir_Rec_GP  gtc  0.000000e+00
+6       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_reg_gp157...  opt_cleaned_data-2019-10      ...                                              Pos_Reg_GP  gtc  0.000000e+00
+7       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_rez_droit...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Droite  gtc  5.000000e+00
+8       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_2eme_droi...  opt_cleaned_data-2019-10      ...                                         CO2_2eme_Droite  gtc  4.470000e+02
+9       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_elec157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Elec  gtc  0.000000e+00
+10      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_08_TAmb  gtc  2.430000e+01
+11      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_08_PosVan_Ch  gtc  0.000000e+00
+12      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_08_PosVAV  gtc  0.000000e+00
+13      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_07_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_07_Fenetre  gtc  1.000000e+00
+14      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_10_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_10_TAmb  gtc -2.083000e+02
+15      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_05_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_05_PosVan_Ch  gtc  0.000000e+00
+16      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_03_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_03_Fenetre  gtc  1.000000e+00
+17      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_01_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_01_PosVan_Ch  gtc  0.000000e+00
+18      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_14_PosVAV  gtc  0.000000e+00
+19      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_14_Fenetre  gtc  1.000000e+00
+20      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+21      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.540000e+02
+22      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_17_PosVan_Ch  gtc  0.000000e+00
+23      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_co21571...  opt_cleaned_data-2019-10      ...                                               R0_17_CO2  gtc  4.580000e+02
+24      1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+25      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                     Conso_TD_RDC_Gauche  gtc  8.576577e+04
+26      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_+2_d...  opt_cleaned_data-2019-10      ...                                       Conso_TD_+2_Droit  gtc  2.580866e+05
+27      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_mag1...  opt_cleaned_data-2019-10      ...                                            Conso_TD_Mag  gtc  8.795651e+04
+28      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_07_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_07_TAmb  gtc  2.420000e+01
+29      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+111671  1571154420000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc  1.508517e+03
+111672  1571154420000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Thiopaq  gtc  2.157265e+05
+111673  1571154420000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.279142e+06
+111674  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_mot...  opt_cleaned_data-2019-10      ...                                  LUTOSA_AG_Mot_Cogen_Ar  gtc  0.000000e+00
+111675  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+111676  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_arret_...  opt_cleaned_data-2019-10      ...                                LUTOSA_Arret_Urgence_Alm  gtc  0.000000e+00
+111677  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+111678  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_CH4_Av_Cogen  gtc  7.510000e+01
+111679  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_ap_...  opt_cleaned_data-2019-10      ...                                    LUTOSA_O2_Ap_Thiopaq  gtc  0.000000e+00
+111680  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+111681  1571154420000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                            LUTOSA_Cond_Fct_Global_Cogen  gtc  1.000000e+00
+111682  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_m...  opt_cleaned_data-2019-10      ...                                     LUTOSA_Etat_Mot_Fct  gtc  1.000000e+00
+111683  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_debit_...  opt_cleaned_data-2019-10      ...                                         LUTOSA_Debit_HT  gtc  3.240000e+01
+111684  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  1.000000e-01
+111685  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cpt_Elec_Valogaz  gtc  6.241395e+00
+111686  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  4.009100e+03
+111687  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.854584e+03
+111688  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc  1.508534e+03
+111689  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_Refroidiss...  gtc  1.210973e+06
+111690  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...              COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Thiopaq  gtc  1.259456e+06
+111691  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.279142e+06
+111692  1571154480000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  3.200000e+00
+111693  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+111694  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_arret_...  opt_cleaned_data-2019-10      ...                                LUTOSA_Arret_Urgence_Alm  gtc  0.000000e+00
+111695  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_ap...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Ap_Thiopaq  gtc  7.590000e+01
+111696  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_H2S_Av_Thiopaq  gtc  5.686000e+03
+111697  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.360000e+01
+111698  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_moteur...  opt_cleaned_data-2019-10      ...                                LUTOSA_Moteur_Disponible  gtc  1.000000e+00
+111699  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_2_Cogen  gtc  1.000000e+00
+111700  1571154480000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                            LUTOSA_Cond_Fct_Global_Cogen  gtc  1.000000e+00
+
+[111701 rows x 11 columns]
+2019-10-15 17:49:42,492.492 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.091s]
+2019-10-15 17:49:42,531.531 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.036s]
+2019-10-15 17:49:42,532.532 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:49:42,533.533 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:49:42,551.551 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:49:42,553.553 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:49:42,646.646 ERROR gtc_sites_computed - doTheWork: Error During creating specifics data
+2019-10-15 17:49:42,647.647 ERROR gtc_sites_computed - doTheWork: Traceback (most recent call last):
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 727, in doTheWork
+    obj_to_es = create_obj(df, start)
+  File "/Users/valentin/Documents/GitHub/nyx_containers_cof/sources/gtc_sites_computed.py", line 544, in create_obj
+    df_daily_lutosa.loc[df_daily_lutosa['on'], 'entry_biogas_thiopaq_target_MWh'] = daily_target_prod_biogaz
+NameError: name 'df_daily_lutosa' is not defined
+
+2019-10-15 17:49:49,158.158 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.429s]
+2019-10-15 17:49:49,182.182 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:49:54,237.237 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:49:59,242.242 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:04,248.248 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:09,253.253 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:14,265.265 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:19,268.268 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:24,276.276 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:29,281.281 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:34,284.284 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 566}
+2019-10-15 17:50:39,298.298 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:50:44,305.305 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:50:49,316.316 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:51:06,068.068 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:51:06,070.070 INFO gtc_sites_computed - <module>: Starting: GTC_SITES_COMPUTED
+2019-10-15 17:51:06,070.070 INFO gtc_sites_computed - <module>: Module:   0.0.20
+2019-10-15 17:51:06,071.071 INFO gtc_sites_computed - <module>: ==============================
+2019-10-15 17:51:06,072.072 INFO gtc_sites_computed - <module>: {'ip': 'nyxaws.cofelygtc.com', 'port': '61613', 'login': 'admin', 'password': 'nyxaimelespetitslapins', 'heartbeats': (1200000, 1200000), 'earlyack': True}
+2019-10-15 17:51:06,072.072 INFO amqstompclient - __init__: Early ack set to true.
+2019-10-15 17:51:06,073.073 INFO amqstompclient - create_connection: #=- Creating connection.
+2019-10-15 17:51:06,074.074 INFO transport - attempt_connection: Attempting connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:51:06,157.157 INFO transport - attempt_connection: Established connection to host nyxaws.cofelygtc.com, port 61613
+2019-10-15 17:51:06,159.159 INFO transport - transmit: Sending frame: 'STOMP', headers={'client-id': 'GTC_SITES_COMPUTED', 'accept-version': '1.1', 'login': 'admin', 'passcode': '********', 'heart-beat': '1200000,1200000'}
+2019-10-15 17:51:06,161.161 INFO transport - __receiver_loop: Starting receiver loop
+2019-10-15 17:51:06,184.184 INFO transport - process_frame: Received frame: 'CONNECTED', headers={'server': 'ActiveMQ/5.15.2', 'heart-beat': '1200000,1200000', 'session': 'GTC_SITES_COMPUTED', 'version': '1.1'}, len(body)=0
+2019-10-15 17:51:06,185.185 INFO transport - transmit: Sending frame: 'SUBSCRIBE', headers={'activemq.prefetchSize': 1, 'destination': 'GTC_SITES_COMPUTED_RANGE', 'id': 1, 'ack': 'client'}
+2019-10-15 17:51:06,186.186 INFO gtc_sites_computed - <module>: true
+2019-10-15 17:51:06,194.194 INFO gtc_sites_computed - <module>: AMQC_URL          :nyxaws.cofelygtc.com
+2019-10-15 17:51:11,195.195 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 540}
+2019-10-15 17:51:11,356.356 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/ [status:200 request:0.160s]
+2019-10-15 17:51:14,812.812 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:3.452s]
+2019-10-15 17:51:17,704.704 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.791s]
+2019-10-15 17:51:17,762.762 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:17,763.763 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:19,930.930 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.145s]
+2019-10-15 17:51:19,989.989 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:19,989.989 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:22,311.311 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.296s]
+2019-10-15 17:51:22,377.377 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:22,378.378 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:24,424.424 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.022s]
+2019-10-15 17:51:24,480.480 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:24,481.481 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:27,738.738 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:3.238s]
+2019-10-15 17:51:27,818.818 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:27,819.819 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:29,620.620 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.781s]
+2019-10-15 17:51:29,676.676 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:29,677.677 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:31,731.731 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.035s]
+2019-10-15 17:51:31,786.786 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:31,786.786 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:34,254.254 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.448s]
+2019-10-15 17:51:34,319.319 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:34,320.320 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:36,168.168 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.820s]
+2019-10-15 17:51:36,237.237 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:36,238.238 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:37,951.951 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.687s]
+2019-10-15 17:51:38,040.040 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:38,040.040 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:40,446.446 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.384s]
+2019-10-15 17:51:40,501.501 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:40,501.501 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:42,344.344 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.822s]
+2019-10-15 17:51:42,406.406 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:42,407.407 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:44,514.514 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.087s]
+2019-10-15 17:51:44,569.569 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:44,570.570 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:46,476.476 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.885s]
+2019-10-15 17:51:46,533.533 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:51:46,534.534 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:51:46,603.603 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.048s]
+2019-10-15 17:51:46,607.607 INFO es_helper - elastic_to_dataframe: scroll size: 96
+2019-10-15 17:51:46,608.608 INFO es_helper - elastic_to_dataframe: Next page:96
+2019-10-15 17:51:46,661.661 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.052s]
+2019-10-15 17:51:46,662.662 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:51:46,662.662 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:51:47,483.483 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:51:47,483.483 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571004120000  clean_h5bani_h5bani_exportnyxaws_t_amb_mag1571...  opt_cleaned_data-2019-10      ...                                               T_Amb_Mag  gtc  2.010000e+01
+1       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ch11571004...  opt_cleaned_data-2019-10      ...                                                  Et_Ch1  gtc  0.000000e+00
+2       1571004120000  clean_h5bani_h5bani_exportnyxaws_et_cirlt_fr15...  opt_cleaned_data-2019-10      ...                                             Et_CirLT_Fr  gtc  0.000000e+00
+3       1571004120000  clean_h5bani_h5bani_exportnyxaws_pos_van_frgp1...  opt_cleaned_data-2019-10      ...                                            Pos_Van_FrGP  gtc  0.000000e+00
+4       1571004120000  clean_h5bani_h5bani_exportnyxaws_press_pul_gp1...  opt_cleaned_data-2019-10      ...                                            Press_Pul_GP  gtc  2.450000e+02
+5       1571004120000  clean_h5bani_h5bani_exportnyxaws_hr_pul_gp1571...  opt_cleaned_data-2019-10      ...                                               HR_Pul_GP  gtc  6.790000e+01
+6       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_rez_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Gauche  gtc  6.000000e+00
+7       1571004120000  clean_h5bani_h5bani_exportnyxaws_co2_1er_gauch...  opt_cleaned_data-2019-10      ...                                          CO2_1er_Gauche  gtc  4.130000e+02
+8       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_07_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_07_PosVan_Ch  gtc  0.000000e+00
+9       1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_06_PosVan_Ch  gtc  0.000000e+00
+10      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_06_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_06_Fenetre  gtc  1.000000e+00
+11      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_08_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_08_Fenetre  gtc  1.000000e+00
+12      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_05_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_05_Fenetre  gtc  1.000000e+00
+13      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_12_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_12_Fenetre  gtc  1.000000e+00
+14      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+15      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.660000e+02
+16      1571004120000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_17_PosVAV  gtc  0.000000e+00
+17      1571004120000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+18      1571004120000  clean_h5bani_h5bani_exportnyxaws_press_rep_ge_...  opt_cleaned_data-2019-10      ...                                       Press_Rep_GE_Labo  gtc  4.510000e+02
+19      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_gaz1571...  opt_cleaned_data-2019-10      ...                                               Conso_Gaz  gtc  9.411889e+05
+20      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_asc1571...  opt_cleaned_data-2019-10      ...                                               Conso_Asc  gtc  2.400425e+04
+21      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_ecl_ext...  opt_cleaned_data-2019-10      ...                                           Conso_Ecl_Ext  gtc  2.036821e+04
+22      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_vent...  opt_cleaned_data-2019-10      ...                                           Conso_TD_Vent  gtc  5.288272e+05
+23      1571004120000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                      Conso_TD_Rdc_Droit  gtc  9.458283e+05
+24      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_01_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_01_TAmb  gtc  2.280000e+01
+25      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_04_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_04_Fenetre  gtc  1.000000e+00
+26      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+27      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_18_posvav1...  opt_cleaned_data-2019-10      ...                                            R1_18_PosVAV  gtc  0.000000e+00
+28      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_20_posvan_...  opt_cleaned_data-2019-10      ...                                         R1_20_PosVan_Ch  gtc  0.000000e+00
+29      1571004120000  clean_h5bani_h5bani_exportnyxaws_r1_21_fenetre...  opt_cleaned_data-2019-10      ...                                           R1_21_Fenetre  gtc  1.000000e+00
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+150066  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150067  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq  gtc  1.920000e+02
+150068  1571090220000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Sortie  gtc  9.700000e+00
+150069  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+150070  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu02_...  opt_cleaned_data-2019-10      ...                        LUTOSA_CPU02_Thiopaq_def_liaison  gtc  0.000000e+00
+150071  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150072  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_ch4_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_CH4_Av_Thiopaq  gtc  7.160000e+01
+150073  1571090220000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  0.000000e+00
+150074  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_th...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Ther_Drycooler  gtc  1.210968e+06
+150075  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                              LUTOSA_Cpt_Elec_IntoMoteur  gtc  8.202773e+04
+150076  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_hr...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cpt_Hres_FctMoteur  gtc  1.342600e+04
+150077  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_s...  opt_cleaned_data-2019-10      ...                                   LUTOSA_Etat_Surp2_Fct  gtc  1.000000e+00
+150078  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_positi...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Position_CV01  gtc  0.000000e+00
+150079  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_tempso...  opt_cleaned_data-2019-10      ...                             LUTOSA_TempSortie_Boucle_HT  gtc  5.633000e+01
+150080  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  3.991217e+03
+150081  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...         COGLTS_BIOLTS_Index_Cpt_Hre_Surpresseur2_Marche  gtc  1.836400e+03
+150082  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.000882e+07
+150083  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.278944e+06
+150084  1571090100000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+150085  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_surpre...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Surpresseur_Alm  gtc  0.000000e+00
+150086  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150087  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_b...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Blancheur_1  gtc  1.000000e+00
+150088  1571090100000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150089  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                     LUTOSA_H2S_Av_Cogen  gtc  0.000000e+00
+150090  1571089980000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...          COGLTS_BIOLTS_Index_Cpt_KWh_Electrique_Valogaz  gtc  1.718122e+05
+150091  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+150092  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  0.000000e+00
+150093  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+150094  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  0.000000e+00
+150095  1571089980000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_5_Cogen  gtc  1.000000e+00
+
+[150096 rows x 11 columns]
+2019-10-15 17:51:48,051.051 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.090s]
+2019-10-15 17:51:48,088.088 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.033s]
+2019-10-15 17:51:48,089.089 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:51:48,090.090 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:51:48,108.108 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:51:48,110.110 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:51:48,730.730 INFO base - log_request_success: PUT https://nyxaws.cofelygtc.com:9200/daily_cogen_lutosa/doc/1571004000 [status:200 request:0.072s]
+2019-10-15 17:51:48,780.780 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.040s]
+2019-10-15 17:51:48,781.781 INFO gtc_sites_computed - save_tags_to_computed: BULK done without errors.
+2019-10-15 17:51:55,690.690 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.464s]
+2019-10-15 17:51:55,694.694 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:51:59,032.032 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/opt_cleaned_data*/_search?scroll=2m&size=10000 [status:200 request:3.251s]
+2019-10-15 17:52:01,146.146 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.057s]
+2019-10-15 17:52:01,205.205 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:01,205.205 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:03,297.297 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.075s]
+2019-10-15 17:52:03,347.347 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:03,347.347 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:05,650.650 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.284s]
+2019-10-15 17:52:05,700.700 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:05,701.701 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:07,632.632 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:1.908s]
+2019-10-15 17:52:07,709.709 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:07,710.710 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:10,429.429 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.699s]
+2019-10-15 17:52:10,488.488 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:10,489.489 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:12,666.666 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.152s]
+2019-10-15 17:52:12,722.722 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:12,722.722 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:15,221.221 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.478s]
+2019-10-15 17:52:15,280.280 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:15,281.281 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:17,388.388 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.087s]
+2019-10-15 17:52:17,443.443 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:17,444.444 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:19,569.569 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.105s]
+2019-10-15 17:52:19,656.656 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:19,657.657 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:22,082.082 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:2.405s]
+2019-10-15 17:52:22,138.138 INFO es_helper - elastic_to_dataframe: scroll size: 10000
+2019-10-15 17:52:22,139.139 INFO es_helper - elastic_to_dataframe: Next page:10000
+2019-10-15 17:52:22,656.656 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.498s]
+2019-10-15 17:52:22,679.679 INFO es_helper - elastic_to_dataframe: scroll size: 1941
+2019-10-15 17:52:22,680.680 INFO es_helper - elastic_to_dataframe: Next page:1941
+2019-10-15 17:52:22,722.722 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.036s]
+2019-10-15 17:52:22,724.724 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:52:22,725.725 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:52:23,308.308 INFO gtc_sites_computed - retrieve_raw_data: Data retrieved
+2019-10-15 17:52:23,308.308 INFO gtc_sites_computed - retrieve_raw_data:            @timestamp                                                _id                    _index      ...                                                    name  src         value
+0       1571090520000  clean_h5bani_h5bani_exportnyxaws_t_ext15710905...  opt_cleaned_data-2019-10      ...                                                   T_Ext  gtc  1.990000e+01
+1       1571090520000  clean_h5bani_h5bani_exportnyxaws_hr_ext1571090...  opt_cleaned_data-2019-10      ...                                                  HR_Ext  gtc  6.480000e+01
+2       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cirvav1571...  opt_cleaned_data-2019-10      ...                                               Et_CirVAV  gtc  0.000000e+00
+3       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge15710905...  opt_cleaned_data-2019-10      ...                                                   Et_GE  gtc  1.000000e+00
+4       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_var_gp157...  opt_cleaned_data-2019-10      ...                                              Pos_VAR_GP  gtc  0.000000e+00
+5       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_cir_rec_gp...  opt_cleaned_data-2019-10      ...                                           Et_Cir_Rec_GP  gtc  0.000000e+00
+6       1571090520000  clean_h5bani_h5bani_exportnyxaws_pos_reg_gp157...  opt_cleaned_data-2019-10      ...                                              Pos_Reg_GP  gtc  0.000000e+00
+7       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_rez_droit...  opt_cleaned_data-2019-10      ...                                          CO2_Rez_Droite  gtc  5.000000e+00
+8       1571090520000  clean_h5bani_h5bani_exportnyxaws_co2_2eme_droi...  opt_cleaned_data-2019-10      ...                                         CO2_2eme_Droite  gtc  4.470000e+02
+9       1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_elec157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Elec  gtc  0.000000e+00
+10      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_08_TAmb  gtc  2.430000e+01
+11      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_08_PosVan_Ch  gtc  0.000000e+00
+12      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_08_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_08_PosVAV  gtc  0.000000e+00
+13      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_07_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_07_Fenetre  gtc  1.000000e+00
+14      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_10_tamb157...  opt_cleaned_data-2019-10      ...                                              R0_10_TAmb  gtc -2.083000e+02
+15      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_05_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_05_PosVan_Ch  gtc  0.000000e+00
+16      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_03_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_03_Fenetre  gtc  1.000000e+00
+17      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_01_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_01_PosVan_Ch  gtc  0.000000e+00
+18      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_14_PosVAV  gtc  0.000000e+00
+19      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_14_fenetre...  opt_cleaned_data-2019-10      ...                                           R0_14_Fenetre  gtc  1.000000e+00
+20      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_posvav1...  opt_cleaned_data-2019-10      ...                                            R0_15_PosVAV  gtc  0.000000e+00
+21      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_15_co21571...  opt_cleaned_data-2019-10      ...                                               R0_15_CO2  gtc  4.540000e+02
+22      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_posvan_...  opt_cleaned_data-2019-10      ...                                         R0_17_PosVan_Ch  gtc  0.000000e+00
+23      1571090520000  clean_h5bani_h5bani_exportnyxaws_r0_17_co21571...  opt_cleaned_data-2019-10      ...                                               R0_17_CO2  gtc  4.580000e+02
+24      1571090520000  clean_h5bani_h5bani_exportnyxaws_et_ge_labo157...  opt_cleaned_data-2019-10      ...                                              Et_GE_Labo  gtc  1.000000e+00
+25      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_rdc_...  opt_cleaned_data-2019-10      ...                                     Conso_TD_RDC_Gauche  gtc  8.576577e+04
+26      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_+2_d...  opt_cleaned_data-2019-10      ...                                       Conso_TD_+2_Droit  gtc  2.580866e+05
+27      1571090520000  clean_h5bani_h5bani_exportnyxaws_conso_td_mag1...  opt_cleaned_data-2019-10      ...                                            Conso_TD_Mag  gtc  8.795651e+04
+28      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_07_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_07_TAmb  gtc  2.420000e+01
+29      1571090520000  clean_h5bani_h5bani_exportnyxaws_r1_18_tamb157...  opt_cleaned_data-2019-10      ...                                              R1_18_TAmb  gtc -2.085000e+02
+...               ...                                                ...                       ...      ...                                                     ...  ...           ...
+111911  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Index_Cpt_Hre_Moteur_Alarme  gtc  2.180000e+03
+111912  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc  1.508567e+03
+111913  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_KWh_Chaleur_HauteTempe...  gtc  1.001455e+07
+111914  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...           COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Chaufferie  gtc  4.401690e+05
+111915  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...              COGLTS_BIOLTS_Index_Cpt_Nm3_Biogaz_Thiopaq  gtc  1.259464e+06
+111916  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...               COGLTS_BIOLTS_Valeur_Debit_GazNat_Thiopaq  gtc  1.200000e+01
+111917  1571154600000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...            COGLTS_BIOLTS_Valeur_Pression_Valogaz_Sortie  gtc  1.745000e+02
+111918  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+111919  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_cpu01_...  opt_cleaned_data-2019-10      ...                         LUTOSA_CPU01_Cofely_def_liaison  gtc  0.000000e+00
+111920  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_av_...  opt_cleaned_data-2019-10      ...                                      LUTOSA_O2_Av_Cogen  gtc  1.000000e-01
+111921  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_o2_ap_...  opt_cleaned_data-2019-10      ...                                    LUTOSA_O2_Ap_Thiopaq  gtc  0.000000e+00
+111922  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_h2s_av...  opt_cleaned_data-2019-10      ...                                   LUTOSA_H2S_Av_Thiopaq  gtc  5.671000e+03
+111923  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_1_Thiopaq  gtc  1.000000e+00
+111924  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                          LUTOSA_Cond_Fct_Global_Thiopaq  gtc  1.000000e+00
+111925  1571154600000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_1_Cogen  gtc  1.000000e+00
+111926  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_a...  opt_cleaned_data-2019-10      ...                                  LUTOSA_Etat_Autor_Biog  gtc  1.000000e+00
+111927  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_etat_p...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Etat_Peleur1_Fct  gtc  1.000000e+00
+111928  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_cpt_el...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cpt_Elec_Valogaz  gtc  1.810465e+01
+111929  1571154660000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Deshumidificateur2...  gtc  4.009150e+03
+111930  1571154660000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...        COGLTS_BIOLTS_Index_Cpt_Hre_Moteur_Autoristation  gtc  9.323862e+03
+111931  1571154660000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...       COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Debit3Seui...  gtc  1.508584e+03
+111932  1571154660000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...              COGLTS_BIOLTS_Index_Cpt_Hre_Thiopaq_Marche  gtc  5.549211e+03
+111933  1571154660000  clean_coglts_lutosa_exportnyxaws_coglts_biolts...  opt_cleaned_data-2019-10      ...                COGLTS_BIOLTS_Index_Cpt_Nm3_GazNat_Cogen  gtc  1.279142e+06
+111934  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_ag_thi...  opt_cleaned_data-2019-10      ...                                       LUTOSA_AG_Thiopaq  gtc  0.000000e+00
+111935  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_moteur...  opt_cleaned_data-2019-10      ...                                LUTOSA_Moteur_Disponible  gtc  1.000000e+00
+111936  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_dispo_...  opt_cleaned_data-2019-10      ...                                    LUTOSA_Dispo_Valogaz  gtc  1.000000e+00
+111937  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                               LUTOSA_Cond_Fct_2_Thiopaq  gtc  1.000000e+00
+111938  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_1_Cogen  gtc  1.000000e+00
+111939  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_3_Cogen  gtc  1.000000e+00
+111940  1571154660000  clean_coglts_lutosa_exportnyxaws_lutosa_cond_f...  opt_cleaned_data-2019-10      ...                                 LUTOSA_Cond_Fct_4_Cogen  gtc  1.000000e+00
+
+[111941 rows x 11 columns]
+2019-10-15 17:52:23,848.848 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/nyx_calendar/_search?scroll=2m&size=5000 [status:200 request:0.132s]
+2019-10-15 17:52:23,883.883 INFO base - log_request_success: GET https://nyxaws.cofelygtc.com:9200/_search/scroll?scroll=2m [status:200 request:0.032s]
+2019-10-15 17:52:23,884.884 INFO es_helper - elastic_to_dataframe: scroll size: 0
+2019-10-15 17:52:23,885.885 INFO es_helper - elastic_to_dataframe: Next page:0
+2019-10-15 17:52:23,900.900 INFO gtc_sites_computed - create_obj: size df_calendar: 365
+2019-10-15 17:52:23,902.902 INFO gtc_sites_computed - create_obj: opening days: 252
+2019-10-15 17:52:24,391.391 INFO base - log_request_success: PUT https://nyxaws.cofelygtc.com:9200/daily_cogen_lutosa/doc/1571090400 [status:200 request:0.049s]
+2019-10-15 17:52:24,432.432 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.039s]
+2019-10-15 17:52:24,434.434 INFO gtc_sites_computed - save_tags_to_computed: BULK done without errors.
+2019-10-15 17:52:30,729.729 INFO base - log_request_success: POST https://nyxaws.cofelygtc.com:9200/_bulk [status:200 request:0.322s]
+2019-10-15 17:52:30,732.732 INFO es_helper - dataframe_to_elastic: BULK done without errors.
+2019-10-15 17:52:35,787.787 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:52:40,792.792 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:52:45,794.794 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:52:50,797.797 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:52:55,799.799 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:53:00,800.800 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:53:05,802.802 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:53:10,804.804 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:53:15,812.812 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 567}
+2019-10-15 17:53:20,819.819 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:25,823.823 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:30,829.829 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:35,834.834 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:40,839.839 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:45,845.845 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:50,852.852 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:53:55,860.860 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:00,866.866 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:05,868.868 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:10,870.870 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:15,872.872 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:20,877.877 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:25,884.884 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:30,886.886 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:35,893.893 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:40,899.899 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:45,903.903 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
+2019-10-15 17:54:50,908.908 INFO transport - transmit: Sending frame: 'SEND', headers={'destination': '/topic/NYX_MODULE_INFO', 'content-length': 568}
