@@ -15,7 +15,8 @@ VERSION HISTORY
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
 * 26 Sep 2019 0.0.17 **VME** Change totally the daily object (daily_cogen_lutosa)  
 * 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
-* 17 Oct 2019 0.0.22 **VME** Add on field on daily_cogen
+* 17 Oct 2019 0.0.22 **VME** Add 'on' field to daily_cogen
+* 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
 
 """  
 import re
@@ -54,7 +55,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.22"
+VERSION = "0.0.23"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -626,10 +627,14 @@ def retrieve_raw_data(day):
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
-                                           datecolumns=['@timestamp'],
-                                           sort='@timestamp',
                                            scrollsize=10000,
                                            size=1000000)
+
+    
+    containertimezone=pytz.timezone(get_localzone().zone)
+    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+                                               unit='ms', utc=True).dt.tz_convert(containertimezone)
+    df_raw=df_raw.sort_values('@timestamp') 
     
     return df_raw
 
