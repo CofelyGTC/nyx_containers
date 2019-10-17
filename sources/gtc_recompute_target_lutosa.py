@@ -20,7 +20,6 @@ VERSION HISTORY
 -------------------------------------
 
 * 09 Oct 2019 0.0.1 **VME** Creation
-* 16 Oct 2019 0.0.2 **VME** Bug fixing on targets when day off
 """
 
 import sys
@@ -54,7 +53,7 @@ import dateutil.parser
 
 import tzlocal # $ pip install tzlocal
 
-VERSION="0.0.2"
+VERSION="0.0.1"
 MODULE="GTC_RECOMPUTE_TARGET_LUTOSA"
 QUEUE=["RECOMPUTE_TARGET_LUTOSA"]
 
@@ -88,7 +87,6 @@ def compute_targets(year):
                                                  end=end, 
                                                  index='nyx_calendar', 
                                                  query='type:LUTOSA',
-                                                 datecolumns=['date'],
                                                  timestampfield='date')
     
     open_days = 365
@@ -96,8 +94,7 @@ def compute_targets(year):
     logger.info('size df_calendar: '+str(len(df_calendar)))
     if len(df_calendar) > 0:
         open_days = df_calendar.loc[df_calendar['on'], 'on'].count()
-        # df_calendar['date']=pd.to_datetime(df_calendar['date'], utc=True).dt.tz_convert('Europe/Paris').dt.date
-        df_calendar['date']=pd.to_datetime(df_calendar['date']).dt.date
+        df_calendar['date']     = pd.to_datetime(df_calendar['date']).dt.date
         del df_calendar['_id']
         del df_calendar['_index']
     
@@ -112,7 +109,6 @@ def compute_targets(year):
                                                      start=start, 
                                                      end=end, 
                                                      index='daily_cogen_lutosa', 
-                                                     datecolumns=['@timestamp'],
                                                      query='*')
     
     if len(df_daily_lutosa) == 0:
@@ -157,11 +153,6 @@ def compute_targets(year):
         del df_daily_lutosa['date']
     if 'type' in df_daily_lutosa.columns:
         del df_daily_lutosa['type']
-
-    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'out_therm_cogen_ratio_target'] = np.nan
-    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'out_elec_cogen_ratio_target'] = np.nan
-    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'daily_avail_motor_ratio_target'] = np.nan
-    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'entry_biogas_thiopaq_ratio_target'] = np.nan
 
     es_helper.dataframe_to_elastic(es, df_daily_lutosa)
 
