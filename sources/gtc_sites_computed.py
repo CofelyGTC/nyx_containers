@@ -228,16 +228,20 @@ def compute_avail_debit_entry_thiopac(df_raw):
     df_debit_biogas.loc[(df_debit_biogas['value']>330) & (df_debit_biogas['value']<600), 'bit_330_600'] = 1
     
     obj = {
-        'percent_value_minus_120': sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0],
-        'percent_value_120_220': sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0],
-        'percent_value_220_330': sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0],
-        'percent_value_330_600': sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0],
+        
         'value': df_debit_biogas['value'].sum()/60,
         'value_minus_120': df_debit_biogas.loc[df_debit_biogas['bit_minus_120'] == 1, 'value'].sum()/60,
         'value_120_220': df_debit_biogas.loc[df_debit_biogas['bit_120_220'] == 1, 'value'].sum()/60,
         'value_220_330': df_debit_biogas.loc[df_debit_biogas['bit_220_330'] == 1, 'value'].sum()/60,
         'value_330_600': df_debit_biogas.loc[df_debit_biogas['bit_330_600'] == 1, 'value'].sum()/60,
     }
+    
+    if df_debit_biogas.shape[0] != 0:
+    
+        obj['percent_value_minus_120'] = sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0]
+        obj['percent_value_120_220']   = sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0]
+        obj['percent_value_220_330']   = sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0]
+        obj['percent_value_330_600']   = sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0]
     
     return obj
 
@@ -272,9 +276,14 @@ def compute_prod_therm_cogen(df_raw):
     df_drycooler = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
     df_drycooler = df_drycooler[df_drycooler['value']!=0]
     
-    ht = max(df_ht['value']) - min(df_ht['value'])
-    drycooler = max(df_drycooler['value']) - min(df_drycooler['value'])
-
+    
+    if len(df_drycooler) > 0:
+        ht = max(df_ht['value']) - min(df_ht['value'])
+        drycooler = max(df_drycooler['value']) - min(df_drycooler['value'])
+    else:
+        ht = 0
+        drycooler = 0
+    
     return (ht + drycooler)
 
 
@@ -308,10 +317,15 @@ def compute_prod_elec_cogen(df_raw):
     df_out_motor = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
     df_out_motor = df_out_motor[df_out_motor['value']!=0]
     
-    out_motor = max(df_out_motor['value']) - min(df_out_motor['value'])
-    in_motor = max(df_in_motor['value']) - min(df_in_motor['value'])
+    if len(df_out_motor) > 0:
+        out_motor = max(df_out_motor['value']) - min(df_out_motor['value'])
+        in_motor = max(df_in_motor['value']) - min(df_in_motor['value'])
+    else:
+        out_motor = 0
+        in_motor = 0
 
     return (out_motor - in_motor)
+
 
 
 def compute_dispo_thiopaq(df_raw):
@@ -614,8 +628,8 @@ def create_obj(df_raw, start):
 
     #STARTS AND STOPS
     starts, stops = compute_starts_and_stops(df_raw)
-    obj_report_cogen['starts'] = starts
-    obj_report_cogen['stops'] = stops
+    obj_report_cogen['starts'] = int(starts)
+    obj_report_cogen['stops'] = int(stops)
         
     return obj_report_cogen
 
