@@ -104,5 +104,10 @@ venv.bak/
 .mypy_cache/
 .vscode/settings.json
 
+.vscode/
+sources/tmp/
+tmp/
+
+logs/
 #shellscripts
 *.sh
