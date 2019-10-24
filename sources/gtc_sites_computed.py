@@ -17,6 +17,8 @@ VERSION HISTORY
 * 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
 * 17 Oct 2019 0.0.22 **VME** Add 'on' field to daily_cogen
 * 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
+* 23 Oct 2019 0.0.24 **VME** Get targets from cogen_parameters
+* 24 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
 
 """  
 import re
@@ -51,11 +53,13 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 import collections
 import dateutil.parser
 
+from lib import cogenhelper as ch
+
 
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.23"
+VERSION = "0.0.25"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -228,16 +232,20 @@ def compute_avail_debit_entry_thiopac(df_raw):
     df_debit_biogas.loc[(df_debit_biogas['value']>330) & (df_debit_biogas['value']<600), 'bit_330_600'] = 1
     
     obj = {
-        'percent_value_minus_120': sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0],
-        'percent_value_120_220': sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0],
-        'percent_value_220_330': sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0],
-        'percent_value_330_600': sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0],
+        
         'value': df_debit_biogas['value'].sum()/60,
         'value_minus_120': df_debit_biogas.loc[df_debit_biogas['bit_minus_120'] == 1, 'value'].sum()/60,
         'value_120_220': df_debit_biogas.loc[df_debit_biogas['bit_120_220'] == 1, 'value'].sum()/60,
         'value_220_330': df_debit_biogas.loc[df_debit_biogas['bit_220_330'] == 1, 'value'].sum()/60,
         'value_330_600': df_debit_biogas.loc[df_debit_biogas['bit_330_600'] == 1, 'value'].sum()/60,
     }
+    
+    if df_debit_biogas.shape[0] != 0:
+    
+        obj['percent_value_minus_120'] = sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0]
+        obj['percent_value_120_220']   = sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0]
+        obj['percent_value_220_330']   = sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0]
+        obj['percent_value_330_600']   = sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0]
     
     return obj
 
@@ -272,9 +280,14 @@ def compute_prod_therm_cogen(df_raw):
     df_drycooler = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
     df_drycooler = df_drycooler[df_drycooler['value']!=0]
     
-    ht = max(df_ht['value']) - min(df_ht['value'])
-    drycooler = max(df_drycooler['value']) - min(df_drycooler['value'])
-
+    
+    if len(df_drycooler) > 0:
+        ht = max(df_ht['value']) - min(df_ht['value'])
+        drycooler = max(df_drycooler['value']) - min(df_drycooler['value'])
+    else:
+        ht = 0
+        drycooler = 0
+    
     return (ht + drycooler)
 
 
@@ -308,10 +321,15 @@ def compute_prod_elec_cogen(df_raw):
     df_out_motor = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
     df_out_motor = df_out_motor[df_out_motor['value']!=0]
     
-    out_motor = max(df_out_motor['value']) - min(df_out_motor['value'])
-    in_motor = max(df_in_motor['value']) - min(df_in_motor['value'])
+    if len(df_out_motor) > 0:
+        out_motor = max(df_out_motor['value']) - min(df_out_motor['value'])
+        in_motor = max(df_in_motor['value']) - min(df_in_motor['value'])
+    else:
+        out_motor = 0
+        in_motor = 0
 
     return (out_motor - in_motor)
+
 
 
 def compute_dispo_thiopaq(df_raw):
@@ -468,6 +486,7 @@ def create_obj(df_raw, start):
                                                                 + obj_report_cogen['entry_gasnat_cogen_MWh'], 2)
     
 
+    #CALENDAR OPEN DAYS FOR RATIOS
     start = containertimezone.localize(start)
     start_year, end_year = datetime(start.year, 1, 1), datetime(start.year, 12, 31, 23, 59, 59)
 
@@ -490,10 +509,10 @@ def create_obj(df_raw, start):
     
     logger.info('opening days: '+str(open_days))
 
-    target_prod_biogaz   = 9808
-    target_prod_elec     = 4400
-    target_prod_heat     = 4180
-    target_runtime_cogen = 1800
+    target_prod_biogaz   = ch.get_targets(es)['biogas']
+    target_prod_elec     = ch.get_targets(es)['elec']
+    target_prod_heat     = ch.get_targets(es)['heat']
+    target_runtime_cogen = ch.get_targets(es)['runtime']
     
     daily_target_prod_biogaz   = target_prod_biogaz   / open_days
     daily_target_prod_elec     = target_prod_elec     / open_days
@@ -602,7 +621,9 @@ def create_obj(df_raw, start):
 
     obj_report_cogen['max_theorical_avail_thiopaq_hour'] = obj['max_theorical_avail_thiopaq_hour']
     obj_report_cogen['avail_thiopaq_hour'] = obj['avail_thiopaq_hour']
-    obj_report_cogen['avail_thiopaq_ratio'] = obj['avail_thiopaq_ratio']
+    
+    if day_on:
+        obj_report_cogen['avail_thiopaq_ratio'] = obj['avail_thiopaq_ratio']
         
         
     #DISPO COGEN
@@ -610,12 +631,15 @@ def create_obj(df_raw, start):
 
     obj_report_cogen['max_theorical_avail_cogen_hour'] = obj['max_theorical_avail_cogen_hour']
     obj_report_cogen['avail_cogen_hour'] = obj['avail_cogen_hour']
-    obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
+
+
+    if day_on:
+        obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
 
     #STARTS AND STOPS
     starts, stops = compute_starts_and_stops(df_raw)
-    obj_report_cogen['starts'] = starts
-    obj_report_cogen['stops'] = stops
+    obj_report_cogen['starts'] = int(starts)
+    obj_report_cogen['stops'] = int(stops)
         
     return obj_report_cogen
 

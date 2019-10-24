@@ -21,6 +21,8 @@ VERSION HISTORY
 
 * 09 Oct 2019 0.0.1 **VME** Creation
 * 16 Oct 2019 0.0.2 **VME** Bug fixing on targets when day off
+* 23 Oct 2019 0.0.3 **VME** Get targets from cogen_parameters
+* 24 Oct 2019 0.0.4 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN 
 """
 
 import sys
@@ -51,10 +53,12 @@ from io import StringIO
 from dateutil import tz
 import dateutil.parser
 
+from lib import cogenhelper as ch
+
 
 import tzlocal # $ pip install tzlocal
 
-VERSION="0.0.2"
+VERSION="0.0.4"
 MODULE="GTC_RECOMPUTE_TARGET_LUTOSA"
 QUEUE=["RECOMPUTE_TARGET_LUTOSA"]
 
@@ -73,10 +77,11 @@ def log_message(message):
 
 ################################################################################
 def compute_targets(year):
-    target_prod_biogaz   = 9808
-    target_prod_elec     = 4400
-    target_prod_heat     = 4180
-    target_runtime_cogen = 1800
+    global es
+    target_prod_biogaz   = ch.get_targets(es)['biogas']
+    target_prod_elec     = ch.get_targets(es)['elec']
+    target_prod_heat     = ch.get_targets(es)['heat']
+    target_runtime_cogen = ch.get_targets(es)['runtime']
     
     start, end = datetime(year, 1, 1), datetime(year, 12, 31, 23, 59, 59)
 
@@ -162,6 +167,8 @@ def compute_targets(year):
     df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'out_elec_cogen_ratio_target'] = np.nan
     df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'daily_avail_motor_ratio_target'] = np.nan
     df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'entry_biogas_thiopaq_ratio_target'] = np.nan
+    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'avail_cogen_ratio'] = np.nan
+    df_daily_lutosa.loc[df_daily_lutosa['on']==False, 'avail_thiopaq_ratio'] = np.nan
 
     es_helper.dataframe_to_elastic(es, df_daily_lutosa)
 
