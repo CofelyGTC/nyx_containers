@@ -35,6 +35,7 @@ VERSION HISTORY
 * 22 Aug 2019 0.0.5 **AMA** Fix a logging bug
 * 26 Aug 2019 0.0.6 **AMA** Fix a bug in the report entity / matching
 * 24 Sep 2019 0.0.7 **AMA** Message localized in NL
+* 23 Oct 2019 0.0.7 **AMA** Lot 4 Feedback result works
 """  
 import re
 import json
@@ -62,7 +63,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -198,15 +199,33 @@ def messageReceivedXLSX(destination,message,headers):
         logger.info(user_id)
 
         df=pd.read_excel("./tmp/excel.xlsx",skiprows=7)
+        dforg=df.copy()
         df=df[[df.columns[1],df.columns[10]]]
         df.columns=["KPI","NEGO"]
 
         nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
-
+        print(nscore)
+        
         df=pd.read_excel("./tmp/excel.xlsx")
 
-        reporttype=df.columns[8]
-        reportdate=datetime.strptime(df.columns[7],"%d/%m/%Y")
+#        print(df)
+        try:
+            reporttype=df.columns[8]
+            reportdate=datetime.strptime(df.columns[7],"%d/%m/%Y")
+        except: # LOT 4
+            logger.info("Unable to decode report date")
+            print(df.columns)
+            reporttype=df.columns[7]
+            reportdate=datetime.strptime(df.columns[6],"%d/%m/%Y")
+
+            dforg=dforg[[dforg.columns[2],dforg.columns[14]]]
+            dforg.columns=["KPI","NEGO"]
+            #dforg=dforg[dforg['NEGO']!="/"]
+
+            nscore=dforg[(pd.notnull(dforg['KPI'])) & (pd.notnull(dforg['NEGO']))]
+            print(nscore)
+
+            
 
         maanden=['Januari',
             'Februari',
@@ -224,11 +243,13 @@ def messageReceivedXLSX(destination,message,headers):
 
         reportdateNL=maanden[reportdate.month-1]
 
+        reporttype=reporttype.replace("Lot4 (DNB)","Lot4 (BACDNB)")
+
         entity=getEntityObjXLS(es,reporttype)
 
         logger.info(entity)
         
-        results=[{"kpi":int(x[1][0]),"result":x[1][1]} for x in nscore.iterrows()]
+        results=[{"kpi":x[1][0],"result":x[1][1]} for x in nscore.iterrows()]
 
         
         scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Resultaat:</b>"+str(x["result"])+ "</li>" for x in results])
@@ -247,7 +268,7 @@ def messageReceivedXLSX(destination,message,headers):
                 'title': entity["title"],
                 'lot': entity["lot"],
                 'contract': entity["contract"],
-                'technic': entity["technic"],
+                'technic': entity.get("technic",""),
                 'report_date': reportdate,                
                 'creation_date': datetime.now(),
                 'kpi': result["kpi"],

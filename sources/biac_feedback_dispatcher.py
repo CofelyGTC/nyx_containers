@@ -25,6 +25,8 @@ VERSION HISTORY
 * 19 Aug 2019 0.0.2 **AMA** Title of the report is set
 * 22 Aug 2019 0.0.3 **AMA** Rename the report type parameter
 * 11 Sep 2019 0.0.4 **AMA** Changed the result ready check duration
+* 24 Sep 2019 0.0.5 **AMA** Improved the NL translation
+* 25 Sep 2019 0.0.6 **AMA** Changed time period to 60 days -> now
 """ 
 import json
 import time
@@ -50,7 +52,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.4"
+VERSION="0.0.6"
 MODULE="BIAC_FEEDBACK_DISPATCHER"
 QUEUE=[]
 
@@ -101,7 +103,7 @@ def log_message(message):
 def checkCommentsStatus():
     logger.info(">>>>>>>> CHECKING FEEDBACK STATUS")
     start_dt,end_dt=get_month_day_range(datetime.now()-timedelta(days=60))
-    df = es_helper.elastic_to_dataframe(es,query="xlsx: true AND docx: true AND sent: false", index="biac_feedback_status", start=start_dt, end=end_dt,timestampfield="reportdate")
+    df = es_helper.elastic_to_dataframe(es,query="xlsx: true AND docx: true AND sent: false", index="biac_feedback_status", start=start_dt, end=datetime.now(),timestampfield="reportdate")
 
     if not df.empty:
         for index,row in df.iterrows():
@@ -152,20 +154,37 @@ def checkCommentsStatus():
                     ]
                 }
 
-            
+            maanden=['Januari',
+                'Februari',
+                'Maart',
+                'April',
+                'Mei',
+                'Juni',
+                'Juli',
+                'Augustus',
+                'September',
+                'Oktober',
+                'November',
+                'December']
+
             task={
                     "mailAttachmentName": "KPI rapport ${KPI} ${DATE}-val",
                     "attachmentName" : "KPI rapport ${KPI} ${DATE}-val",
                     "icon" : "file-excel",
-                    "mailSubject" : "SLA - KPI rapport ${KPI} ${DATE}",
+                    "mailSubject" : "SLA-KPI gevalideerde rapport ${DATE} ${YEAR} ${KPI}",
                     "mailTemplate" : """
                     <body>
-                    <h2>KPI Rapport ${KPI} </h2>
+                    <h2>KPI gevalideerde rapport ${KPI} </h2>
                     <br/>
                     Goedemorgen,<br/>
                     <br/>
-                    Hierbij de automatische rapport van de KPI voor ${KPI}.<br/>  
+                    Hierbij het gevalideerde rapport van de KPI voor ${KPI}, met inbegrip van de commentaren en de nieuwe berekende scores.<br/>  
+                    Percentagewijzigingen, zoals deze tijdens de maandelijkse vergadering door BAC geaccepteerd werden, zijn in de overzichtstabel aangepast.
+                    De titel werd door 'Gevalideerd' vervangen en de naam van het rapport werd in "val"  veranderd.
+                    Het gevalideerde rapport moet behouden worden.
+
                     <br/>      
+
                     <br/>
                     Mvg,<br/>
                     <br/>
@@ -182,7 +201,8 @@ def checkCommentsStatus():
                 if "email" in dest:                    
                     task["mailingList"].append(dest["email"])
 
-            task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",start_dt.strftime("%B")))
+            #task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",start_dt.strftime("%B")))
+            task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",maanden [start_dt.month-1]).replace("${YEAR}",str(start_dt.year)))
 
             message={
                     "id":"id_" + str(uuid.uuid4()),

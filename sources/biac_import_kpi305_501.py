@@ -1,3 +1,33 @@
+"""
+BIAC IMPORT KPI 305 501
+====================================
+
+This process listens to two queues, decodes the file included in each message in order to process KPI 305 or 501.
+The monthly collection is used for the dashboard with a query equal to: "active:1" in order to retrieve the most recent values.
+
+Listens to:
+-------------------------------------
+
+* /queue/BIAC_EXCELS_KPI305
+* /queue/BIAC_EXCELS_KPI501
+
+
+Collections:
+-------------------------------------
+
+* **biac_kpi305** (Raw Data)
+* **biac_kpi501** (Raw Data)
+* **biac_month_kpi305** (Aggregated Data)
+* **biac_month_kpi501** (Aggregated Data)
+
+
+
+VERSION HISTORY
+===============
+
+* 24 Oct 2019 0.0.2 **AMA** Do no longer crash with empty data frames. Add the lot4 if it does not exist yet.
+"""  
+
 import re
 import json
 import time
@@ -23,7 +53,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from lib import reporthelper as rp
 
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -195,6 +225,10 @@ def compute501():
 
     logger.info(">>> KEYS")
     keys=orgdf["key"].unique()
+    keys=list(orgdf["key"].unique())
+    if "Lot4 (BACDNB)"  not in keys:
+        keys.append("Lot4 (BACDNB)")
+
     logger.info(keys)
 
     alllot={}
@@ -395,60 +429,70 @@ def messageReceived(destination,message,headers):
             dfdata.columns=newcols
 
             dfdata["Month"]=dfdata["Month"].apply(reorderMonth)
-            dfdata["key"]=dfdata.apply(computeReport,axis=1)
 
-            regex = r"Lot[0-4]"
-            
-            matches = re.finditer(regex, orgfile, re.MULTILINE)
-            lot="NA"
-            for matchNum, match in enumerate(matches, start=1):    
-                lot=match.group()
-                break
-            logger.info("Lot:"+lot)
-            
-            dfdata["FileLot"]=lot
+            if not dfdata.empty:
 
-#            dfdata["_id"]=dfdata["Month_BacID"]
-            dfdata["_index"]="biac_kpi501"
-            dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
 
-            dfdata=dfdata.fillna("")
+                regex = r"Lot[0-4]"
+                
+                matches = re.finditer(regex, orgfile, re.MULTILINE)
+                lot="NA"
+                for matchNum, match in enumerate(matches, start=1):    
+                    lot=match.group()
+                    break
+                logger.info("Lot:"+lot)
 
-#            logger.info(dfdata["FileLot"])
+                if str(lot) !="4":
+                    dfdata["key"]=dfdata.apply(computeReport,axis=1)
+                else:
+                    dfdata["key"]="Lot4 (BACDNB)"
 
-            for month in dfdata["Month"].unique():
-                    deletequery={
-                            "query":{
-                                "bool": {
-                                    "must": [
-                                    {
-                                        "query_string": {
-                                        "query": "Month: "+month
+
+                dfdata["FileLot"]=lot
+
+    #            dfdata["_id"]=dfdata["Month_BacID"]
+                dfdata["_index"]="biac_kpi501"
+                dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
+
+                dfdata=dfdata.fillna("")
+
+    #            logger.info(dfdata["FileLot"])
+
+                for month in dfdata["Month"].unique():
+                        deletequery={
+                                "query":{
+                                    "bool": {
+                                        "must": [
+                                        {
+                                            "query_string": {
+                                            "query": "Month: "+month
+                                            }
+                                        },
+                                        {
+                                            "query_string": {
+                                            "query": "FileLot: "+lot
+                                            }
                                         }
-                                    },
-                                    {
-                                        "query_string": {
-                                        "query": "FileLot: "+lot
-                                        }
-                                    }
-                                    ]
-                                }            
-                            }   
-                        }
-                    logger.info("Deleting records")
-                    logger.info(deletequery)
-                    try:
-                        resdelete=es.delete_by_query(body=deletequery,index="biac_kpi501")
-                        logger.info(resdelete)
-                    except Exception as e3:            
-                        logger.error(e3)   
-                        logger.error("Unable to delete records.")            
+                                        ]
+                                    }            
+                                }   
+                            }
+                        logger.info("Deleting records")
+                        logger.info(deletequery)
+                        try:
+                            resdelete=es.delete_by_query(body=deletequery,index="biac_kpi501")
+                            logger.info(resdelete)
+                        except Exception as e3:            
+                            logger.error(e3)   
+                            logger.error("Unable to delete records.")            
 
-            time.sleep(3)
-            #DELETE COLUMNS WITH MIXED CONTENTS
-            del dfdata["SRPresentation"]
-            del dfdata["ReportDate"]
-            pte.pandas_to_elastic(es, dfdata)        
+                time.sleep(3)
+                #DELETE COLUMNS WITH MIXED CONTENTS
+                del dfdata["SRPresentation"]
+                del dfdata["ReportDate"]
+                pte.pandas_to_elastic(es, dfdata)
+            else:
+                logger.info("Empty Data")        
             compute501()
 
 
@@ -562,55 +606,55 @@ def messageReceived(destination,message,headers):
 
     logger.info("<== "*10)
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
-logger.info(server)                
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
-
-rps=rp.ReportStructure(es)
-
 if __name__ == '__main__':    
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
+    logger.info(server)                
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    #conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
+    connectionparameters={"conn":conn}
+
+    #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
+    rps=rp.ReportStructure(es)
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)
