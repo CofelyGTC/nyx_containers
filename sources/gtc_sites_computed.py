@@ -18,7 +18,7 @@ VERSION HISTORY
 * 17 Oct 2019 0.0.22 **VME** Add 'on' field to daily_cogen
 * 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
 * 23 Oct 2019 0.0.24 **VME** Get targets from cogen_parameters
-* 25 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
+* 24 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
 
 """  
 import re
