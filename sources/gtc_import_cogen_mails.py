@@ -56,7 +56,7 @@ import csv
 
 import tzlocal # $ pip install tzlocal
 
-VERSION="0.0.4"
+VERSION="0.0.5"
 MODULE="GTC_COGEN_MAILS_IMPORTER"
 QUEUE=["COGEN_MAILS2"]
 
@@ -299,17 +299,21 @@ def messageReceived(destination,message,headers):
             messagebody=""
 
             if index1>0:
+                print(1)
                 index2=message.rfind(' ',0,index1-1)
                 if index2>0:
+                    print(2)
                     motor=message[index2+1:index1].replace("\n","").replace("\r","")
                     motor=motor.replace(' ','')
                     f = StringIO(message[index1:])
                     reader = csv.reader(f, delimiter=';')
 
-                    if (maildatestr.index(',')>=0):
+                    if (maildatestr.find(',')>=0):
+                        print(3)
                         maildatestr=maildatestr[maildatestr.index(',')+1:]
 
-                    if (maildatestr.index('+')>=0):
+                    if (maildatestr.find('+')>=0):
+                        print(4)
                         maildatestr=maildatestr[:maildatestr.index('+')]
 
                     maildatestr=maildatestr.strip()

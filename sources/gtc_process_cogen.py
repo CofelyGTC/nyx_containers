@@ -49,7 +49,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.2"
+VERSION = "0.0.7"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -487,7 +487,7 @@ def loadCurveGroup(client,area,group,starttime,endtime):
     for i in range(1,len(gazinlabels)):
         gazindf2=pd.DataFrame(data=gazincurves[i],columns=["date",gazinlabels[i]])
         gazindf2.index=gazindf2["date"]
-        del gazindf2["date"];
+        del gazindf2["date"]
         gazindf= pd.concat([gazindf,gazindf2], join='inner', axis=1)
 
     if(len(pciinlabels)>0):
@@ -578,14 +578,14 @@ def loadCogen(cogenname,starttime,endtime):
     if("startstops" in cog["_source"]):
         if (("startsstopsuseoptimizcollection" in cog["_source"]) and (cog["_source"]["startsstopsuseoptimizcollection"])):
             logger.info ("Load starts / stops using Optimiz collection...")
-            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000)
+            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000, False)
             finaldf= pd.concat([finaldf,startsdf], join='outer', axis=1)
         else:
             if( isoptibox):
-                startsdf=loadStartStops("code: "+cog["_source"]["startstops"]+" AND area: \""+area+"\"",st,et,1000000000)
+                startsdf=loadStartStops("code: "+cog["_source"]["startstops"]+" AND area: \""+area+"\"",st,et,1000000000, True)
                 finaldf= pd.concat([finaldf,startsdf], join='outer', axis=1)
             else:
-                startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: "+client+" AND area: "+area,st,et,1000000)
+                startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: "+client+" AND area: "+area,st,et,1000000, False)
                 finaldf= pd.concat([finaldf,startsdf], join='outer', axis=1)
 
     if("power" in cog["_source"]):
@@ -738,7 +738,10 @@ def loadUsageHours(query,startt,entt,limit,isoptibox):
     hoursquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["gte"]=int(startt)
     hoursquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["lte"]=int(entt)
 
-    res=es.search(body=hoursquery,index="opt_sites_data*")
+    if isoptibox:
+        res=es.search(body=hoursquery,index="opt_optibox*")
+    else:
+        res=es.search(body=hoursquery,index="opt_sites_data*")
 
     print(hoursquery)
 #    print(res)
@@ -762,7 +765,7 @@ def loadUsageHours(query,startt,entt,limit,isoptibox):
 
 
 #===================================================================================
-def loadStartStops(query,startt,entt,limit):
+def loadStartStops(query,startt,entt,limit, isoptibox):
     global hoursquery
 
     if limit<100000: # not optibox
@@ -774,7 +777,11 @@ def loadStartStops(query,startt,entt,limit):
     hoursquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["gte"]=int(startt)
     hoursquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["lte"]=int(entt)
 
-    res=es.search(body=hoursquery,index="opt_sites_data*")
+
+    if isoptibox:
+        res=es.search(body=hoursquery,index="opt_optibox*")
+    else:
+        res=es.search(body=hoursquery,index="opt_sites_data*")
 
 #    print (res)
 
@@ -855,6 +862,108 @@ def insertIntoELK(onecogendf,definition):
     else:
         logger.info("BYPASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
         print (messagebody)
+
+
+def computeLastLifeSign():
+    global es
+    logger.info("Compute Life Sign")
+    allcogens=getCogenNames()
+
+    messagebody=""
+
+    for cogenname in allcogens:
+        logger.info("=>"+cogenname)
+
+#        if cogenname != 'dumoulin':
+#            continue
+
+
+        try:
+            cog=es.get(index="cogen_parameters",doc_type="doc",id=cogenname)
+
+#            logger.info(cog)
+
+            isoptibox=False
+            if("isoptibox" in cog["_source"]):
+                isoptibox=True
+            query="NONONONONNO"
+
+            if (("usagehoursuseoptimizcollection" in cog["_source"]) and (cog["_source"]["usagehoursuseoptimizcollection"])):
+                query="name: "+cog["_source"]["usagehours"]+" AND client: COGEN AND area: NyxAWS"
+            else:
+                if( isoptibox):
+                    query="code: "+cog["_source"]["usagehours"]+" AND area: \""+cog["_source"]["area"]+"\""
+                    logger.info("Query:"+query)
+                else:
+                    query="name: "+cog["_source"]["usagehours"]+" AND client: "+cog["_source"]["client"]+" AND area: "+cog["_source"]["area"]
+
+
+
+            lifesignquery["query"]["bool"]["must"][0]["query_string"]["query"]=query+""
+            lifesignquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["gte"]=int((datetime.now()- timedelta(days=2)).timestamp())*1000
+            lifesignquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["lte"]=int(datetime.now().timestamp())*1000
+
+            print(lifesignquery)
+
+            res=es.search(index="opt_*",body=lifesignquery)
+            logger.info(res)
+            logger.info(res["aggregations"]["1"]["value"])
+
+            action={}
+            id=cogenname
+            obj={}
+            action["index"]={"_index":"cogen_lifesign","_type":"doc","_id":id}
+            messagebody+=json.dumps(action)+"\r\n";
+            if(res["aggregations"]["1"]["value"]!=None):
+                obj["@timestamp"]=int(res["aggregations"]["1"]["value"])
+            else:
+                obj["@timestamp"]=int((datetime.now()- timedelta(days=3)).timestamp())*1000
+            obj["project"]=cog["_source"]["project"]
+            messagebody+=json.dumps(obj)+"\r\n"
+        except Exception as excep:
+            logger.error("Unable to find COGEN:"+cogenname)
+            logger.error(excep)
+            #return None
+    logger.info(messagebody)
+    #es2 = Elasticsearch(hosts=["http://optimiz2.cofelygtc.com:9200"])
+    res2=es.bulk(messagebody)
+    #logger.info(res2)
+
+def calcCogen():
+    global es
+    logger.info("Calc Cogen ...")
+    end = datetime.now()
+    start = end - timedelta(days=30)
+
+    cogens = es_helper.elastic_to_dataframe(es, 'cogen_computed', query='*', start=start, end=end)
+    cogengrouped = cogens.groupby(['Contract', 'client', 'name']).agg({'@timestamp': 'max', 'Hours_Index': 'max', 'Starts_Index': 'max'}).reset_index()
+    cogengrouped = cogengrouped.set_index('name')
+    params = es.search("cogen_parameters", size='10000')
+
+    for cog in params['hits']['hits']:
+        name = cog['_source']['name']
+        if name in cogengrouped.index:
+            cogstats = cogengrouped.loc[name, :]
+            cog['_source']['Hours'] = cogstats['Hours_Index']
+            cog['_source']['Starts'] = cogstats['Starts_Index']
+            cog['_source']['LastUpdate'] = int(time.time()*1000)
+            cog['_source']['modifyBy'] = 'GTC'
+
+    bulkbody = ''
+    action={}
+    for cog in params['hits']['hits']:
+        action["index"]={"_index":cog['_index'],"_type":"doc","_id":cog['_id']}
+        print(action)
+        newrec = cog['_source']
+        print(newrec)
+        bulkbody+=json.dumps(action)+"\r\n"
+        bulkbody+=json.dumps(newrec)+"\r\n"
+
+    res = es.bulk(body=bulkbody)
+    logger.info(res)
+
+
+
 
 
 def doTheWork(start):
@@ -958,8 +1067,10 @@ if __name__ == '__main__':
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
 
     SECONDSBETWEENCHECKS=3600
+    SECONDSBETWEENKEEPALIVE=900
 
     nextload=datetime.now()
+    keepalivenextload=datetime.now()
 
     while True:
         time.sleep(5)
@@ -968,16 +1079,25 @@ if __name__ == '__main__':
             
             conn.send_life_sign(variables=variables)
 
+            if (datetime.now() > keepalivenextload):
+                try:
+                    keepalivenextload=datetime.now()+timedelta(seconds=SECONDSBETWEENKEEPALIVE)
+                    computeLastLifeSign()
+                    calcCogen()
+                except Exception as e2:
+                    logger.error("Unable to check keepalive.")
+                    logger.error(e2,exc_info=True)
+
             if (datetime.now() > nextload):
                 try:
                     start = datetime.now()
                     start = start.replace(hour=0,minute=0,second=0, microsecond=0)
                     nextload=datetime.now()+timedelta(seconds=SECONDSBETWEENCHECKS)
-                    doTheWork(start-timedelta(1))
                     doTheWork(start)
                 except Exception as e2:
                     logger.error("Unable to load sites data.")
                     logger.error(e2,exc_info=True)
+
             
         except Exception as e:
             logger.error("Unable to send life sign.")

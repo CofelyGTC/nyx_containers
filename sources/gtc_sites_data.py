@@ -26,11 +26,14 @@ from io import StringIO
 from dateutil import tz
 import dateutil.parser
 
+from elastic_helper import es_helper 
+
+
 
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="1.0.5"
+VERSION="1.1.1"
 MODULE="GTC_SITES_DATA"
 QUEUE=["GTC_SITES_DATA_temp1"]
 
@@ -140,6 +143,18 @@ def log_message(message):
     logger.info(message_to_send)
     conn.send_message("/queue/NYX_LOG",json.dumps(message_to_send))
 
+def getTimestamp(timeD):
+    """ Returns the Unix timestamp of a datetime
+
+    Parameters
+    ----------
+    dt
+        Date on datetime format
+    """
+    dtt = timeD.timetuple()
+    ts = int(time.mktime(dtt))
+    return ts
+
 
 ################################################################################
 def messageReceived(destination,message,headers):
@@ -164,6 +179,7 @@ def messageReceived(destination,message,headers):
     if((filename != None) and (len(mes)>10)):
         try:
             handleOneMessage(filename,mes)
+            cleanData(filename, mes)
         except Exception as e:
             logger.error("Unable to decode message")
             error = traceback.format_exc()
@@ -269,6 +285,154 @@ def convertToDate(cell):
     except:
         return None
 
+def condType1(var1, var2):
+    cond1 = var1 > 0
+    cond2 = (var1-(var1 - 1)) < (30*var1/100)
+    cond3 = var2 > 10
+    
+    if cond1 and cond2 and cond3:
+        return var1
+    else:
+        return 0
+    
+def condType2(var1, var2):
+    cond1 = var1 > 0
+    cond2 = (var1-(var1 - 1)) < (50*var1/100)
+    cond3 = var2 > 10
+    
+    if cond1 and cond2 and cond3:
+        return var1
+    else:
+        return 0
+    
+def condType3(var1, var2, var3):
+    cond1 = var1 > 0
+    cond2 = (var1-(var1 - 1)) < var3
+    cond3 = var2 > 10
+    
+    if cond1 and cond2 and cond3:
+        return var1
+    else:
+        return 0
+
+def cleanData(filename, mes):
+    global es
+    logger.info("===> CLEANING DATA <===")
+    if decodeMetaData(filename)==0:
+        logger.info("===> ENTER IF <===")
+        indexname="OPT_CLEANED_DATA-%s" %(datetime.now().strftime("%Y-%m"))
+
+    dataasio=StringIO(mes)
+    nofsemicolons=mes.count(';')
+    nofcommas=mes.count(',')
+
+    if nofsemicolons>nofcommas:
+        df=pd.read_csv(dataasio,sep=";",header=None)
+    else:
+        df=pd.read_csv(dataasio,sep=",",header=None)
+    
+    dfindexed = df.set_index(0)
+
+    if contract == 'COGLTS':
+        dfindexed = df.set_index(0)
+        H2SApThiopaq = dfindexed.loc['LUTOSA_H2S_Ap_Thiopaq'].at[3]
+        H2SAvCogen = dfindexed.loc['LUTOSA_H2S_Av_Cogen'].at[3]
+        H2SAvThiopaq  = dfindexed.loc['LUTOSA_H2S_Av_Thiopaq'].at[3]
+
+        CH4ApThiopaq = dfindexed.loc['LUTOSA_CH4_Ap_Thiopaq'].at[3]
+        CH4AvCogen = dfindexed.loc['LUTOSA_CH4_Av_Cogen'].at[3]
+        CH4AvThiopaq = dfindexed.loc['LUTOSA_CH4_Av_Thiopaq'].at[3]
+
+        O2ApThiopaq = dfindexed.loc['LUTOSA_O2_Ap_Thiopaq'].at[3]
+        O2AvCogen = dfindexed.loc['LUTOSA_O2_Av_Cogen'].at[3]
+        O2AvThiopaq = dfindexed.loc['LUTOSA_O2_Av_Thiopaq'].at[3]
+
+        DebitBiogazThiopaq = dfindexed.loc['COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'].at[3]
+        DebitBiogazCogen = dfindexed.loc['COGLTS_BIOLTS_Valeur_Debit_Biogaz_Cogen'].at[3]
+
+        H2SApThiopaq = condType1(H2SApThiopaq, DebitBiogazThiopaq)
+        H2SAvCogen = condType3(H2SAvCogen, DebitBiogazCogen, 20)
+        H2SAvThiopaq  = condType2(H2SAvThiopaq, DebitBiogazThiopaq)
+
+        CH4ApThiopaq = condType3(CH4ApThiopaq, DebitBiogazThiopaq, 35)
+        CH4AvCogen = condType3(CH4AvCogen, DebitBiogazCogen, 40)
+        CH4AvThiopaq = condType3(CH4AvThiopaq, DebitBiogazThiopaq, 45)
+
+        O2ApThiopaq = condType3(O2ApThiopaq, DebitBiogazThiopaq, 1.5)
+        O2AvCogen = condType3(O2AvCogen, DebitBiogazCogen, 1.5)
+        O2AvThiopaq = condType3(O2AvThiopaq, DebitBiogazThiopaq, 1.5)
+
+        dfindexed.at['LUTOSA_H2S_Ap_Thiopaq', 3] = H2SApThiopaq 
+        dfindexed.at['LUTOSA_H2S_Av_Cogen',3] = H2SAvCogen
+        dfindexed.at['LUTOSA_H2S_Av_Thiopaq',3] = H2SAvThiopaq 
+
+        dfindexed.at['LUTOSA_CH4_Ap_Thiopaq',3] = CH4ApThiopaq
+        dfindexed.at['LUTOSA_CH4_Av_Cogen',3] = CH4AvCogen
+        dfindexed.at['LUTOSA_CH4_Av_Thiopaq',3] = CH4AvThiopaq
+
+        dfindexed.at['LUTOSA_O2_Ap_Thiopaq',3] = O2ApThiopaq
+        dfindexed.at['LUTOSA_O2_Av_Cogen',3] = O2AvCogen
+        dfindexed.at['LUTOSA_O2_Av_Thiopaq',3] = O2AvThiopaq
+
+        datefile = dfindexed.at['LUTOSA_Cpt_Ther_HT', 1]
+        param1 = dfindexed.at['LUTOSA_Cpt_Ther_HT', 2]
+        param2 = dfindexed.at['LUTOSA_Cpt_Ther_HT', 4]
+        dffinal = dfindexed.reset_index()
+        fctThiopaqCond1 = 1 if dfindexed.loc['COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'].at[3] > 120 else 0
+        fctThiopaqCond2 = 1 if (dfindexed.loc['COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'].at[3] > 15 and dfindexed.loc['COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'].at[3] < 36) else 0
+        fctThiopaqCond3 = dfindexed.loc['LUTOSA_Etat_Autor_Biog'].at[3]
+        fctThiopaqCondGlobal = 1 if fctThiopaqCond1 + fctThiopaqCond2 + fctThiopaqCond3 == 3 else 0
+
+        consoDispos = dfindexed.loc['LUTOSA_Etat_Peleur1_Fct'].at[3] + dfindexed.loc['LUTOSA_Etat_Peleur2_Fct'].at[3] + dfindexed.loc['LUTOSA_Etat_Blancheur_1'].at[3] +dfindexed.loc['LUTOSA_Etat_Blancheur_2'].at[3]
+        fctCogenCond1 = 1 if consoDispos >= 2 else 0
+        fctCogenCond2 = 1 if dfindexed.loc['LUTOSA_TempRetour_Boucle_HT'].at[3] <= 80 else 0
+        fctCogenCond3 = 1 if dfindexed.loc['COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'].at[3] > 220 else 0
+        fctCogenCond4 = dfindexed.loc['LUTOSA_Moteur_Disponible'].at[3]
+        fctCogenCond5 = 1 if dfindexed.loc['LUTOSA_H2S_Av_Cogen'].at[3] <= 5 else 0
+        fctCogenCondGlobal = 1 if fctCogenCond1 + fctCogenCond2 + fctCogenCond3 + fctCogenCond4 + fctCogenCond5 == 5 else 0
+
+
+        data = [{0: 'LUTOSA_Cond_Fct_1_Thiopaq',1:datefile, 2:param1, 3:fctThiopaqCond1, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_2_Thiopaq',1:datefile, 2:param1, 3:fctThiopaqCond2, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_3_Thiopaq',1:datefile, 2:param1, 3:fctThiopaqCond3, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_Global_Thiopaq',1:datefile, 2:param1, 3:fctThiopaqCondGlobal, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_1_Cogen',1:datefile, 2:param1, 3:fctCogenCond1, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_2_Cogen',1:datefile, 2:param1, 3:fctCogenCond2, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_3_Cogen',1:datefile, 2:param1, 3:fctCogenCond3, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_4_Cogen',1:datefile, 2:param1, 3:fctCogenCond4, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_5_Cogen',1:datefile, 2:param1, 3:fctCogenCond5, 4:param2},
+              {0: 'LUTOSA_Cond_Fct_Global_Cogen',1:datefile, 2:param1, 3:fctCogenCondGlobal, 4:param2}]
+        dffinal = dffinal.append(data,ignore_index=True,sort=True)
+    else:
+        dffinal = dfindexed.reset_index()
+    
+    dffinal = dffinal[[0,1,3]]
+    dffinal.columns = ['name', 'date', 'value']
+
+    dffinal['src'] = 'gtc'
+    dffinal['area_name'] = site +'_'+ dffinal['name']
+    dffinal['client_area_name'] = contract + '_' + dffinal['area_name']
+    dffinal['client'] = contract
+    dffinal['area'] = site
+    dffinal["date"]=dffinal['date'].apply(convertToDate)
+    dffinal["date"]=dffinal['date'].apply(lambda x: utc_to_local(x))
+    dffinal['@timestamp'] = dffinal['date'].apply(lambda x: getTimestamp(x)*1000)
+    dffinal['date'] = dffinal['date'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:00'))
+    dffinal['_index'] = dffinal['date'].apply(lambda x: getIndex(x))
+    dffinal['_id'] = dffinal.apply(lambda row: getId(row), axis=1)
+
+    es_helper.dataframe_to_elastic(es, dffinal)
+    
+
+
+
+def getIndex(ts):
+    return 'opt_cleaned_data-'+ts[:7]
+
+def getId(row):
+    _id = ('clean_'+row['client_area_name']+str(row['@timestamp'])).lower()
+    return _id
+
 def handleOneMessage(name,body):
     global es
     logger.info("===> HANDLE MESSAGE <===")
@@ -276,8 +440,8 @@ def handleOneMessage(name,body):
         logger.info("===> ENTER IF <===")
         indexname="OPT_SITES_DATA-%s" %(datetime.now().strftime("%Y-%m"))
 
-        logger.info(lastvaluecache['Conso_Ecl_Ext'])
-        logger.info(dayvaluecache['Conso_Ecl_Ext'])
+        #logger.info(lastvaluecache['Conso_Ecl_Ext'])
+        #logger.info(dayvaluecache['Conso_Ecl_Ext'])
         #logger.info(body)
 
         dataasio=StringIO(body)
@@ -331,19 +495,21 @@ def handleOneMessage(name,body):
               dayvaluecache[row[0]]= {"key": key2, "value": 0}
 
 
-          first_alarm_ts = getTimestamp(localdate)
-          obj = {
-                  'start_ts': int(first_alarm_ts),
-                  'area_name': area_name 
-              }
-          logger.info(obj)     
-          conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
+            first_alarm_ts = getTimestamp(localdate)
+            obj = {
+                    'start_ts': int(first_alarm_ts),
+                    'area_name': area_name 
+                }
+            #logger.info(obj)     
+        
+        conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
         
 
         #logger.info("Final %s=" %(bulkbody))
         logger.info("Bulk ready.")
         if(bulkbody != ""):
-            es.bulk(body=bulkbody)
+            res = es.bulk(body=bulkbody)
+            #logger.info(res)
         else:
             logger.error("No BODY !!!")
         logger.info("Bulk gone.")
@@ -351,56 +517,58 @@ def handleOneMessage(name,body):
     
       
     
+if __name__ == '__main__':   
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
+    lshandler=None
 
-lshandler=None
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
 
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
 
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
 
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
-
-
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
-                ,"heartbeats":(180000,180000),"earlyack":True}
-
-lastvaluecache={}
-dayvaluecache={}
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
 
 
-#>> ELK
-es=None
-logger.info (os.environ["ELK_SSL"])
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
+                    ,"heartbeats":(180000,180000),"earlyack":True}
 
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
+    lastvaluecache={}
+    dayvaluecache={}
 
 
-if __name__ == '__main__':    
+
+
+
+  
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
+      
+      #>> ELK
+    es=None
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
 
     res=es.search(index='opt_*'
         ,size=0

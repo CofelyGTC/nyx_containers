@@ -13,6 +13,10 @@ VERSION HISTORY
 * 04 Sep 2019 0.0.3 **PDE** Adding **VME**'s functions
 * 05 Sep 2019 0.0.7 **VME** Adding fields to the lutosa cogen records (ratios elec, heat, biogaz, gaznat, w/o zeros...)
 * 06 Sep 2019 0.0.8 **VME** fix bug with indices not at starting day 
+* 26 Sep 2019 0.0.17 **VME** Change totally the daily object (daily_cogen_lutosa)  
+* 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
+* 17 Oct 2019 0.0.22 **VME** Add 'on' field to daily_cogen
+* 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
 
 """  
 import re
@@ -51,7 +55,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.16"
+VERSION = "0.0.23"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -111,14 +115,14 @@ def calc_dispo_thiopaq(raw):
     return condition
 
 def get_dispo_thiopaq(df_raw):
-    df_debit_biogaz = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
-    df_debit_biogaz.columns = ['@timestamp', 'value_debit']
+    df_debit_biogas = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
+    df_debit_biogas.columns = ['@timestamp', 'value_debit']
     df_pression_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'][['@timestamp', 'value']]
     df_pression_thiopaq.columns = ['@timestamp', 'value_pression']
     df_fct_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Thiopaq_Fct'][['@timestamp', 'value']]
     df_fct_thiopaq.columns = ['@timestamp', 'value_fct']
 
-    df_computed = df_debit_biogaz.set_index('@timestamp').join(df_pression_thiopaq.set_index('@timestamp').join(df_fct_thiopaq.set_index('@timestamp')))
+    df_computed = df_debit_biogas.set_index('@timestamp').join(df_pression_thiopaq.set_index('@timestamp').join(df_fct_thiopaq.set_index('@timestamp')))
     df_computed['condition_fct'] = df_computed.apply(lambda raw: calc_dispo_thiopaq(raw), axis=1)
 
     tps_total_fct = df_computed['value_fct'].sum()
@@ -210,226 +214,448 @@ def getFiltre(value, filtre):
 
     return 0
 
+def compute_avail_debit_entry_thiopac(df_raw):
+    tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
+    df_debit_biogas = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
+    
+    df_debit_biogas['bit_minus_120'] = 0
+    df_debit_biogas['bit_120_220'] = 0
+    df_debit_biogas['bit_220_330'] = 0
+    df_debit_biogas['bit_330_600'] = 0
+    df_debit_biogas.loc[(df_debit_biogas['value']<120), 'bit_minus_120'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>=120) & (df_debit_biogas['value']<220), 'bit_120_220'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>=220) & (df_debit_biogas['value']<=330), 'bit_220_330'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>330) & (df_debit_biogas['value']<600), 'bit_330_600'] = 1
+    
+    obj = {
+        
+        'value': df_debit_biogas['value'].sum()/60,
+        'value_minus_120': df_debit_biogas.loc[df_debit_biogas['bit_minus_120'] == 1, 'value'].sum()/60,
+        'value_120_220': df_debit_biogas.loc[df_debit_biogas['bit_120_220'] == 1, 'value'].sum()/60,
+        'value_220_330': df_debit_biogas.loc[df_debit_biogas['bit_220_330'] == 1, 'value'].sum()/60,
+        'value_330_600': df_debit_biogas.loc[df_debit_biogas['bit_330_600'] == 1, 'value'].sum()/60,
+    }
+    
+    if df_debit_biogas.shape[0] != 0:
+    
+        obj['percent_value_minus_120'] = sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0]
+        obj['percent_value_120_220']   = sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0]
+        obj['percent_value_220_330']   = sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0]
+        obj['percent_value_330_600']   = sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0]
+    
+    return obj
+
+
+
+def compute_gasnat_entry(df_raw):
+    tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_GazNat_Thiopaq'
+    df_debit_gasnat = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
+    entry_gasnat = df_debit_gasnat['value'].sum()/60
+    return entry_gasnat
+
+
+def compute_entry_biogas_cogen(df_raw):
+    tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Cogen'
+    df_entree_biogas = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
+    
+    df_entree_biogas['corrected_value'] = 0
+    df_entree_biogas.loc[(df_entree_biogas['value']>0) & (df_entree_biogas['value']<1000), 'corrected_value'] \
+                                                                                = df_entree_biogas['value'] 
+    entry_biogas_cogen = df_entree_biogas['corrected_value'].sum()/60
+    
+    return entry_biogas_cogen, df_entree_biogas
+
+
+def compute_prod_therm_cogen(df_raw):
+    tag_name_1 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Ther_HT'
+    tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Ther_Drycooler'
+    
+    df_ht = df_raw[df_raw['area_name']==tag_name_1][['@timestamp', 'value']]
+    df_ht = df_ht[df_ht['value']!=0]
+    
+    df_drycooler = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
+    df_drycooler = df_drycooler[df_drycooler['value']!=0]
+    
+    
+    if len(df_drycooler) > 0:
+        ht = max(df_ht['value']) - min(df_ht['value'])
+        drycooler = max(df_drycooler['value']) - min(df_drycooler['value'])
+    else:
+        ht = 0
+        drycooler = 0
+    
+    return (ht + drycooler)
+
+
+def compute_avail_moteur(df_raw):
+    df_moteur = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct']
+    
+    percent_value = sum(df_moteur['value']) / 1440
+    
+    return percent_value
+
+def compute_starts_and_stops(df_raw):
+    tag_name = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
+
+    df_fct = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']] 
+
+    df_fct['edge']=df_fct.value.diff().fillna(0)
+
+    starts = df_fct.loc[df_fct['edge']==1, 'value'].count()
+    stops = df_fct.loc[df_fct['edge']==-1, 'value'].count()
+    
+    return starts, stops
+
+
+def compute_prod_elec_cogen(df_raw):
+    tag_name_1 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_IntoMoteur'
+    tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_OutToMoteur'
+    
+    df_in_motor = df_raw[df_raw['area_name']==tag_name_1][['@timestamp', 'value']]
+    df_in_motor = df_in_motor[df_in_motor['value']!=0]
+    
+    df_out_motor = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
+    df_out_motor = df_out_motor[df_out_motor['value']!=0]
+    
+    if len(df_out_motor) > 0:
+        out_motor = max(df_out_motor['value']) - min(df_out_motor['value'])
+        in_motor = max(df_in_motor['value']) - min(df_in_motor['value'])
+    else:
+        out_motor = 0
+        in_motor = 0
+
+    return (out_motor - in_motor)
+
+
+
+def compute_dispo_thiopaq(df_raw):
+    tag_name_1 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
+    tag_name_2 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'
+
+    df_debit = df_raw[df_raw['area_name']==tag_name_1][['@timestamp', 'value']]
+    df_debit['bit'] = 0
+    df_debit.loc[df_debit['value']>120, 'bit'] = 1
+
+    df_pression = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
+    df_pression['bit'] = 0
+    df_pression.loc[(df_pression['value']>=15)&(df_pression['value']<=36), 'bit'] = 1
+
+    df_merged=df_debit.merge(df_pression, left_on='@timestamp', right_on='@timestamp')
+    df_merged['bit'] = 0
+    df_merged.loc[(df_merged['bit_x']==1)&(df_merged['bit_y']==1), 'bit'] = 1
+    
+    tag_name_3 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Thiopaq_Fct'
+    
+    df_motor = df_raw[df_raw['area_name']==tag_name_3][['@timestamp', 'value']]
+    
+    obj = {
+      'max_theorical_avail_thiopaq_hour': round(df_merged['bit'].sum()/60, 2),  
+      'avail_thiopaq_hour': round(df_motor['value'].sum()/60, 2), 
+    }
+    
+    if obj['max_theorical_avail_thiopaq_hour'] == 0:
+        obj['avail_thiopaq_ratio'] = 0
+    elif obj['avail_thiopaq_hour'] > obj['max_theorical_avail_thiopaq_hour']:
+        obj['avail_thiopaq_ratio'] = 1
+    else:
+        obj['avail_thiopaq_ratio'] = round(obj['avail_thiopaq_hour'] / obj['max_theorical_avail_thiopaq_hour'], 2)
+        
+    
+    return obj
+
+
+def compute_dispo_cogen(df_raw):
+    tag_name_1 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
+    tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_TempRetour_Boucle_HT'
+    tag_name_3 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Peleur1_Fct'
+    tag_name_4 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Peleur2_Fct'
+    tag_name_5 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Blancheur_1'
+    tag_name_6 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Blancheur_2'
+
+    df_debit = df_raw[df_raw['area_name']==tag_name_1][['@timestamp', 'value']]
+    df_debit['bit'] = 0
+    df_debit.loc[df_debit['value']>220, 'bit'] = 1
+
+    df_temp = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
+    df_temp['bit'] = 0
+    df_temp.loc[(df_temp['value']<80), 'bit'] = 1
+    
+    df_merged=df_debit.merge(df_temp, left_on='@timestamp', right_on='@timestamp')
+    df_merged['bit'] = 0
+    df_merged.loc[(df_merged['bit_x']==1)&(df_merged['bit_y']==1), 'bit'] = 1
+    
+
+    df_3  = df_raw[df_raw['area_name']==tag_name_3][['@timestamp', 'value']]
+    df_4  = df_raw[df_raw['area_name']==tag_name_4][['@timestamp', 'value']]
+    df_5  = df_raw[df_raw['area_name']==tag_name_5][['@timestamp', 'value']]
+    df_6  = df_raw[df_raw['area_name']==tag_name_6][['@timestamp', 'value']]
+
+    df_3456 = df_3.merge(df_4, left_on='@timestamp', right_on='@timestamp') \
+                  .merge(df_5, left_on='@timestamp', right_on='@timestamp') \
+                  .merge(df_6, left_on='@timestamp', right_on='@timestamp')
+    df_3456.columns=['@timestamp', '3', '4', '5', '6']
+    df_3456['sum'] = df_3456['3']+df_3456['4']+df_3456['5']+df_3456['6']
+    df_3456['bit'] = 0
+    df_3456.loc[df_3456['sum']>=2, 'bit'] = 1
+    
+    df_final=df_merged[['@timestamp', 'bit']] \
+            .merge(df_3456[['@timestamp', 'bit']], left_on='@timestamp', right_on='@timestamp')
+    df_final['bit'] = 0
+    df_final.loc[(df_final['bit_x']==1)&(df_final['bit_y']==1), 'bit'] = 1
+    
+    tag_name_7 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
+    
+    df_motor = df_raw[df_raw['area_name']==tag_name_7][['@timestamp', 'value']]
+    
+    obj = {
+        'max_theorical_avail_cogen_hour': round(df_final['bit'].sum()/60, 2),
+        'avail_cogen_hour': round(df_motor['value'].sum()/60, 2), 
+    }
+    
+    if obj['max_theorical_avail_cogen_hour'] == 0:
+        obj['avail_cogen_ratio'] = 0
+    elif obj['avail_cogen_hour'] > obj['max_theorical_avail_cogen_hour']:
+        obj['avail_cogen_ratio'] = 1
+    else:
+        obj['avail_cogen_ratio'] = round(obj['avail_cogen_hour'] / obj['max_theorical_avail_cogen_hour'], 2)
+        
+    
+    return obj
+
+
+
+
+def create_obj(df_raw, start):
+
+    #DISPO DEBIT ENTREE THIOPAQ + ZOOM
+    obj = compute_avail_debit_entry_thiopac(df_raw)
+    obj_report_cogen = {}
+
+    obj_report_cogen['entry_biogas_thiopaq_Nm3'] = obj['value']
+    obj_report_cogen['entry_biogas_thiopaq_kWh'] = round(obj['value']*6.1656, 2)
+    obj_report_cogen['entry_biogas_thiopaq_MWh'] = round(obj['value']*6.1656/1000, 2)
+
+    obj_report_cogen['entry_biogas_thiopaq_minus_120_Nm3'] = obj['value_minus_120']
+    obj_report_cogen['entry_biogas_thiopaq_minus_120_kWh'] = round(obj['value_minus_120']*6.1656, 2)
+    obj_report_cogen['entry_biogas_thiopaq_minus_120_MWh'] = round(obj['value_minus_120']*6.1656/1000, 2)
+
+    obj_report_cogen['entry_biogas_thiopaq_120_220_Nm3'] = obj['value_120_220']
+    obj_report_cogen['entry_biogas_thiopaq_120_220_kWh'] = round(obj['value_120_220']*6.1656, 2)
+    obj_report_cogen['entry_biogas_thiopaq_120_220_MWh'] = round(obj['value_120_220']*6.1656/1000, 2)
+
+    obj_report_cogen['entry_biogas_thiopaq_220_330_Nm3'] = obj['value_220_330']
+    obj_report_cogen['entry_biogas_thiopaq_220_330_kWh'] = round(obj['value_220_330']*6.1656, 2)
+    obj_report_cogen['entry_biogas_thiopaq_220_330_MWh'] = round(obj['value_220_330']*6.1656/1000, 2)
+
+    obj_report_cogen['entry_biogas_thiopaq_330_600_Nm3'] = obj['value_330_600']
+    obj_report_cogen['entry_biogas_thiopaq_330_600_kWh'] = round(obj['value_330_600']*6.1656, 2)
+    obj_report_cogen['entry_biogas_thiopaq_330_600_MWh'] = round(obj['value_330_600']*6.1656/1000, 2)
+    
+    
+    #GASNAT ENRTREE COGEN
+    entry_gasnat = compute_gasnat_entry(df_raw)
+    obj_report_cogen['entry_gasnat_cogen_Nm3'] = entry_gasnat
+
+    obj_report_cogen['entry_gasnat_cogen_kWh'] = round(entry_gasnat * 10.42, 2)
+    obj_report_cogen['entry_gasnat_cogen_MWh'] = round(entry_gasnat * 10.42 / 1000, 2)
+    
+    
+    #ENTREE BIOGASCOGEN ET CHAUDIERE
+    entry_biogas_cogen, df_entree_biogas = compute_entry_biogas_cogen(df_raw)
+
+
+    obj_report_cogen['entry_biogas_cogen_Nm3'] = entry_biogas_cogen
+
+    obj_report_cogen['entry_biogas_cogen_kWh'] = round(entry_biogas_cogen * 6.1656, 2)
+    obj_report_cogen['entry_biogas_cogen_MWh'] = round(entry_biogas_cogen * 6.1656 / 1000, 2)
+
+    obj_report_cogen['entry_biogas_boiler_Nm3'] = round(obj_report_cogen['entry_biogas_thiopaq_Nm3'] 
+                                                                - entry_biogas_cogen, 2)
+    obj_report_cogen['entry_biogas_boiler_kWh'] = round(obj_report_cogen['entry_biogas_thiopaq_kWh'] 
+                                                                - obj_report_cogen['entry_biogas_cogen_kWh'], 2)
+    obj_report_cogen['entry_biogas_boiler_MWh'] = round(obj_report_cogen['entry_biogas_thiopaq_MWh'] 
+                                                                - obj_report_cogen['entry_biogas_cogen_MWh'], 2)
+
+    obj_report_cogen['entry_total_cogen_kWh'] = round(obj_report_cogen['entry_biogas_cogen_kWh']
+                                                                + obj_report_cogen['entry_gasnat_cogen_kWh'], 2)
+    obj_report_cogen['entry_total_cogen_MWh'] = round(obj_report_cogen['entry_biogas_cogen_MWh']
+                                                                + obj_report_cogen['entry_gasnat_cogen_MWh'], 2)
+    
+
+    start = containertimezone.localize(start)
+    start_year, end_year = datetime(start.year, 1, 1), datetime(start.year, 12, 31, 23, 59, 59)
+
+
+
+
+    df_calendar = es_helper.elastic_to_dataframe(es, 
+                                                    start=start_year, 
+                                                    end=end_year, 
+                                                    index='nyx_calendar', 
+                                                    query='type:LUTOSA',
+                                                    datecolumns=['date'],
+                                                    timestampfield='date')
+    
+    open_days = 365
+    
+    logger.info('size df_calendar: '+str(len(df_calendar)))
+    if len(df_calendar) > 0:
+        open_days = df_calendar.loc[df_calendar['on'], 'on'].count()
+    
+    logger.info('opening days: '+str(open_days))
+
+    target_prod_biogaz   = 9808
+    target_prod_elec     = 4400
+    target_prod_heat     = 4180
+    target_runtime_cogen = 1800
+    
+    daily_target_prod_biogaz   = target_prod_biogaz   / open_days
+    daily_target_prod_elec     = target_prod_elec     / open_days
+    daily_target_prod_heat     = target_prod_heat     / open_days
+    daily_target_runtime_cogen = target_runtime_cogen / open_days
+
+    day_on = True
+    try:
+        day_on = bool(df_calendar[df_calendar['date']==start]['on'].iloc[0])
+    except:
+        pass
+
+
+    obj_report_cogen['on'] = day_on
+
+    #HEURES DE FCT (DE ROTATION) COGEN
+    percent_value = compute_avail_moteur(df_raw)
+    obj_report_cogen['daily_avail_motor'] = round(percent_value, 2)
+    obj_report_cogen['daily_avail_motor_hour'] = round(percent_value*24, 2)
+
+    if day_on:
+        obj_report_cogen['daily_avail_motor_target_hour'] = daily_target_runtime_cogen
+        obj_report_cogen['daily_avail_motor_ratio_target'] = round((obj_report_cogen['daily_avail_motor_hour']/daily_target_runtime_cogen), 2)
+    else:
+        obj_report_cogen['daily_avail_motor_target_hour'] = 0
+        
+
+
+
+    #PROD ELEC COGEN
+    prod_elec_cogen = compute_prod_elec_cogen(df_raw)
+    obj_report_cogen['out_elec_cogen_kWh'] = round(prod_elec_cogen, 2)
+    obj_report_cogen['out_elec_cogen_MWh'] = round(prod_elec_cogen / 1000, 2)
+
+
+    if day_on:
+        obj_report_cogen['out_elec_cogen_target_MWh'] = daily_target_prod_elec
+        obj_report_cogen['out_elec_cogen_ratio_target'] = round(obj_report_cogen['out_elec_cogen_MWh'] 
+                                                                / obj_report_cogen['out_elec_cogen_target_MWh'], 2) 
+    else:
+        obj_report_cogen['out_elec_cogen_target_MWh'] = 0
+        
+    
+    #PROD THERM COGEN
+    prod_therm_cogen = compute_prod_therm_cogen(df_raw)
+    obj_report_cogen['out_therm_cogen_kWh'] = round(prod_therm_cogen, 2)
+    obj_report_cogen['out_therm_cogen_MWh'] = round(prod_therm_cogen / 1000, 2)
+
+    if day_on:
+        obj_report_cogen['out_therm_cogen_target_MWh'] = daily_target_prod_heat
+        obj_report_cogen['out_therm_cogen_ratio_target'] = round(obj_report_cogen['out_therm_cogen_MWh'] 
+                                                                / obj_report_cogen['out_therm_cogen_target_MWh'], 2) 
+    else:
+        obj_report_cogen['out_therm_cogen_target_MWh'] = 0
+        
+
+
+
+    obj_report_cogen['out_total_cogen_kWh'] = round(obj_report_cogen['out_therm_cogen_kWh']
+                                                                + obj_report_cogen['out_elec_cogen_kWh'], 2)
+    obj_report_cogen['out_total_cogen_MWh'] = round(obj_report_cogen['out_therm_cogen_MWh']
+                                                                + obj_report_cogen['out_elec_cogen_MWh'], 2)
+
+
+    if day_on:
+        obj_report_cogen['entry_biogas_thiopaq_target_MWh'] = daily_target_prod_biogaz
+        obj_report_cogen['entry_biogas_thiopaq_ratio_target'] = round((obj_report_cogen['entry_biogas_thiopaq_MWh'] / 
+                                                                obj_report_cogen['entry_biogas_thiopaq_target_MWh']), 2)
+    else:
+        obj_report_cogen['entry_biogas_thiopaq_target_MWh'] = 0
+    
+
+    
+    #RENDEMENTS
+    if obj_report_cogen['entry_total_cogen_kWh'] == 0: 
+        obj_report_cogen['total_efficiency'] = 0
+        obj_report_cogen['elec_efficiency'] = 0
+        obj_report_cogen['therm_efficiency'] = 0
+
+        obj_report_cogen['gasnat_ratio'] = 0
+        obj_report_cogen['biogas_ratio'] = 0
+
+    else:
+        obj_report_cogen['total_efficiency'] = round(obj_report_cogen['out_total_cogen_kWh'] / 
+                                                     obj_report_cogen['entry_total_cogen_kWh'], 2)
+        obj_report_cogen['elec_efficiency'] = round(obj_report_cogen['out_elec_cogen_kWh'] / 
+                                                    obj_report_cogen['entry_total_cogen_kWh'], 2)
+        obj_report_cogen['therm_efficiency'] = round(obj_report_cogen['out_therm_cogen_kWh'] / 
+                                                     obj_report_cogen['entry_total_cogen_kWh'], 2)
+
+        obj_report_cogen['gasnat_ratio'] = round(obj_report_cogen['entry_gasnat_cogen_kWh'] / 
+                                                 obj_report_cogen['entry_total_cogen_kWh'], 2)
+        obj_report_cogen['biogas_ratio'] = round(obj_report_cogen['entry_biogas_cogen_kWh'] / 
+                                                 obj_report_cogen['entry_total_cogen_kWh'], 2)
+
+        obj_report_cogen['total_efficiency_wo_zero'] = obj_report_cogen['total_efficiency']
+        obj_report_cogen['therm_efficiency_wo_zero'] = obj_report_cogen['therm_efficiency'] 
+        obj_report_cogen['elec_efficiency_wo_zero'] = obj_report_cogen['elec_efficiency']
+
+        obj_report_cogen['gasnat_ratio_wo_zero'] = obj_report_cogen['gasnat_ratio']
+        obj_report_cogen['biogas_ratio_wo_zero'] = obj_report_cogen['biogas_ratio']
+      
+    
+    #DISPO THIOPAQ
+    obj=compute_dispo_thiopaq(df_raw)
+
+    obj_report_cogen['max_theorical_avail_thiopaq_hour'] = obj['max_theorical_avail_thiopaq_hour']
+    obj_report_cogen['avail_thiopaq_hour'] = obj['avail_thiopaq_hour']
+    obj_report_cogen['avail_thiopaq_ratio'] = obj['avail_thiopaq_ratio']
+        
+        
+    #DISPO COGEN
+    obj=compute_dispo_cogen(df_raw)
+
+    obj_report_cogen['max_theorical_avail_cogen_hour'] = obj['max_theorical_avail_cogen_hour']
+    obj_report_cogen['avail_cogen_hour'] = obj['avail_cogen_hour']
+    obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
+
+    #STARTS AND STOPS
+    starts, stops = compute_starts_and_stops(df_raw)
+    obj_report_cogen['starts'] = int(starts)
+    obj_report_cogen['stops'] = int(stops)
+        
+    return obj_report_cogen
+
 def retrieve_raw_data(day):
     start_dt = datetime(day.year, day.month, day.day)
     end_dt   = datetime(start_dt.year, start_dt.month, start_dt.day, 23, 59, 59)
 
-    df_raw=es_helper.elastic_to_dataframe(es, index='opt_sites_data*', 
+    df_raw=es_helper.elastic_to_dataframe(es, index='opt_cleaned_data*', 
                                            query='*', 
                                            start=start_dt, 
                                            end=end_dt,
                                            scrollsize=10000,
                                            size=1000000)
 
+    
     containertimezone=pytz.timezone(get_localzone().zone)
-    logger.info('Data retrieved')
-    logger.info(df_raw)
     df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
                                                unit='ms', utc=True).dt.tz_convert(containertimezone)
     df_raw=df_raw.sort_values('@timestamp') 
     
     return df_raw
 
-def compute_avail_debit_entree_thiopac(df_raw):
-    df_debit_biogaz = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
-    
-    df_debit_biogaz['bit'] = 0
-    df_debit_biogaz.loc[(df_debit_biogaz['value']>220) & (df_debit_biogaz['value']<600), 'bit'] = 1
-    
-    percent_value = sum(df_debit_biogaz['bit']) / df_debit_biogaz.shape[0]
-    
-    entry_biogaz_thiopaq = df_debit_biogaz['value'].mean()*24
-    
-    return percent_value, entry_biogaz_thiopaq, df_debit_biogaz
-
-def compute_gaznat_entry(df_raw):
-    df_debit_gaznat = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_GazNat_Thiopaq'][['@timestamp', 'value']]
-    entry_gaznat = df_debit_gaznat['value'].mean()*24
-    return entry_gaznat
-
-def compute_entry_biogaz_cogen(df_raw):
-    df_entree_biogaz = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Cogen'][['@timestamp', 'value']]
-    
-    df_entree_biogaz['corrected_value'] = 0
-    df_entree_biogaz.loc[(df_entree_biogaz['value']>0) & (df_entree_biogaz['value']<1000), 'corrected_value'] = df_entree_biogaz['value'] 
-    entry_biogaz_cogen = df_entree_biogaz['corrected_value'].mean()*24
-    
-    return entry_biogaz_cogen, df_entree_biogaz
-
-def compute_avail_moteur(df_raw):
-    df_moteur = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct']
-    
-    percent_value = sum(df_moteur['value']) / df_moteur.shape[0]
-    
-    return percent_value
-
-def compute_avail_puissance(df_raw):
-    df_puissance = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_OutToMoteur'][['@timestamp', 'value']]
-    df_puissance['diff'] = df_puissance['value'].diff()
-    df_puissance['diff'] = df_puissance['diff'].fillna(0)
-    df_puissance['bit'] = 0
-    df_puissance.loc[(df_puissance['diff']>0), 'bit'] = 1
-
-    percent_value = sum(df_puissance['bit']) / df_puissance.shape[0]
-    return percent_value, df_puissance
-
-def compute_out_cogen(df_raw):
-    df_out_elec = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Ther_HT'][['@timestamp', 'value']]
-    df_out_elec=df_out_elec[df_out_elec['value']!=0]
-    out_elec = max(df_out_elec['value']) - min(df_out_elec['value'])
-
-    df_out_to_moteur = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_OutToMoteur'][['@timestamp', 'value']]
-    df_out_to_moteur=df_out_to_moteur[df_out_to_moteur['value']!=0]
-    out_to_moteur = max(df_out_to_moteur['value']) - min(df_out_to_moteur['value'])
-
-    return out_elec, out_to_moteur
-
-def create_obj(day, df_raw):
-    #df_raw = retrieve_raw_data(day)
-    
-    percent_value, entry_biogaz_thiopaq, df_debit_biogaz = compute_avail_debit_entree_thiopac(df_raw)
-    
-    df_debit_biogaz.tail()
-
-    obj_report_cogen = {
-        'in_biogaz_thiopaq': entry_biogaz_thiopaq,
-        'daily_avail'      : percent_value,
-        'daily_avail_hour'  : percent_value*24,
-    }
-    
-    entry_gaznat = compute_gaznat_entry(df_raw)
-    obj_report_cogen['in_gaznat_cogen'] = entry_gaznat
-    #obj_report_cogen['in_gaznat_cogen_kWh'] = obj_report_cogen['in_gaznat_cogen'] * 11.5
-    obj_report_cogen['in_gaznat_cogen_kWh'] = obj_report_cogen['in_gaznat_cogen'] * 10.42
-    obj_report_cogen['in_gaznat_cogen_MWh'] = obj_report_cogen['in_gaznat_cogen_kWh'] / 1000
-    
-    entry_biogaz_cogen, df_entree_biogaz = compute_entry_biogaz_cogen(df_raw)
-    obj_report_cogen['in_biogaz_cogen'] = entry_biogaz_cogen
-    obj_report_cogen['in_biogaz_chaudiere'] = obj_report_cogen['in_biogaz_thiopaq'] - obj_report_cogen['in_biogaz_cogen']
-    #obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 5.98
-    obj_report_cogen['in_biogaz_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen'] * 16.1656
-    obj_report_cogen['in_biogaz_cogen_MWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] / 1000
-    
-    obj_report_cogen['in_total_cogen_kWh'] = obj_report_cogen['in_biogaz_cogen_kWh'] + obj_report_cogen['in_gaznat_cogen_kWh']
-    
-    percent_value = compute_avail_moteur(df_raw)
-    obj_report_cogen['daily_avail_moteur'] = percent_value
-    obj_report_cogen['daily_avail_moteur_hour'] = percent_value*24
-    
-    percent_value = compute_avail_puissance(df_raw)[0]
-    obj_report_cogen['daily_avail_puissance'] = percent_value
-    obj_report_cogen['daily_avail_puissance_hour'] = percent_value*24
-    
-    if  obj_report_cogen['daily_avail'] == 0:
-        obj_report_cogen['daily_avail_moteur_real'] = 0
-        obj_report_cogen['daily_avail_puissance_real'] = 0
-    else:  
-        if obj_report_cogen['daily_avail_moteur'] > obj_report_cogen['daily_avail']:
-            obj_report_cogen['daily_avail_moteur_real'] = 1
-        else:
-            obj_report_cogen['daily_avail_moteur_real'] = obj_report_cogen['daily_avail_moteur'] / obj_report_cogen['daily_avail']
-
-        if obj_report_cogen['daily_avail_puissance'] > obj_report_cogen['daily_avail']:
-            obj_report_cogen['daily_avail_puissance_real'] = 1
-        else:
-            obj_report_cogen['daily_avail_puissance_real'] = obj_report_cogen['daily_avail_puissance'] / obj_report_cogen['daily_avail']
-
-    
-    out_elec, out_to_moteur = compute_out_cogen(df_raw)
-    obj_report_cogen['out_elec_kWh'] = out_elec
-    obj_report_cogen['out_moteur_kWh'] = out_to_moteur
-    obj_report_cogen['out_total_kWh'] = obj_report_cogen['out_elec_kWh'] + obj_report_cogen['out_moteur_kWh']
-    
-    
-    
-    if obj_report_cogen['in_total_cogen_kWh'] == 0: 
-        obj_report_cogen['total_efficiency'] = 0
-        obj_report_cogen['elec_efficiency'] = 0
-        obj_report_cogen['heat_efficiency'] = 0
-
-        obj_report_cogen['gaznat_ratio'] = 0
-        obj_report_cogen['biogaz_ratio'] = 0
-        
-    else:
-        obj_report_cogen['total_efficiency'] = obj_report_cogen['out_total_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['elec_efficiency'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['heat_efficiency'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-    
-        obj_report_cogen['gaznat_ratio'] = obj_report_cogen['in_gaznat_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['biogaz_ratio'] = obj_report_cogen['in_biogaz_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-    
-        obj_report_cogen['total_efficiency_wo_zero'] = obj_report_cogen['out_total_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['elec_efficiency_wo_zero'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['heat_efficiency_wo_zero'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-    
-        obj_report_cogen['gaznat_ratio_wo_zero'] = obj_report_cogen['in_gaznat_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-        obj_report_cogen['biogaz_ratio_wo_zero'] = obj_report_cogen['in_biogaz_cogen_kWh'] / obj_report_cogen['in_total_cogen_kWh']
-    
-    
-    if obj_report_cogen['out_total_kWh'] == 0: 
-        obj_report_cogen['heat_ratio'] = 0
-        obj_report_cogen['elec_ratio'] = 0
-        
-    else:
-        obj_report_cogen['heat_ratio'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['out_total_kWh']
-        obj_report_cogen['elec_ratio'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['out_total_kWh']
-    
-        obj_report_cogen['heat_ratio_wo_zero'] = obj_report_cogen['out_moteur_kWh'] / obj_report_cogen['out_total_kWh']
-        obj_report_cogen['elec_ratio_wo_zero'] = obj_report_cogen['out_elec_kWh'] / obj_report_cogen['out_total_kWh']
-
-
-    
-    fct_max_thiopaq_min = compute_fct_thiopaq(df_raw)
-    obj_report_cogen['fct_max_thiopaq'] = fct_max_thiopaq_min
-    fct_max_thiopaq_min_avail = fct_max_thiopaq_min/24
-    obj_report_cogen['fct_max_thiopaq_min_avail'] = fct_max_thiopaq_min_avail
-
-    tps_fct_thiopaq_min = get_tps_fct_thiopaq(df_raw)
-    obj_report_cogen['tps_fct_thiopaq'] = tps_fct_thiopaq_min
-    tps_fct_thiopaq_avail = tps_fct_thiopaq_min /24
-    obj_report_cogen['tps_fct_thiopaq_avail'] = tps_fct_thiopaq_avail
-
-    tps_fct_surpresseur_min = get_tps_fct_surpresseur(df_raw)
-    obj_report_cogen['tps_fct_surpresseur'] =  tps_fct_surpresseur_min
-    tps_fct_surpresseur_avail = tps_fct_surpresseur_min / 24
-    obj_report_cogen['tps_fct_surpresseur_avail'] = tps_fct_surpresseur_avail
-
-    tps_fct_real_thiopaq = get_tps_fct_real_thiopaq(fct_max_thiopaq_min, tps_fct_thiopaq_min) 
-    obj_report_cogen['tps_fct_real_thiopaq'] = tps_fct_real_thiopaq
-    tps_fct_real_surpresseur = get_tps_fct_real_thiopaq(fct_max_thiopaq_min, tps_fct_surpresseur_min)
-    obj_report_cogen['tps_fct_real_surpresseur'] = tps_fct_real_surpresseur
-    total_biogaz_thiopaq = get_total_biogaz_thiopaq(df_raw)
-    obj_report_cogen['total_biogaz_thiopaq'] = total_biogaz_thiopaq
-    total_biogaz_thiopaq_120 = total_biogaz_thiopaq['120']
-    obj_report_cogen['total_biogaz_thiopaq_120'] = total_biogaz_thiopaq_120
-    total_biogaz_thiopaq_220 = total_biogaz_thiopaq['220']
-    obj_report_cogen['total_biogaz_thiopaq_220'] = total_biogaz_thiopaq_220
-    total_biogaz_thiopaq_330 = total_biogaz_thiopaq['330']
-    obj_report_cogen['total_biogaz_thiopaq_330'] = total_biogaz_thiopaq_330 
-    total_biogaz_thiopaq_120_600 = total_biogaz_thiopaq_120 + total_biogaz_thiopaq_220 + total_biogaz_thiopaq_330
-    obj_report_cogen['total_biogaz_thiopaq_120_600'] = total_biogaz_thiopaq_120_600
-    
-
-    dispo_thiopaq = get_dispo_thiopaq(df_raw)
-    obj_report_cogen['dispo_thiopaq'] = dispo_thiopaq
-    obj_report_cogen['dispo_thiopaq_prct'] = dispo_thiopaq * 100
-
-
-
-    
-
-    
-    
-    
-    
-    return obj_report_cogen
 
 
 def save_tags_to_computed(es, obj):
-    list_of_tag = ['in_biogaz_thiopaq', 'in_gaznat_cogen', 
-               'in_gaznat_cogen_kWh', 'in_biogaz_cogen', 'in_biogaz_chaudiere', 'in_biogaz_cogen_kWh', 
-               'in_total_cogen_kWh', 'out_elec_kWh', 
-               'out_moteur_kWh', 'out_total_kWh']
+    list_of_tag = ['entry_biogas_cogen_MWh', 'entry_gasnat_cogen_MWh']
 
 
     bulkbody = ''
@@ -458,21 +684,21 @@ def save_tags_to_computed(es, obj):
         bulkbody+=json.dumps(new_obj, cls=DateTimeEncoder)+"\r\n"
 
     diff_list = [
-        {
-            'name': 'INminusOUT',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_total_kWh',
-        },
-        {
-            'name': 'INminusHEAT',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_moteur_kWh',
-        },
-        {
-            'name': 'INminusELEC',
-            'a': 'in_total_cogen_kWh',
-            'b': 'out_elec_kWh',
-        },
+        # {
+        #     'name': 'INminusOUT',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_total_kWh',
+        # },
+        # {
+        #     'name': 'INminusHEAT',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_moteur_kWh',
+        # },
+        # {
+        #     'name': 'INminusELEC',
+        #     'a': 'in_total_cogen_kWh',
+        #     'b': 'out_elec_kWh',
+        # },
     ]
 
     for i in diff_list:
@@ -531,10 +757,10 @@ def doTheWork(start):
 
     start = datetime(start.year, start.month, start.day)
 
-    df = retrieve_raw_data(start)
 
     try:
-        obj_to_es = create_obj(start, df)
+        df = retrieve_raw_data(start)
+        obj_to_es = create_obj(df, start)
         obj_to_es['@timestamp'] = containertimezone.localize(start)
         obj_to_es['site'] = 'LUTOSA'
         es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
@@ -542,10 +768,10 @@ def doTheWork(start):
         save_tags_to_computed(es, obj_to_es)
     except Exception as er:
         logger.error('Error During creating specifics data')
-        logger.error(er)
+        error = traceback.format_exc()
+        logger.error(error)
 
     try:
-        df = retrieve_raw_data(start)
         df['value'] = df['value'].apply(lambda x: removeStr(x))
         df['value_min'] = df['value']
         df['value_min_sec'] = df['value']
@@ -571,7 +797,8 @@ def doTheWork(start):
         print("finished")
     except Exception as er:
         logger.error('Unable to compute data for ' + str(start))
-        logger.error(er)
+        error = traceback.format_exc()
+        logger.error(error)
 
 
 def messageReceived(destination,message,headers):
@@ -587,7 +814,6 @@ def messageReceived(destination,message,headers):
     while start <= stop:
         doTheWork(start)
         start = start + timedelta(1)
-
 
 
 
