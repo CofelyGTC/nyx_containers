@@ -36,7 +36,7 @@ from elastic_helper import es_helper
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="0.0.1"
+VERSION="0.0.2"
 MODULE="GTC_CLEANED_DATA"
 QUEUE=["GTC_CLEANED_DATA_RANGE"]
 
@@ -209,8 +209,12 @@ def retrieve_raw_data(day):
                                            size=1000000)
 
     containertimezone=pytz.timezone(get_localzone().zone)
-    df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
-                                               unit='ms', utc=True).dt.tz_convert(containertimezone)
+    try:
+      df_raw['@timestamp'] = pd.to_datetime(df_raw['@timestamp'], \
+                                                 unit='ms', utc=True).dt.tz_convert(containertimezone)
+    except:
+      pass
+
     df_raw=df_raw.sort_values('@timestamp') 
 
     logger.info(df_raw)

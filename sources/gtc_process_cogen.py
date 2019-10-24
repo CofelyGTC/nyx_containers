@@ -49,7 +49,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -664,7 +664,14 @@ def setSearchQueryField(newfield):
 def getCogenNames():
     logger.info("GET ALL COGENS")
     rescogen=[]
-    cogens=es.search(index="cogen_parameters",size=1000)
+    querycogens = {
+      "query": {
+        "exists": {
+          "field": "order"
+        }
+      }
+    }
+    cogens=es.search(index="cogen_parameters", body=querycogens, size=1000)
 
 #    print (cogens)
 
