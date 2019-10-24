@@ -21,6 +21,7 @@ VERSION HISTORY
 
 * 09 Oct 2019 0.0.1 **VME** Creation
 * 16 Oct 2019 0.0.2 **VME** Bug fixing on targets when day off
+* 23 Oct 2019 0.0.3 **VME** Get targets from cogen_parameters
 """
 
 import sys
@@ -51,10 +52,12 @@ from io import StringIO
 from dateutil import tz
 import dateutil.parser
 
+from lib import cogenhelper as ch
+
 
 import tzlocal # $ pip install tzlocal
 
-VERSION="0.0.2"
+VERSION="0.0.3"
 MODULE="GTC_RECOMPUTE_TARGET_LUTOSA"
 QUEUE=["RECOMPUTE_TARGET_LUTOSA"]
 
@@ -73,10 +76,11 @@ def log_message(message):
 
 ################################################################################
 def compute_targets(year):
-    target_prod_biogaz   = 9808
-    target_prod_elec     = 4400
-    target_prod_heat     = 4180
-    target_runtime_cogen = 1800
+    global es
+    target_prod_biogaz   = ch.get_targets(es)['biogas']
+    target_prod_elec     = ch.get_targets(es)['elec']
+    target_prod_heat     = ch.get_targets(es)['heat']
+    target_runtime_cogen = ch.get_targets(es)['runtime']
     
     start, end = datetime(year, 1, 1), datetime(year, 12, 31, 23, 59, 59)
 

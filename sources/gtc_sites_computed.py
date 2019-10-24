@@ -17,6 +17,8 @@ VERSION HISTORY
 * 15 Oct 2019 0.0.21 **VME** Add the dynamic target depending on open days in the current year  
 * 17 Oct 2019 0.0.22 **VME** Add 'on' field to daily_cogen
 * 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
+* 23 Oct 2019 0.0.24 **VME** Get targets from cogen_parameters
+* 25 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
 
 """  
 import re
@@ -51,11 +53,13 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 import collections
 import dateutil.parser
 
+from lib import cogenhelper as ch
+
 
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.23"
+VERSION = "0.0.25"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -482,6 +486,7 @@ def create_obj(df_raw, start):
                                                                 + obj_report_cogen['entry_gasnat_cogen_MWh'], 2)
     
 
+    #CALENDAR OPEN DAYS FOR RATIOS
     start = containertimezone.localize(start)
     start_year, end_year = datetime(start.year, 1, 1), datetime(start.year, 12, 31, 23, 59, 59)
 
@@ -504,10 +509,10 @@ def create_obj(df_raw, start):
     
     logger.info('opening days: '+str(open_days))
 
-    target_prod_biogaz   = 9808
-    target_prod_elec     = 4400
-    target_prod_heat     = 4180
-    target_runtime_cogen = 1800
+    target_prod_biogaz   = ch.get_targets(es)['biogas']
+    target_prod_elec     = ch.get_targets(es)['elec']
+    target_prod_heat     = ch.get_targets(es)['heat']
+    target_runtime_cogen = ch.get_targets(es)['runtime']
     
     daily_target_prod_biogaz   = target_prod_biogaz   / open_days
     daily_target_prod_elec     = target_prod_elec     / open_days
@@ -616,7 +621,9 @@ def create_obj(df_raw, start):
 
     obj_report_cogen['max_theorical_avail_thiopaq_hour'] = obj['max_theorical_avail_thiopaq_hour']
     obj_report_cogen['avail_thiopaq_hour'] = obj['avail_thiopaq_hour']
-    obj_report_cogen['avail_thiopaq_ratio'] = obj['avail_thiopaq_ratio']
+    
+    if day_on:
+        obj_report_cogen['avail_thiopaq_ratio'] = obj['avail_thiopaq_ratio']
         
         
     #DISPO COGEN
@@ -624,7 +631,10 @@ def create_obj(df_raw, start):
 
     obj_report_cogen['max_theorical_avail_cogen_hour'] = obj['max_theorical_avail_cogen_hour']
     obj_report_cogen['avail_cogen_hour'] = obj['avail_cogen_hour']
-    obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
+
+
+    if day_on:
+        obj_report_cogen['avail_cogen_ratio'] = obj['avail_cogen_ratio']
 
     #STARTS AND STOPS
     starts, stops = compute_starts_and_stops(df_raw)
