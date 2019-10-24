@@ -144,7 +144,7 @@ def messageReceived(destination,message,headers):
         log_message("Import of file [%s] started." % headers["file"])
 
 
-#####################
+    #####################
     # TO MODIFY ########
     lot = headers['lot']
     filename = headers['CamelFileNameOnly']

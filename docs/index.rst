@@ -33,6 +33,9 @@ Modules
 .. automodule:: biac_import_kpi105
     :members:
 
+.. automodule:: biac_import_kpi305_501
+    :members:
+
 .. automodule:: biac_import_kpi502
     :members:
 
