@@ -25,6 +25,7 @@ VERSION HISTORY
 * 08 Oct 2019 0.0.5 **VME** Adding lot 3. Big code refactoring for handling multi-lot
 * 09 Oct 2019 0.0.6 **VME** Default value if no data
 * 14 Oct 2019 0.0.7 **VME** Bug fixing when no ronde for lot
+* 30 Oct 2019 0.0.8 **VME** Buf fixing r.text empty and better error log.
 """  
 import re
 import sys
@@ -59,7 +60,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -185,8 +186,7 @@ def loadKPI102():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -219,32 +219,34 @@ def loadKPI102():
                 if r.status_code != 200:
                     logger.info('something went wrong...')
                     logger.info(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    logger.info(r.json())
 
-                logger.info(r.json())
+                    ids=r.json()['data']["dataIds"]
 
-                ids=r.json()['data']["dataIds"]
+                    logger.info(ids)
+                    payload={
+                    "data_ids": ids
+                    }
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
 
-                logger.info(ids)
-                payload={
-                "data_ids": ids
-                }
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
 
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                    if r.status_code != 200:
+                        logger.info('something went wrong...')
+                        logger.info(r.status_code, r.reason)
 
-                if r.status_code != 200:
-                    logger.info('something went wrong...')
-                    logger.info(r.status_code, r.reason)
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
 
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
+                        file = open("./tmp/excel.xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
 
-                    file = open("./tmp/excel.xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
-
-                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
+                        df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
 
 
         if len(df_all) > 0:

@@ -27,6 +27,7 @@ VERSION HISTORY
 * 28 May 2019 0.0.5 **AMA** Stats collection added first day skipped
 * 05 Jun 2019 0.0.6 **AMA** Fixed a bug that oprevenrts new record to be read
 * 01 Aug 2019 0.0.7 **VME** Remove call to compute_kpi103_monthly. New Kizeo forms for weekend.
+* 30 Oct 2019 0.0.8 **VME** Buf fixing r.text empty and better error log.
 """       
 import re
 import sys
@@ -63,7 +64,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -149,11 +150,12 @@ def loadKPI103():
             "password": kizeo_password,
             "company": kizeo_company
             }
+
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
+
 
         response = r.json()
         token = response['data']['token']
@@ -183,39 +185,42 @@ def loadKPI103():
                 if r.status_code != 200:
                     logger.error('something went wrong...')
                     logger.error(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+
+                    ids=r.json()['data']["dataIds"]
                     
-                ids=r.json()['data']["dataIds"]
-                
-                logger.info(ids)
-                payload={
-                    "data_ids": ids
-                }
+                    logger.info(ids)
+                    payload={
+                        "data_ids": ids
+                    }
 
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
 
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
 
-                if r.status_code != 200:
-                    logger.error('something went wrong...')
-                    logger.error(r.status_code, r.reason)
+                    if r.status_code != 200:
+                        logger.error('something went wrong...')
+                        logger.error(r.status_code, r.reason)
 
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
-                    file = open("./tmp/"+i['name']+".xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
-                
-                    df = pd.read_excel("./tmp/"+i['name']+".xlsx", header=None)
-                                                            
-                    logger.info(i["name"])
-                    if "16" in i['name']:
-                        ronde='16'
-                    else:
-                        ronde='702'
-                    df=df[[1,2]]
-                    df[5]=ronde
-                    df_all=df_all.append(df)
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
+                        file = open("./tmp/"+i['name']+".xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
+                    
+                        df = pd.read_excel("./tmp/"+i['name']+".xlsx", header=None)
+                                                                
+                        logger.info(i["name"])
+                        if "16" in i['name']:
+                            ronde='16'
+                        else:
+                            ronde='702'
+                        df=df[[1,2]]
+                        df[5]=ronde
+                        df_all=df_all.append(df)
 
                     
                     
@@ -322,8 +327,6 @@ def computeStats103():
         rondestats={"16":{"done":0},"702":{"done":0}}    
 
         res=es.search(body=query,index="biac_kpi103*")
-        logger.info("========+>"*10)
-        logger.info(res)
 
         records=res["aggregations"]["time"]["buckets"]
 
@@ -352,9 +355,6 @@ def computeStats103():
 
 
         bulkbody=[]
-        logger.info(objs)
-
-    #    print(rondestats)
         
         
         for ronde in rondes:
@@ -396,8 +396,6 @@ def computeStats103():
                     value=0
                     if date in objs:
                         if ronde in objs[date]:
-                            print("===>")
-                            print(rondestats[ronde])
                             rondestats[ronde]["done"]+=1                    
                             value=1  
             for key in rondestats:
@@ -407,9 +405,6 @@ def computeStats103():
             if dones+notdones>0:
                 percentage=(dones*100)/(dones+notdones)
         
-        logger.info("====>")
-        logger.info(dones)
-        logger.info(notdones)
 
         for key in rondestats:
             rondestats[key]["notdone"]=datetime.now().date().day-rondestats[key]["done"]

@@ -27,6 +27,7 @@ VERSION HISTORY
 * 27 May 2019 0.0.6 **AMA** Heatmap collection added (biac_kib_kpi105)
 * 28 May 2019 0.0.8 **AMA** Global Percentage does not count the current day
 * 25 Jun 2019 0.0.9 **VME** Handle multi Lot (for lot 3) 
+* 30 Oct 2019 1.0.1 **VME** Buf fixing r.text empty and better error log.
 """ 
 import re
 import sys
@@ -60,7 +61,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI105_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 QUEUE   = ["KPI105_IMPORT"]
 
 def log_message(message):
@@ -365,8 +366,7 @@ def loadKPI105():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -397,38 +397,40 @@ def loadKPI105():
                 if r.status_code != 200:
                     logger.error('something went wrong...')
                     logger.error(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    ids=r.json()['data']["dataIds"]
                     
-                ids=r.json()['data']["dataIds"]
+                    logger.info(ids)
+                    payload={
+                        "data_ids": ids
+                    }
+
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
+
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+
+                    if r.status_code != 200:
+                        logger.error('something went wrong...')
+                        logger.error(r.status_code, r.reason)
+
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
+
+                        file_name = "./tmp/"+i['name'].replace('/','').replace(' ','').lower()+".xlsx"
+                        file = open(file_name, "wb")
+                        file.write(r.content)
+                        file.close()
                 
-                logger.info(ids)
-                payload={
-                    "data_ids": ids
-                }
+                        df = pd.read_excel(file_name)
+                        print("======*"*100)
+                        print(file_name)
+                        df.columns=['ronde', 'date', 'date_modification','date_answer', 'record_number']
 
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
-
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
-
-                if r.status_code != 200:
-                    logger.error('something went wrong...')
-                    logger.error(r.status_code, r.reason)
-
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
-
-                    file_name = "./tmp/"+i['name'].replace('/','').replace(' ','').lower()+".xlsx"
-                    file = open(file_name, "wb")
-                    file.write(r.content)
-                    file.close()
-            
-                    df = pd.read_excel(file_name)
-                    print("======*"*100)
-                    print(file_name)
-                    df.columns=['ronde', 'date', 'date_modification','date_answer', 'record_number']
-
-                    logger.info(df)
-                    df_all=df_all.append(df)
+                        logger.info(df)
+                        df_all=df_all.append(df)
 
         if len(df_all) > 0:
 

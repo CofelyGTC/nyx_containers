@@ -25,6 +25,7 @@ VERSION HISTORY
 
 * 23 Jul 2019 0.0.19 **VME** Code commented
 * 24 Jul 2019 0.0.20 **VME** Modification of screen name to fill the requirements for BACFIR dashboards (Maximo)
+* 30 Oct 2019 0.0.21 **VME** Buf fixing r.text empty and better error log.
 """  
 import re
 import sys
@@ -54,7 +55,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "0.0.20"
+VERSION = "0.0.21"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -99,7 +100,6 @@ def extract_contract(row):
     ----------
     row
         a spotcheck record 
-
     """
     
     lot = int(row['lot'])
@@ -534,13 +534,11 @@ def loadKizeo():
         "user": kizeo_user,
         "password": kizeo_password,
         "company": kizeo_company
-        }
-    #logger.info(payload)
+    }
 
     r = requests.post(url_kizeo + '/login', json = payload)
     if r.status_code != 200:
-        logger.error('Something went wrong...')
-        logger.error(r.status_code, r.reason)
+        logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
         return
 
     response = r.json()
@@ -551,61 +549,52 @@ def loadKizeo():
     form_list = r.json()['forms']
 
     logger.info('>Form List: ')
-    #logger.info(form_list)
-
 
     for i in form_list:
         if i['name'] == 'SPOTCHECK ~ Loten 1-2-3 (KPI200 & KPI300)':
             logger.info("=== SPOTCHECK FOUND")
             form_id = i['id']
 
-
-#            r = requests.get(url_kizeo + '/forms/' + form_id + '/data/all?Authorization='+token)
             start=(datetime.now()+timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
             logger.info("Start %s" %(start))            
             end=datetime(2019, 1, 1).strftime("%Y-%m-%d %H:%M:%S")
             logger.info("End %s" %(end))
             post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
             
-            #https://www.kizeoforms.com/rest/v3//forms/411820/data/exports_info
             r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
 
             if r.status_code != 200:
                 logger.error('something went wrong...')
                 logger.error(r.status_code, r.reason)
+            elif r.text == '':
+                logger.info('Empty response')
+            else:
+                logger.info(r.json())
 
-            logger.info(r.json())
-
-            ids=r.json()['data']["dataIds"]
-            
-            #for j in r.json()['data']:
-            #    data_id = j['id']
-            #   ids.append(str(j['id']))
-            
-            
-            logger.info(ids)
-            payload={
-            "data_ids": ids
-            }
-            posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-            headers = {'Content-type': 'application/json','Authorization':token}
-            
-            r=requests.post(posturl,data=json.dumps(payload),headers=headers)
-            
-            if r.status_code != 200:
-                logger.error('something went wrong...')
-                logger.error(r.status_code, r.reason)
-            
-#            print (r.content)
-
-            logger.info("Handling Form. Content Size:"+str(len(r.content)))
-            if len(r.content) >0:
+                ids=r.json()['data']["dataIds"]
                 
-                file = open("./tmp/excel.xlsx", "wb")
-                file.write(r.content)
-                file.close()
+                
+                logger.info(ids)
+                payload={
+                "data_ids": ids
+                }
+                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                headers = {'Content-type': 'application/json','Authorization':token}
+                
+                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                
+                if r.status_code != 200:
+                    logger.error('something went wrong...')
+                    logger.error(r.status_code, r.reason)
 
-                importKizeo({"file":"RestAPI"})
+                logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                if len(r.content) >0:
+                    
+                    file = open("./tmp/excel.xlsx", "wb")
+                    file.write(r.content)
+                    file.close()
+
+                    importKizeo({"file":"RestAPI"})
 
 
 
