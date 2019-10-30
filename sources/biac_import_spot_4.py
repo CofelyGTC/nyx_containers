@@ -14,6 +14,7 @@ VERSION HISTORY
 ===============
 
 * 21 Oct 2019 0.0.1 **VME** First commit
+* 30 Oct 2019 0.0.2 **VME** Buf fixing r.text empty and better error log.
 """  
 import re
 import sys
@@ -110,8 +111,7 @@ def loadKizeo():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -139,32 +139,34 @@ def loadKizeo():
                 if r.status_code != 200:
                     logger.info('something went wrong...')
                     logger.info(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    logger.info(r.json())
 
-                logger.info(r.json())
+                    ids=r.json()['data']["dataIds"]
 
-                ids=r.json()['data']["dataIds"]
+                    logger.info(ids)
+                    payload={
+                    "data_ids": ids
+                    }
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
 
-                logger.info(ids)
-                payload={
-                "data_ids": ids
-                }
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
 
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                    if r.status_code != 200:
+                        logger.info('something went wrong...')
+                        logger.info(r.status_code, r.reason)
 
-                if r.status_code != 200:
-                    logger.info('something went wrong...')
-                    logger.info(r.status_code, r.reason)
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
 
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
+                        file = open("./tmp/excel.xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
 
-                    file = open("./tmp/excel.xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
-
-                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
+                        df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
 
         if len(df_all) > 0:
             df_all['KPI']=df_all['KPI'].str.extract(r'([0-9]{3})').astype(int)
