@@ -16,15 +16,22 @@ Listens to:
 Collections:
 -------------------------------------
 
+WORKTYPE PM
 * **biac_maximo** (Raw Data / Modified when a new file append)
 * **biac_maximo_monthly** (Computed Data for Current Month / Modified when a new file append)
 * **biac_histo_maximo** (Raw Data historicly saved by day / Never Change)
+
+
+WORKTYPE ADM
+* **biac_503maximo** (Raw Data / Modified when a new file append) 
+* **biac_503histo_maximo** (Raw Data historicly saved by day / Never Change)
 
 VERSION HISTORY
 -------------------------------------
 
 * 03 Jun 2019 1.0.20 **PDB** Finished version for basic applications
 * 01 Aug 2019 2.0.1 **AMA** Add Historical system
+* 01 Aug 2019 2.1.0 **AMA** Filter worktypes PM and ADM to two different collections.
 """
 
 import re
@@ -48,7 +55,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 from elastic_helper import es_helper 
 
-VERSION="2.0.1"
+VERSION="2.1.0"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -344,6 +351,9 @@ def messageReceived(destination,message,headers):
             actualFinishMax = getTsDate(row['ActualFinish max'])
             actualFinish = getTsDate(row['ActualFinish'])
             KPI302 = row['KPI302']
+            KPI503=""
+            if "KPI503" in row:
+                KPI503= row['KPI503']
 
             overdue = 0
 
@@ -393,6 +403,8 @@ def messageReceived(destination,message,headers):
             if nowts < scheduledStart:
                 future = 0
 
+
+
             newrec = {
                 "woid": woid,
                 "contract": contract,
@@ -424,13 +436,21 @@ def messageReceived(destination,message,headers):
                 "KPI302": KPI302
             }
 
+            ispm=(worktype=="PM")
+            # if not ispm:
+            #     logger.info("===>COUCOCUOCOUC")
+            #     logger.info(row)
 
 
             if not flag_histo:
                 es_id = woid+'_'+str(scheduledStart)
                 action = {}
-                action["index"] = {"_index": 'biac_maximo',
-                    "_type": "doc", "_id": es_id}
+                if ispm:
+                    action["index"] = {"_index": 'biac_maximo',
+                        "_type": "doc", "_id": es_id}
+                else:
+                    action["index"] = {"_index": 'biac_503maximo',
+                        "_type": "doc", "_id": es_id}
 
                 bulkbody += json.dumps(action)+"\r\n"
                 bulkbody += json.dumps(newrec) + "\r\n"
@@ -439,8 +459,12 @@ def messageReceived(destination,message,headers):
             if not flag_already_histo_for_today:
                 es_id = woid+'_'+str(scheduledStart)+'_'+(histo_date.strftime('%Y-%m-%d'))
                 action = {}
-                action["index"] = {"_index": 'biac_histo_maximo',
-                    "_type": "doc", "_id": es_id}
+                if ispm:
+                    action["index"] = {"_index": 'biac_histo_maximo',
+                        "_type": "doc", "_id": es_id}
+                else:
+                    action["index"] = {"_index": 'biac_503histo_maximo',
+                        "_type": "doc", "_id": es_id}
 
                 newrec['histo_date_dt'] = str(histo_date)
                 newrec['histo_date'] = histo_date.strftime('%Y-%m-%d')

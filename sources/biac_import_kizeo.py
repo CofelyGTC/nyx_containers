@@ -26,6 +26,7 @@ VERSION HISTORY
 * 23 Jul 2019 0.0.19 **VME** Code commented
 * 24 Jul 2019 0.0.20 **VME** Modification of screen name to fill the requirements for BACFIR dashboards (Maximo)
 * 30 Oct 2019 0.0.21 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0  **AMA** Use data get rest api exports_info function to get record ids
 """  
 import re
 import sys
@@ -55,7 +56,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "0.0.21"
+VERSION = "1.0.0"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -559,9 +560,10 @@ def loadKizeo():
             logger.info("Start %s" %(start))            
             end=datetime(2019, 1, 1).strftime("%Y-%m-%d %H:%M:%S")
             logger.info("End %s" %(end))
-            post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+            #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
             
-            r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+            #1r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+            r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
             if r.status_code != 200:
                 logger.error('something went wrong...')
@@ -569,9 +571,13 @@ def loadKizeo():
             elif r.text == '':
                 logger.info('Empty response')
             else:
-                logger.info(r.json())
+            #    logger.info(r.json())
 
-                ids=r.json()['data']["dataIds"]
+                #ids=r.json()['data']["dataIds"]
+                ids=[]
+                for rec in r.json()["data"]:
+#                    print(rec)
+                    ids.append(rec["id"])
                 
                 
                 logger.info(ids)

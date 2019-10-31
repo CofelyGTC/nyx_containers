@@ -28,6 +28,8 @@ VERSION HISTORY
 * 05 Jun 2019 0.0.6 **AMA** Fixed a bug that oprevenrts new record to be read
 * 01 Aug 2019 0.0.7 **VME** Remove call to compute_kpi103_monthly. New Kizeo forms for weekend.
 * 30 Oct 2019 0.0.8 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
+* 30 Oct 2019 1.0.1 **AMA** Fix a bug that added an additional day during the daylight saving month
 """       
 import re
 import sys
@@ -64,7 +66,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "0.0.8"
+VERSION = "1.0.0"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -178,9 +180,10 @@ def loadKPI103():
                 logger.info("Start %s" %(start))            
                 end=(datetime.now()-timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
 
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                #r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.error('something went wrong...')
@@ -189,7 +192,11 @@ def loadKPI103():
                     logger.info('Empty response')
                 else:
 
-                    ids=r.json()['data']["dataIds"]
+                    ids=[]
+                    for rec in r.json()["data"]:
+    #                    print(rec)
+                        ids.append(rec["id"])
+                    
                     
                     logger.info(ids)
                     payload={
@@ -348,7 +355,7 @@ def computeStats103():
         startloop=start
         dates=[]
         
-        while startloop <=end:
+        while startloop <=end  and startloop.month==start.month:
             dates.append(startloop.strftime("%Y-%m-%d"))        
             startloop+=timedelta(days=1)
             
