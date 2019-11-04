@@ -288,7 +288,7 @@ def compute_prod_therm_cogen(df_raw):
         ht = 0
         drycooler = 0
     
-    return (ht + drycooler)
+    return ht, drycooler
 
 
 def compute_avail_moteur(df_raw):
@@ -370,49 +370,18 @@ def compute_dispo_thiopaq(df_raw):
 
 def compute_dispo_cogen(df_raw):
     tag_name_1 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
-    tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_TempRetour_Boucle_HT'
-    tag_name_3 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Peleur1_Fct'
-    tag_name_4 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Peleur2_Fct'
-    tag_name_5 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Blancheur_1'
-    tag_name_6 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Blancheur_2'
+
 
     df_debit = df_raw[df_raw['area_name']==tag_name_1][['@timestamp', 'value']]
     df_debit['bit'] = 0
-    df_debit.loc[df_debit['value']>220, 'bit'] = 1
-
-    df_temp = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
-    df_temp['bit'] = 0
-    df_temp.loc[(df_temp['value']<80), 'bit'] = 1
+    df_debit.loc[df_debit['value']>=220, 'bit'] = 1
     
-    df_merged=df_debit.merge(df_temp, left_on='@timestamp', right_on='@timestamp')
-    df_merged['bit'] = 0
-    df_merged.loc[(df_merged['bit_x']==1)&(df_merged['bit_y']==1), 'bit'] = 1
+    tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
     
-
-    df_3  = df_raw[df_raw['area_name']==tag_name_3][['@timestamp', 'value']]
-    df_4  = df_raw[df_raw['area_name']==tag_name_4][['@timestamp', 'value']]
-    df_5  = df_raw[df_raw['area_name']==tag_name_5][['@timestamp', 'value']]
-    df_6  = df_raw[df_raw['area_name']==tag_name_6][['@timestamp', 'value']]
-
-    df_3456 = df_3.merge(df_4, left_on='@timestamp', right_on='@timestamp') \
-                  .merge(df_5, left_on='@timestamp', right_on='@timestamp') \
-                  .merge(df_6, left_on='@timestamp', right_on='@timestamp')
-    df_3456.columns=['@timestamp', '3', '4', '5', '6']
-    df_3456['sum'] = df_3456['3']+df_3456['4']+df_3456['5']+df_3456['6']
-    df_3456['bit'] = 0
-    df_3456.loc[df_3456['sum']>=2, 'bit'] = 1
-    
-    df_final=df_merged[['@timestamp', 'bit']] \
-            .merge(df_3456[['@timestamp', 'bit']], left_on='@timestamp', right_on='@timestamp')
-    df_final['bit'] = 0
-    df_final.loc[(df_final['bit_x']==1)&(df_final['bit_y']==1), 'bit'] = 1
-    
-    tag_name_7 = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
-    
-    df_motor = df_raw[df_raw['area_name']==tag_name_7][['@timestamp', 'value']]
+    df_motor = df_raw[df_raw['area_name']==tag_name_2][['@timestamp', 'value']]
     
     obj = {
-        'max_theorical_avail_cogen_hour': round(df_final['bit'].sum()/60, 2),
+        'max_theorical_avail_cogen_hour': round(df_debit['bit'].sum()/60, 2),
         'avail_cogen_hour': round(df_motor['value'].sum()/60, 2), 
     }
     
@@ -557,9 +526,14 @@ def create_obj(df_raw, start):
         
     
     #PROD THERM COGEN
-    prod_therm_cogen = compute_prod_therm_cogen(df_raw)
+    prod_therm_cogen_ht, prod_therm_cogen_drycooler = compute_prod_therm_cogen(df_raw)
+    prod_therm_cogen = prod_therm_cogen_ht + prod_therm_cogen_drycooler
     obj_report_cogen['out_therm_cogen_kWh'] = round(prod_therm_cogen, 2)
     obj_report_cogen['out_therm_cogen_MWh'] = round(prod_therm_cogen / 1000, 2)
+    obj_report_cogen['out_therm_cogen_ht_kWh'] = round(prod_therm_cogen_ht, 2)
+    obj_report_cogen['out_therm_cogen_ht_MWh'] = round(prod_therm_cogen_ht / 1000, 2)
+    obj_report_cogen['out_therm_cogen_drycooler_kWh'] = round(prod_therm_cogen_drycooler, 2)
+    obj_report_cogen['out_therm_cogen_drycooler_MWh'] = round(prod_therm_cogen_drycooler / 1000, 2)
 
     if day_on:
         obj_report_cogen['out_therm_cogen_target_MWh'] = daily_target_prod_heat
