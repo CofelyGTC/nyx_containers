@@ -36,6 +36,7 @@ VERSION HISTORY
 * 26 Aug 2019 0.0.6 **AMA** Fix a bug in the report entity / matching
 * 24 Sep 2019 0.0.7 **AMA** Message localized in NL
 * 23 Oct 2019 0.0.7 **AMA** Lot 4 Feedback result works
+* 29 Oct 2019 1.0.0 **AMA** The system accepts KPI that are not numerical
 """  
 import re
 import json
@@ -63,7 +64,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "0.0.8"
+VERSION = "1.0.0"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 

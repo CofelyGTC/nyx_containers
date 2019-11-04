@@ -22,6 +22,7 @@ VERSION HISTORY
 
 * 23 Jul 2019 0.0.4 **VME** Code commented
 * 30 Oct 2019 0.0.5 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 """  
 import re
 import sys
@@ -57,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_SPOT567_IMPORTER"
-VERSION = "0.0.5"
+VERSION = "1.0.0"
 QUEUE   = ["SPOT567_IMPORT"]
 
 localtz = timezone('Europe/Paris')
@@ -403,10 +404,11 @@ def loadKizeo():
 
                 end = datetime(2019, 1, 1)
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
                 
                 #https://www.kizeoforms.com/rest/v3//forms/411820/data/exports_info
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                #r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.error('something went wrong...')
@@ -414,11 +416,17 @@ def loadKizeo():
                 elif r.text == '':
                     logger.info('Empty response')
                 else:
-                    logger.info(r.json())
+                    #logger.info(r.json())
 
-                    ids=r.json()['data']["dataIds"]
+                    #ids=r.json()['data']["dataIds"]
+                    ids=[]
+                    for rec in r.json()["data"]:
+    #                    print(rec)
+                        ids.append(rec["id"])
+                    
                     
                     logger.info(ids)
+                    
                     payload={
                     "data_ids": ids
                     }

@@ -28,6 +28,8 @@ VERSION HISTORY
 * 28 May 2019 0.0.8 **AMA** Global Percentage does not count the current day
 * 25 Jun 2019 0.0.9 **VME** Handle multi Lot (for lot 3) 
 * 30 Oct 2019 1.0.1 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.2 **AMA** Use data get rest api exports_info function to get record ids
+* 30 Oct 2019 1.0.3 **AMA** Fix a bug that added an additional day during the daylight saving month
 """ 
 import re
 import sys
@@ -61,7 +63,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI105_IMPORTER"
-VERSION = "1.0.1"
+VERSION = "1.0.3"
 QUEUE   = ["KPI105_IMPORT"]
 
 def log_message(message):
@@ -257,7 +259,7 @@ def computeStats105(lot=2):
         startloop=start
         dates=[]
         
-        while startloop <=end:
+        while startloop <=end  and startloop.month==start.month:
             dates.append(startloop.strftime("%Y-%m-%d"))        
             startloop+=timedelta(days=1)
             
@@ -390,9 +392,9 @@ def loadKPI105():
                 logger.info("Start %s" %(start))            
                 end=(datetime.now()-timedelta(days=160)).strftime("%Y-%m-%d %H:%M:%S")
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
 
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.error('something went wrong...')
@@ -400,9 +402,12 @@ def loadKPI105():
                 elif r.text == '':
                     logger.info('Empty response')
                 else:
-                    ids=r.json()['data']["dataIds"]
+                    ids=[]
+                    for rec in r.json()["data"]:
+                        ids.append(rec["id"])                    
                     
                     logger.info(ids)
+
                     payload={
                         "data_ids": ids
                     }
