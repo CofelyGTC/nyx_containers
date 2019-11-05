@@ -14,6 +14,8 @@ VERSION HISTORY
 ===============
 
 * 21 Oct 2019 0.0.1 **VME** First commit
+* 30 Oct 2019 0.0.2 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 """  
 import re
 import sys
@@ -49,7 +51,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_SPOT4_IMPORTER"
-VERSION = "0.0.1"
+VERSION = "1.0.0"
 QUEUE   = []
 
 localtz = timezone('Europe/Paris')
@@ -110,8 +112,7 @@ def loadKizeo():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -132,39 +133,42 @@ def loadKizeo():
                 logger.info("Start %s" %(start))            
                 end = datetime(2019, 1, 1)
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
 
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
-
-                if r.status_code != 200:
-                    logger.info('something went wrong...')
-                    logger.info(r.status_code, r.reason)
-
-                logger.info(r.json())
-
-                ids=r.json()['data']["dataIds"]
-
-                logger.info(ids)
-                payload={
-                "data_ids": ids
-                }
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
-
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                #r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.info('something went wrong...')
                     logger.info(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    ids=[]
+                    for rec in r.json()["data"]:
+                        ids.append(rec["id"])                    
+                    
+                    logger.info(ids)
+                    payload={
+                    "data_ids": ids
+                    }
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
 
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
 
-                    file = open("./tmp/excel.xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
+                    if r.status_code != 200:
+                        logger.info('something went wrong...')
+                        logger.info(r.status_code, r.reason)
 
-                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
+
+                        file = open("./tmp/excel.xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
+
+                        df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
 
         if len(df_all) > 0:
             df_all['KPI']=df_all['KPI'].str.extract(r'([0-9]{3})').astype(int)

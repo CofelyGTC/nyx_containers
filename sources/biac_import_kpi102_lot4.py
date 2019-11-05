@@ -1,5 +1,5 @@
 """
-BIAC KPI 102
+BIAC KPI 102 Lot 4
 ====================================
 
 Sends:
@@ -25,6 +25,8 @@ VERSION HISTORY
 * 11 Sep 2019 0.0.2 **VME** Bug fixing - to go untill the end of the month (for th heatmap, not for the gauge)
 * 18 Sep 2019 0.0.3 **VME** Change the way we request Kizeo. Using file export instead of the data endpoint
 * 07 Oct 2019 0.0.4 **VME** Bug fixing - excluding the "LOT 4 - HS Cabines ~ Wekelijkse Ronde A (Rondier) (test cindy) (recovered)" form 
+* 30 Oct 2019 0.0.5 **VME** Bug fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 """  
 import re
 import sys
@@ -59,7 +61,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_LOT4_IMPORTER"
-VERSION = "0.0.3"
+VERSION = "1.0.0"
 QUEUE   = ["KPI102_LOT4_IMPORT"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -185,8 +187,7 @@ def loadKPI102():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -208,42 +209,51 @@ def loadKPI102():
                 form_id = i['id']
                 start=(datetime.now()+timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
                 logger.info("Start %s" %(start))            
-                # end=(datetime.now()-timedelta(days=60)).strftime("%Y-%m-%d %H:%M:%S")
                 end = datetime(2019, 1, 1)
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
 
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
-
-                if r.status_code != 200:
-                    logger.info('something went wrong...')
-                    logger.info(r.status_code, r.reason)
-
-                logger.info(r.json())
-
-                ids=r.json()['data']["dataIds"]
-
-                logger.info(ids)
-                payload={
-                "data_ids": ids
-                }
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
-
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                #r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.info('something went wrong...')
                     logger.info(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    #logger.info(r.json())
 
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
+                    #ids=r.json()['data']["dataIds"]
+                    ids=[]
+                    for rec in r.json()["data"]:
+    #                    print(rec)
+                        ids.append(rec["id"])
+                    
+                    
+                    logger.info(ids)
 
-                    file = open("./tmp/excel.xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
+                    logger.info(ids)
+                    payload={
+                    "data_ids": ids
+                    }
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
 
-                    df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+
+                    if r.status_code != 200:
+                        logger.info('something went wrong...')
+                        logger.info(r.status_code, r.reason)
+
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
+
+                        file = open("./tmp/excel.xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
+
+                        df_all = df_all.append(pd.read_excel("./tmp/excel.xlsx"))
 
         if len(df_all) > 0:
 

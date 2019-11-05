@@ -21,6 +21,8 @@ VERSION HISTORY
 ===============
 
 * 23 Jul 2019 0.0.4 **VME** Code commented
+* 30 Oct 2019 0.0.5 **VME** Buf fixing r.text empty and better error log.
+* 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 """  
 import re
 import sys
@@ -56,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_SPOT567_IMPORTER"
-VERSION = "0.0.4"
+VERSION = "1.0.0"
 QUEUE   = ["SPOT567_IMPORT"]
 
 localtz = timezone('Europe/Paris')
@@ -374,8 +376,7 @@ def loadKizeo():
 
         r = requests.post(url_kizeo + '/login', json = payload)
         if r.status_code != 200:
-            logger.error('Something went wrong...')
-            logger.error(r.status_code, r.reason)
+            logger.error('Unable to reach Kizeo server. Code:'+str(r.status_code)+" Reason:"+str(r.reason))
             return
 
         response = r.json()
@@ -403,51 +404,60 @@ def loadKizeo():
 
                 end = datetime(2019, 1, 1)
                 logger.info("End %s" %(end))
-                post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
+                #post={"onlyFinished":False,"startDateTime":start,"endDateTime":end,"filters":[]}
                 
                 #https://www.kizeoforms.com/rest/v3//forms/411820/data/exports_info
-                r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                #r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
+                r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
 
                 if r.status_code != 200:
                     logger.error('something went wrong...')
                     logger.error(r.status_code, r.reason)
+                elif r.text == '':
+                    logger.info('Empty response')
+                else:
+                    #logger.info(r.json())
 
-                logger.info(r.json())
+                    #ids=r.json()['data']["dataIds"]
+                    ids=[]
+                    for rec in r.json()["data"]:
+    #                    print(rec)
+                        ids.append(rec["id"])
+                    
+                    
+                    logger.info(ids)
+                    
+                    payload={
+                    "data_ids": ids
+                    }
+                    posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
+                    headers = {'Content-type': 'application/json','Authorization':token}
+                    
+                    r=requests.post(posturl,data=json.dumps(payload),headers=headers)
+                    
+                    if r.status_code != 200:
+                        logger.error('something went wrong...')
+                        logger.error(r.status_code, r.reason)
 
-                ids=r.json()['data']["dataIds"]
-                
-                logger.info(ids)
-                payload={
-                "data_ids": ids
-                }
-                posturl=("%s/forms/%s/data/multiple/excel_custom" %(url_kizeo,form_id))
-                headers = {'Content-type': 'application/json','Authorization':token}
-                
-                r=requests.post(posturl,data=json.dumps(payload),headers=headers)
-                
-                if r.status_code != 200:
-                    logger.error('something went wrong...')
-                    logger.error(r.status_code, r.reason)
-
-                #logger.info(r.content)
-                
-                logger.info("Handling Form. Content Size:"+str(len(r.content)))
-                if len(r.content) >0:
+                    #logger.info(r.content)
                     
-                    file = open("./tmp/excel.xlsx", "wb")
-                    file.write(r.content)
-                    file.close()
-                    
-                    df = pd.read_excel("./tmp/excel.xlsx")
-                    
-                    
-                    
-                    if i['name'] == 'Spotcheck ~ Lot 5  Baggage handling':
-                        compute_lot5(df)
-                    if i['name'] == 'Spotcheck ~ Lot 6 Boarding Bridges':
-                        compute_lot6(df)
-                    if i['name'] == 'Spotcheck ~ Lot 7 Screening':
-                        compute_lot7(df)
+                    logger.info("Handling Form. Content Size:"+str(len(r.content)))
+                    if len(r.content) >0:
+                        
+                        file = open("./tmp/excel.xlsx", "wb")
+                        file.write(r.content)
+                        file.close()
+                        
+                        df = pd.read_excel("./tmp/excel.xlsx")
+                        
+                        
+                        
+                        if i['name'] == 'Spotcheck ~ Lot 5  Baggage handling':
+                            compute_lot5(df)
+                        if i['name'] == 'Spotcheck ~ Lot 6 Boarding Bridges':
+                            compute_lot6(df)
+                        if i['name'] == 'Spotcheck ~ Lot 7 Screening':
+                            compute_lot7(df)
 
 
     except Exception as e:

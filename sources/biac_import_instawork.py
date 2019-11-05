@@ -31,6 +31,7 @@ VERSION HISTORY
 
 * 27 May 2019 0.1.7 **AMA** Fix a bug that occurs when the asset description column is interpreted as a float.
 * 26 Jun 2019 0.1.9 **AMA** Added lot 7
+* 29 Oct 2019 0.2.1 **AMA** Added ambiguous="NaT" to localize
 """ 
 import json
 import time
@@ -57,7 +58,7 @@ from datetime import datetime
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="0.2.0"
+VERSION="0.2.1"
 MODULE="BIAC_INSTAWORK_IMPORTER"
 QUEUE=["INSTAWORK_IMPORT"]
 
@@ -265,9 +266,9 @@ def messageReceived(destination,message,headers):
         df['Finish_Date'] =  pd.to_datetime(df['Finish_Date'],dayfirst=True,errors='coerce')
 
 #        df['Reference_Date2']=df['Reference_Date']+ pd.DateOffset(hours=1)
-        df['Reference_Date']=df['Reference_Date'].dt.tz_localize(tz='Europe/Paris')
-        df['Unused_Date']=df['Unused_Date'].dt.tz_localize(tz='Europe/Paris')
-        df['Finish_Date']=df['Finish_Date'].dt.tz_localize(tz='Europe/Paris')
+        df['Reference_Date']=df['Reference_Date'].dt.tz_localize(tz='Europe/Paris',ambiguous="NaT")
+        df['Unused_Date']=df['Unused_Date'].dt.tz_localize(tz='Europe/Paris',ambiguous="NaT")
+        df['Finish_Date']=df['Finish_Date'].dt.tz_localize(tz='Europe/Paris',ambiguous="NaT")
 
         df['Original_Order_Type']=df['Order_Type']
         df['Order_Type']=df['Order_Type'].apply(lambda x: x if x=="PM" else "CM")
