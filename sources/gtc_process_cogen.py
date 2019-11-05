@@ -10,6 +10,7 @@ VERSION HISTORY
 ===============
 
 * 20 Sep 2019 0.0.1 **PDE** First version
+* 05 Nov 2019 1.0.0 **PDE** Logs removed
 
 
 """  
@@ -49,7 +50,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.9"
+VERSION = "1.0.0"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
