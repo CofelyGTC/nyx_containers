@@ -565,7 +565,7 @@ def loadCogen(cogenname,starttime,endtime):
     if("usagehours" in cog["_source"]):
         if (("usagehoursuseoptimizcollection" in cog["_source"]) and (cog["_source"]["usagehoursuseoptimizcollection"])):
             logger.info ("Load hours using Optimiz collection...")
-            hoursdf=loadUsageHours("name: "+cog["_source"]["usagehours"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000,False)
+            hoursdf=loadUsageHours("name: "+cog["_source"]["usagehours"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et,1000000,False)
             finaldf= pd.concat([finaldf,hoursdf], join='outer', axis=1)
         else:
             if( isoptibox):
@@ -578,7 +578,7 @@ def loadCogen(cogenname,starttime,endtime):
     if("startstops" in cog["_source"]):
         if (("startsstopsuseoptimizcollection" in cog["_source"]) and (cog["_source"]["startsstopsuseoptimizcollection"])):
             logger.info ("Load starts / stops using Optimiz collection...")
-            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000, False)
+            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et,1000000, False)
             finaldf= pd.concat([finaldf,startsdf], join='outer', axis=1)
         else:
             if( isoptibox):
@@ -591,7 +591,7 @@ def loadCogen(cogenname,starttime,endtime):
     if("power" in cog["_source"]):
         if (("poweruseoptimizcollection" in cog["_source"]) and (cog["_source"]["poweruseoptimizcollection"])):
             logger.info ("Load power using Optimiz collection...")
-            powerdf=loadPower("name: "+cog["_source"]["power"]+" AND client: COGEN AND area: NyxAWS",st,et)
+            powerdf=loadPower("name: "+cog["_source"]["power"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et)
             finaldf= pd.concat([finaldf,powerdf], join='outer', axis=1)
         else:
             startsdf=loadPower("name: "+cog["_source"]["power"]+" AND client: "+client+" AND area: "+area,st,et)
@@ -896,7 +896,7 @@ def computeLastLifeSign():
             query="NONONONONNO"
 
             if (("usagehoursuseoptimizcollection" in cog["_source"]) and (cog["_source"]["usagehoursuseoptimizcollection"])):
-                query="name: "+cog["_source"]["usagehours"]+" AND client: COGEN AND area: NyxAWS"
+                query="name: "+cog["_source"]["usagehours"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS"
             else:
                 if( isoptibox):
                     query="code: "+cog["_source"]["usagehours"]+" AND area: \""+cog["_source"]["area"]+"\""
