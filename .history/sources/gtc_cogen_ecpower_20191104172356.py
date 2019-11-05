@@ -157,7 +157,7 @@ def doTheWork(start):
                     starts=int(re.sub("[^0-9]", "",htmlline))
                     logger.info("STARTS=%d " %(starts))
 
-        
+
         rowdatahours = tag+'_hours,'+dtstr+',2,'+str(hours)+',0\n'
         rowdatastarts = tag+'_starts,'+dtstr+',2,'+str(starts)+',0\n'   
         finaldata+= rowdatahours
