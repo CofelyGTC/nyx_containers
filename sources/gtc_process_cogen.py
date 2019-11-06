@@ -10,6 +10,7 @@ VERSION HISTORY
 ===============
 
 * 20 Sep 2019 0.0.1 **PDE** First version
+* 05 Nov 2019 1.0.0 **PDE** Logs removed
 
 
 """  
@@ -49,7 +50,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "0.0.8"
+VERSION = "1.0.0"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -554,18 +555,20 @@ def loadCogen(cogenname,starttime,endtime):
         finaldf.index=finaldf["date"]
         del finaldf["date"];
         #del finaldf["date2"];
-        logger.info( "******"*30)
+        #logger.info( "******"*30)
         #logger.info (starttime)
-        logger.info (finaldf)
+        #logger.info (finaldf)
 
     isoptibox=False
     if("isoptibox" in cog["_source"]):
         isoptibox=True
 
+
+
     if("usagehours" in cog["_source"]):
         if (("usagehoursuseoptimizcollection" in cog["_source"]) and (cog["_source"]["usagehoursuseoptimizcollection"])):
             logger.info ("Load hours using Optimiz collection...")
-            hoursdf=loadUsageHours("name: "+cog["_source"]["usagehours"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000,False)
+            hoursdf=loadUsageHours("name: "+cog["_source"]["usagehours"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et,1000000,False)
             finaldf= pd.concat([finaldf,hoursdf], join='outer', axis=1)
         else:
             if( isoptibox):
@@ -578,7 +581,7 @@ def loadCogen(cogenname,starttime,endtime):
     if("startstops" in cog["_source"]):
         if (("startsstopsuseoptimizcollection" in cog["_source"]) and (cog["_source"]["startsstopsuseoptimizcollection"])):
             logger.info ("Load starts / stops using Optimiz collection...")
-            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: COGEN AND area: NyxAWS",st,et,1000000, False)
+            startsdf=loadStartStops("name: "+cog["_source"]["startstops"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et,1000000, False)
             finaldf= pd.concat([finaldf,startsdf], join='outer', axis=1)
         else:
             if( isoptibox):
@@ -591,7 +594,7 @@ def loadCogen(cogenname,starttime,endtime):
     if("power" in cog["_source"]):
         if (("poweruseoptimizcollection" in cog["_source"]) and (cog["_source"]["poweruseoptimizcollection"])):
             logger.info ("Load power using Optimiz collection...")
-            powerdf=loadPower("name: "+cog["_source"]["power"]+" AND client: COGEN AND area: NyxAWS",st,et)
+            powerdf=loadPower("name: "+cog["_source"]["power"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS",st,et)
             finaldf= pd.concat([finaldf,powerdf], join='outer', axis=1)
         else:
             startsdf=loadPower("name: "+cog["_source"]["power"]+" AND client: "+client+" AND area: "+area,st,et)
@@ -603,13 +606,13 @@ def loadCogen(cogenname,starttime,endtime):
     if (client =='cogenmail'):
 
         logger.info("Interpolate missing values...")
-        logger.info(finaldf)
+        #logger.info(finaldf)
         finaldf["Hours_Index"]=finaldf["Hours_Index"].interpolate()
         finaldf["Starts_Index"]=finaldf["Starts_Index"].interpolate()
 
         todelete=0
         for i in range(finaldf.shape[0]-1,-1,-1):
-            logger.info(finaldf["Hours"][i])
+            #logger.info(finaldf["Hours"][i])
             if(np.isnan(finaldf["Hours"][i])):
                 #logger.info("NAN")
                 todelete+=1
@@ -655,7 +658,7 @@ def loadCogen(cogenname,starttime,endtime):
 
 #===================================================================================
 def setSearchQueryField(newfield):
-    logger.info("Value field:"+newfield)
+#    logger.info("Value field:"+newfield)
     searchquery["aggs"]["1"]["aggs"]["2"]["min"]["field"]=newfield
     searchquery["aggs"]["1"]["aggs"]["3"]["max"]["field"]=newfield
 
@@ -677,7 +680,7 @@ def getCogenNames():
 
     for cogen in cogens["hits"]["hits"]:
         if cogen["_source"]["active"]:
-            logger.info("* "+cogen["_id"]+" added.")
+#            logger.info("* "+cogen["_id"]+" added.")
             rescogen.append(cogen["_id"])
         else:
             logger.info("* "+cogen["_id"]+" skipped.")
@@ -689,7 +692,7 @@ def getCogenNames():
 #===================================================================================
 def computePerformance(onecogendf):
     logger.info("Compute Performance")
-    logger.info(onecogendf)
+#    logger.info(onecogendf)
     onecogendf["Total Out kWh"]=0
     onecogendf["Total In kWh"]=0
 
@@ -750,7 +753,7 @@ def loadUsageHours(query,startt,entt,limit,isoptibox):
     else:
         res=es.search(body=hoursquery,index="opt_sites_data*")
 
-    print(hoursquery)
+#    print(hoursquery)
 #    print(res)
 
     newcurve=[]
@@ -861,7 +864,7 @@ def insertIntoELK(onecogendf,definition):
 
     if True and len(messagebody)>0:
         res=es.bulk(messagebody)
-        print (res)
+        #print (res)
         try:
             es.bulk(messagebody)
         except:
@@ -896,7 +899,7 @@ def computeLastLifeSign():
             query="NONONONONNO"
 
             if (("usagehoursuseoptimizcollection" in cog["_source"]) and (cog["_source"]["usagehoursuseoptimizcollection"])):
-                query="name: "+cog["_source"]["usagehours"]+" AND client: COGEN AND area: NyxAWS"
+                query="name: "+cog["_source"]["usagehours"]+" AND client: (COGEN OR ECPOWER) AND area: NyxAWS"
             else:
                 if( isoptibox):
                     query="code: "+cog["_source"]["usagehours"]+" AND area: \""+cog["_source"]["area"]+"\""
@@ -910,11 +913,11 @@ def computeLastLifeSign():
             lifesignquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["gte"]=int((datetime.now()- timedelta(days=2)).timestamp())*1000
             lifesignquery["query"]["bool"]["must"][1]["range"]["@timestamp"]["lte"]=int(datetime.now().timestamp())*1000
 
-            print(lifesignquery)
+#            print(lifesignquery)
 
             res=es.search(index="opt_*",body=lifesignquery)
-            logger.info(res)
-            logger.info(res["aggregations"]["1"]["value"])
+#            logger.info(res)
+#            logger.info(res["aggregations"]["1"]["value"])
 
             action={}
             id=cogenname
@@ -931,7 +934,7 @@ def computeLastLifeSign():
             logger.error("Unable to find COGEN:"+cogenname)
             logger.error(excep)
             #return None
-    logger.info(messagebody)
+#    logger.info(messagebody)
     #es2 = Elasticsearch(hosts=["http://optimiz2.cofelygtc.com:9200"])
     res2=es.bulk(messagebody)
     #logger.info(res2)
@@ -960,14 +963,14 @@ def calcCogen():
     action={}
     for cog in params['hits']['hits']:
         action["index"]={"_index":cog['_index'],"_type":"doc","_id":cog['_id']}
-        print(action)
+#        print(action)
         newrec = cog['_source']
-        print(newrec)
+#        print(newrec)
         bulkbody+=json.dumps(action)+"\r\n"
         bulkbody+=json.dumps(newrec)+"\r\n"
 
     res = es.bulk(body=bulkbody)
-    logger.info(res)
+#    logger.info(res)
 
 
 
@@ -987,11 +990,11 @@ def doTheWork(start):
         multires=loadCogen(cogenname, datetime.today() - timedelta(days=40),datetime.now())
 
         cogendf=multires[1]
-        print (cogendf)
+#        print (cogendf)
 
         cogendf=computePerformance(cogendf)
         cogendf.fillna(0, inplace=True)
-        logger.info(cogendf)
+#        logger.info(cogendf)
 
         insertIntoELK(cogendf,multires[0])
 

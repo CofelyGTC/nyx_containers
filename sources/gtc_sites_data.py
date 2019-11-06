@@ -495,13 +495,13 @@ def handleOneMessage(name,body):
               dayvaluecache[row[0]]= {"key": key2, "value": 0}
 
 
-            first_alarm_ts = getTimestamp(localdate)
-            obj = {
-                    'start_ts': int(first_alarm_ts),
-                    'area_name': area_name 
-                }
-            #logger.info(obj)     
-        
+        first_alarm_ts = getTimestamp(localdate)
+        obj = {
+                'start_ts': int(first_alarm_ts),
+                'area_name': area_name 
+            }
+        #logger.info(obj)     
+    
         conn.send_message('/topic/SITES_DATA_IMPORTED', json.dumps(obj))
         
 
@@ -509,7 +509,7 @@ def handleOneMessage(name,body):
         logger.info("Bulk ready.")
         if(bulkbody != ""):
             res = es.bulk(body=bulkbody)
-            #logger.info(res)
+            logger.info(res)
         else:
             logger.error("No BODY !!!")
         logger.info("Bulk gone.")
