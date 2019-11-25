@@ -21,6 +21,7 @@ VERSION HISTORY
 
 * 23 Jul 2019 0.0.2 **VME** Code commented
 * 24 Jul 2019 0.0.3 **VME** Modification of agg to fill the requirements for BACFIR dashboards (Maximo)
+* 25 Nov 2019 0.0.4 **VME** Adding lot4 (comes from another collection biac_spot_lot4)
 """  
 import re
 import json
@@ -48,7 +49,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 MODULE  = "BIAC_MONTH_KIZEO_2"
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 QUEUE   = ["/topic/BIAC_KIZEO_IMPORTED_2"]
 
 def log_message(message):
@@ -127,6 +128,38 @@ def messageReceived(destination,message,headers):
         df_grouped2['screen_name'] = 'BACFIR'
         df_grouped=df_grouped.append(df_grouped2)
 
+
+        #handling lot4
+        df_lot4 = es_helper.elastic_to_dataframe(es, index="biac_spot_lot4", query="kpi:302", scrollsize=1000, 
+                                         start=start_dt, end=end_dt,
+                                         datecolumns=["@timestamp"])
+        df_lot4['screen_name'] = 'BACDNB'
+        df_lot4['month'] = df_lot4['@timestamp'].dt.strftime('%Y-%m') 
+
+        if len(df_lot4) == 0:
+            obj = {
+                'lot': '4',
+                'kpi': 302,
+                'contract': 'DNBBA',
+                'screen_name': 'DNBBA',
+                'conform': 0,
+                'not_conform': 0,
+                'check': 0,
+                '@timestamp': '2019-01-01 00:00:00+01:00',
+            }
+
+            df_lot4 = pd.DataFrame.from_dict({0: obj.values()}, orient='index', columns=obj.keys())
+
+        df_lot4['lot'] = df_lot4['lot'].astype(str)
+
+        df_grouped_lot4 = df_lot4.groupby(['lot', 'kpi', 'contract', 'screen_name', 'month']) \
+                .agg({'conform':'sum', 'not_conform':'sum', 'check':'sum', '@timestamp':'max'}) \
+                    .reset_index()
+
+        df_grouped_lot4=df_grouped_lot4.rename(columns={"conform": "check_conform", "not_conform": "check_no_conform", 
+                                        "check": "check_number"})
+
+        df_grouped=df_grouped.append(df_grouped_lot4)
 
         df_grouped['_index'] = 'biac_month_2_kizeo'
 
