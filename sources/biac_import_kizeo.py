@@ -27,6 +27,7 @@ VERSION HISTORY
 * 24 Jul 2019 0.0.20 **VME** Modification of screen name to fill the requirements for BACFIR dashboards (Maximo)
 * 30 Oct 2019 0.0.21 **VME** Buf fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.0  **AMA** Use data get rest api exports_info function to get record ids
+* 25 Nov 2019 1.0.1  **VME** change the end date of the message to other container that create monthly collections (replace max of the timestamp by now)
 """  
 import re
 import sys
@@ -56,7 +57,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -399,7 +400,7 @@ def importKizeo(headers):
         last_kizeo_ts = df['@timestamp'].max()
         obj = {
                 'start_ts': int(datetime(2019, 1, 1).timestamp()),
-                'end_ts': int(last_kizeo_ts.timestamp())
+                'end_ts': int(datetime.now().timestamp())
             }
 
         logger.info(obj)

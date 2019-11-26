@@ -29,8 +29,9 @@ Collections:
 VERSION HISTORY
 -------------------------------------
 
-* Feb 2019 1.0.1 **PDB** First Version
-* Jun 2019 1.0.18 **PDB** Add Lot7 importation
+* 01 Feb 2019 1.0.1  **PDB** First Version
+* 01 Jun 2019 1.0.18 **PDB** Add Lot7 importation
+* 19 Nov 2019 1.0.19 **VME** Bug fixing on dates
 """
 
 import json
@@ -56,7 +57,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.18"
+VERSION="1.0.19"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
 INDEX_PATTERN = "biac_availability"
@@ -214,9 +215,9 @@ def messageReceived(destination,message,headers):
 
     dfdata.dropna(axis=0, how='all', inplace=True)
 
-    if dfdata.index[0] != 1:
-        print('we expect the file to start at 1 day/week of year -> we drop the first line')
-        dfdata.drop(index=dfdata.index[0], inplace=True)
+    # if dfdata.index[0] != 1:
+    #     print('we expect the file to start at 1 day/week of year -> we drop the first line')
+    #     dfdata.drop(index=dfdata.index[0], inplace=True)
 
 
     print(dfdata)
@@ -242,19 +243,45 @@ def messageReceived(destination,message,headers):
         month=1, day=1, hour=0, minute=0, second=0)
 
 
+
+    cur_year = first_day_year.year
+
+    year = []
+    old = 0
+
+    for i in dfdata.index:
+        if i < old:
+            cur_year += 1
+
+        year.append(cur_year)
+        old = i
+
+
+    dfdata['year'] = year
+
     dfdata.reset_index(inplace=True)
 
-    print(dfdata)
-
     if interval == 'week':
-        dfdata['dt'] = dfdata['EQ'].apply(
-            lambda x: first_day_year + ((x-1)*timedelta(days=7)))
-    elif interval == 'day' and lot=='6':
-        dfdata['dt'] = dfdata['EQ'].apply(
-            lambda x: startDate + ((x)*timedelta(days=1)))
+        # dfdata['dt'] = dfdata['EQ'].apply(
+        #     lambda x: first_day_year + ((x-1)*timedelta(days=7)))
+        dfdata['dt'] = dfdata.apply(
+            lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=7*(row['EQ']-1)), axis=1)
+
+    # elif interval == 'day' and lot=='6':
+    #     # dfdata['dt'] = dfdata['EQ'].apply(
+    #     #     lambda x: startDate + ((x)*timedelta(days=1)))
+    #     dfdata['dt'] = dfdata.apply(
+    #         lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=row['EQ']), axis=1)
+
     elif interval == 'day':
-        dfdata['dt'] = dfdata['EQ'].apply(
-            lambda x: startDate + ((x-1)*timedelta(days=1)))
+        # dfdata['dt'] = dfdata['EQ'].apply(
+        #     lambda x: startDate + ((x-1)*timedelta(days=1)))
+        dfdata['dt'] = dfdata.apply(
+            lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=(row['EQ']-1)), axis=1)
+
+
+    del dfdata['year']
+
     dfdata.set_index('dt', inplace=True)
 
     dfdata = dfdata.resample('1d').pad()
@@ -276,7 +303,7 @@ def messageReceived(destination,message,headers):
 
     if lot == '6':
         for index, col in dfdata.iteritems():
-            lastwas0 = 0
+            last
             cpt = 0
             if re.match(regex, index):
                 print(len(col))
@@ -293,14 +320,14 @@ def messageReceived(destination,message,headers):
                         lastwas0 = 0
                     cpt +=1
 
-    print(dfdata)
+    # print(dfdata)
 
     bulkbody = ''
     bulkres = ''
 
 
     for index, row in dfdata.iterrows():
-        print(index)
+        # print(index)
         # print(row)
 
         week_of_the_month = row['week_of_month']

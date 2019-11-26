@@ -71,26 +71,12 @@ def messageReceived(destination,message,headers):
     if "file" in headers:
         logger.info("File:%s" %headers["file"])
         log_message("Import of file [%s] started." % headers["file"])
-    #elif "CamelSplitAttachmentId" in headers:
-    #    logger.info("File:%s" %headers["CamelSplitAttachmentId"])
-    #    log_message("Import of file [%s] started." % headers["CamelSplitAttachmentId"])
 
     mess = base64.b64decode(message)
     mesin=mess.decode("utf-8", "ignore")
     full=basefile+"\r\n"+mesin
-    #f = open('./tmp/excel.xlsx', 'wb')
-    #f.write(xlsbytes)
-    #f.close()
 
     df = None
-    #try:
-    #    df = pd.read_csv('./tmp/excel.xlsx',delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
-    #except Exception as er:
-    #    logger.error('Unable to read csv')
-    #    logger.error(er)
-    
-
-    #te = df.copy()
 
     mesin=mess.decode("utf-8", "ignore")
 
@@ -103,9 +89,6 @@ def messageReceived(destination,message,headers):
     te=te[89:]
 
 
-
-#        te = te[te.Called.notnull()]
-
     te['InternalCalled1']=te['Called'].str.replace(' ','')
     te['InternalCalled']=(te['InternalCalled1'].str.len()<6)
     te['InternalCaller1']=te['Caller'].str.replace(' ','')
@@ -114,34 +97,29 @@ def messageReceived(destination,message,headers):
 
     te['Desk2']=pd.to_numeric(te['Desk'], errors='coerce',downcast='integer')
     te['DeskCaller']=pd.to_numeric(te['Caller'], errors='coerce',downcast='integer')
-    #te['Desk2']=te['Desk'].astype(int)
 
     del te['InternalCalled1']
     del te['InternalCaller1']
-
-    #te['Calltype']=(te['InternalCalled1'].str.match("93904"))
 
     calltype=[]
 
 
 
-    for index,row in te.iterrows():
-
-#            print ("#####"*20)
-#            print(row)
-
+    for index, row in te.iterrows():
         if(row["Caller"].find("91931")>=0):
             calltype.append("Test")
+
         elif (row["Desk2"]>76800) and (row["Desk2"]<76810) and (row["DeskCaller"]>76900) and (row["DeskCaller"]<76910):
             calltype.append("Transfer")
+
         elif (row["DeskCaller"]>76800) and (row["DeskCaller"]<76810) and (row["Desk2"]>76900) and (row["Desk2"]<76910):
             calltype.append("Transfer")
+
         elif(row["Desk2"]>76900) and (row["Desk2"]<76910):
             calltype.append("InDispa")
+
         elif(row["Desk2"]>76800) and (row["Desk2"]<76810):
             calltype.append("InDesk")
-    #    else:
-    #        calltype.append("Solidus")
 
         elif(row["SolidusCalled"]):
             if (not(row["InternalCaller"])):
