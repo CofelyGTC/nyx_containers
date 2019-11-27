@@ -15,9 +15,9 @@ RUN rm -d -r /opt/sources/*.sh
 #RUN rm -d -r /opt/sources/jaspergenerator
 #RUN rm -d -r /opt/sources/reports
 RUN apt-get update
-RUN apt-get install -y build-essential chrpath libssl-dev libxft-dev
-RUN apt-get install -y libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev
-RUN cp /opt/sources/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin
+#RUN apt-get install -y build-essential chrpath libssl-dev libxft-dev
+#RUN apt-get install -y libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev
+#RUN cp /opt/sources/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin
 
 WORKDIR /opt/sources
 #CMD ["python", "nyx_xlsimporter.py"]
@@ -64,7 +64,7 @@ CMD ["python", "biac_month_kizeo_2.py"]
 #CMD ["python", "gtc_sites_computed.py"]
 #CMD ["python", "biac_import_kpi102.py"]
 #CMD ["python", "gtc_import_cogen_mails.py"]
-#CMD ["python", "gtc_process_cogen.py"]
+CMD ["python", "gtc_process_cogen.py"]
 #CMD ["python", "gtc_load_scp.py"]
 #CMD ["python", "gtc_optibox_computed.py"]
 #CMD ["python", "gtc_cleaned_data.py"]
