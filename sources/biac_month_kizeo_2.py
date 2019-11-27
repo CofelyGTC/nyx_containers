@@ -142,6 +142,7 @@ def messageReceived(destination,message,headers):
                 'kpi': 302,
                 'contract': 'DNBBA',
                 'screen_name': 'DNBBA',
+                'month': '2019-01',
                 'conform': 0,
                 'not_conform': 0,
                 'check': 0,
