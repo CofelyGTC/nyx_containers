@@ -2,6 +2,11 @@
 BIAC IMPORT SPOT 4
 ====================================
 
+Sends:
+-------------------------------------
+
+* /topic/BIAC_KIZEO_IMPORTED_2
+
 Listens to:
 -------------------------------------
 
@@ -16,6 +21,7 @@ VERSION HISTORY
 * 21 Oct 2019 0.0.1 **VME** First commit
 * 30 Oct 2019 0.0.2 **VME** Buf fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
+* 27 Nov 2019 1.0.1 **VME** Delete data before inserting to weakly handle the deletion of records in Kizeo + send message to kizeo month 2
 """  
 import re
 import sys
@@ -51,7 +57,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_SPOT4_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 QUEUE   = []
 
 localtz = timezone('Europe/Paris')
@@ -189,8 +195,20 @@ def loadKizeo():
             df_all['_id'] = df_all['record_nummer']
             df_all['lot'] = 4
 
+            try:
+                es.indices.delete('biac_spot_lot4')
+            except:
+                pass
+
             es_helper.dataframe_to_elastic(es, df_all)
+
+            obj = {
+                'start_ts': int(datetime(2019, 1, 1).timestamp()),
+                'end_ts': int(datetime.now().timestamp())
+            }
                  
+            conn.send_message('/topic/BIAC_KIZEO_IMPORTED', json.dumps(obj))
+            conn.send_message('/topic/BIAC_KIZEO_IMPORTED_2', json.dumps(obj))
                 
 
     except Exception as e:
