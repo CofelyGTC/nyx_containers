@@ -32,6 +32,7 @@ VERSION HISTORY
 * 01 Feb 2019 1.0.1  **PDB** First Version
 * 01 Jun 2019 1.0.18 **PDB** Add Lot7 importation
 * 19 Nov 2019 1.0.19 **VME** Bug fixing on dates
+* 27 Noc 2019 1.0.21 **PDB** Bug Fixing
 """
 
 import json
@@ -57,7 +58,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.19"
+VERSION="1.0.21"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
 INDEX_PATTERN = "biac_availability"
@@ -303,7 +304,7 @@ def messageReceived(destination,message,headers):
 
     if lot == '6':
         for index, col in dfdata.iteritems():
-            last
+            lastwas0 = 0
             cpt = 0
             if re.match(regex, index):
                 print(len(col))
