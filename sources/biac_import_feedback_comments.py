@@ -37,6 +37,7 @@ VERSION HISTORY
 * 24 Sep 2019 0.0.7 **AMA** Message localized in NL
 * 23 Oct 2019 0.0.7 **AMA** Lot 4 Feedback result works
 * 29 Oct 2019 1.0.0 **AMA** The system accepts KPI that are not numerical
+* 03 Dec 2019 1.0.1 **VME** Fix bug with the user 
 """  
 import re
 import json
@@ -64,7 +65,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -89,6 +90,7 @@ def set_xlsx_status(es,user,reporttype,reportdate):
     try:
         statusobj=es.get(index="biac_feedback_status",id=key,doc_type="doc")["_source"]
         statusobj["xlsx"]=True
+        statusobj["user"]=user
     except:
         statusobj={"user":user,"reporttype":reporttype,"reportdate":reportdate,"xlsx":True,"docx":False,"sent":False,"creation_date":datetime.now()}
     es.index(index="biac_feedback_status",doc_type="doc",body=statusobj,id=key)
@@ -99,6 +101,7 @@ def set_docx_status(es,user,reporttype,reportdate):
     try:
         statusobj=es.get(index="biac_feedback_status",id=key,doc_type="doc")["_source"]
         statusobj["docx"]=True
+        statusobj["user"]=user
     except:
         statusobj={"user":user,"reporttype":reporttype,"reportdate":reportdate,"xlsx":False,"docx":True,"sent":False,"creation_date":datetime.now()}
     es.index(index="biac_feedback_status",doc_type="doc",body=statusobj,id=key)
