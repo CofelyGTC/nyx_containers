@@ -14,13 +14,9 @@ RUN rm -d -r /opt/sources/*.sh
 #RUN rm -d -r /opt/sources/*.bat
 #RUN rm -d -r /opt/sources/jaspergenerator
 #RUN rm -d -r /opt/sources/reports
-RUN apt-get update
-#RUN apt-get install -y build-essential chrpath libssl-dev libxft-dev
-#RUN apt-get install -y libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev
-#RUN cp /opt/sources/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin
 
 WORKDIR /opt/sources
-#CMD ["python", "nyx_xlsimporter.py"]
+CMD ["python", "nyx_xlsimporter.py"]
 #CMD ["python", "nyx_reportrunner.py"]
 #CMD ["python", "biac_compute_instawork.py"]
 #CMD ["python", "biac_import_instawork.py"]
