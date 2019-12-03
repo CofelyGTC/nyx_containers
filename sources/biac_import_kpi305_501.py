@@ -26,6 +26,7 @@ VERSION HISTORY
 ===============
 
 * 24 Oct 2019 0.0.2 **AMA** Do no longer crash with empty data frames. Add the lot4 if it does not exist yet.
+* 12 NOV 2019 1.0.0 **AMA** Match report author and incoming 501/305 value without the white spaces (Van Der Veken issue)
 """  
 
 import re
@@ -53,7 +54,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from lib import reporthelper as rp
 
 
-VERSION="0.2.0"
+VERSION="1.0.0"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -151,7 +152,9 @@ def compute305():
         bulkbody += newrec + "\r\n"
             
     res=es.bulk(bulkbody)
-    logger.info(res)
+    if res["errors"]:
+        logger.error("Error in bulk")
+        logger.info(res)
 
     logger.info(">>>>Set Active Fields")
     logger.info("Reset active records ")
@@ -276,8 +279,10 @@ def compute501():
         bulkbody += newrec + "\r\n"
 
     res=es.bulk(bulkbody)
-    
-    logger.info(res)
+    if res["errors"]:
+        logger.error("Error in bulk")
+        logger.info(res)
+
 
     logger.info(">>>>Set Active Fields")
     logger.info("Reset active records ")
@@ -387,112 +392,116 @@ def messageReceived(destination,message,headers):
             #dfdata = pd.read_excel(file, sheet_name='Sheet1')
             dfdatas = pd.ExcelFile(file)
 
+            sheettoload=""
             for sheet in dfdatas.sheet_names:
                 if "Lot" in sheet or "Sheet1" in sheet:
                     sheettoload=sheet
                     break
-            logger.info("Loading :"+sheettoload)
-            dfdata = pd.read_excel(file, sheet_name=sheettoload)
-
-            if dfdata.shape[1]==38:
-                newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
-                        'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
-                        'Label', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
-                        'SendDate2', 'Status', 'ReportDate2',
-                        'CheckDateSend', 'CheckStatus', 'CheckReportDate',
-                        'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
-                        'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
-                        'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
-                        'MonitorNOK', 'MonitorOK']
-            elif dfdata.shape[1]==40:
-                newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
-                        'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
-                        'Label','Note','Supervisor', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
-                        'SendDate2', 'Status', 'ReportDate2',
-                        'CheckDateSend', 'CheckStatus', 'CheckReportDate',
-                        'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
-                        'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
-                        'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',                        
-                        'MonitorNOK', 'MonitorOK']
-            else:                         # MARCH 2019
-                newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
-                        'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
-                        'Label','Note','Supervisor', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
-                        'SendDate2', 'Status', 'ReportDate2',
-                        'CheckDateSend', 'CheckStatus', 'CheckReportDate',
-                        'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
-                        'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
-                        'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
-                        'Building2','DocName',
-                        'MonitorNOK', 'MonitorOK']
-
-            dfdata.columns=newcols
-
-            dfdata["Month"]=dfdata["Month"].apply(reorderMonth)
-
-            if not dfdata.empty:
-
-
-                regex = r"Lot[0-4]"
-                
-                matches = re.finditer(regex, orgfile, re.MULTILINE)
-                lot="NA"
-                for matchNum, match in enumerate(matches, start=1):    
-                    lot=match.group()
-                    break
-                logger.info("Lot:"+lot)
-
-                if str(lot) !="4":
-                    dfdata["key"]=dfdata.apply(computeReport,axis=1)
-                else:
-                    dfdata["key"]="Lot4 (BACDNB)"
-
-
-                dfdata["FileLot"]=lot
-
-    #            dfdata["_id"]=dfdata["Month_BacID"]
-                dfdata["_index"]="biac_kpi501"
-                dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
-
-                dfdata=dfdata.fillna("")
-
-    #            logger.info(dfdata["FileLot"])
-
-                for month in dfdata["Month"].unique():
-                        deletequery={
-                                "query":{
-                                    "bool": {
-                                        "must": [
-                                        {
-                                            "query_string": {
-                                            "query": "Month: "+month
-                                            }
-                                        },
-                                        {
-                                            "query_string": {
-                                            "query": "FileLot: "+lot
-                                            }
-                                        }
-                                        ]
-                                    }            
-                                }   
-                            }
-                        logger.info("Deleting records")
-                        logger.info(deletequery)
-                        try:
-                            resdelete=es.delete_by_query(body=deletequery,index="biac_kpi501")
-                            logger.info(resdelete)
-                        except Exception as e3:            
-                            logger.error(e3)   
-                            logger.error("Unable to delete records.")            
-
-                time.sleep(3)
-                #DELETE COLUMNS WITH MIXED CONTENTS
-                del dfdata["SRPresentation"]
-                del dfdata["ReportDate"]
-                pte.pandas_to_elastic(es, dfdata)
+            if sheettoload=="":
+                logger.info("No worksheet to load...")
             else:
-                logger.info("Empty Data")        
+                logger.info("Loading :"+sheettoload)
+                dfdata = pd.read_excel(file, sheet_name=sheettoload)
+
+                if dfdata.shape[1]==38:
+                    newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
+                            'MonitorNOK', 'MonitorOK']
+                elif dfdata.shape[1]==40:
+                    newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label','Note','Supervisor', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',                        
+                            'MonitorNOK', 'MonitorOK']
+                else:                         # MARCH 2019
+                    newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label','Note','Supervisor', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
+                            'Building2','DocName',
+                            'MonitorNOK', 'MonitorOK']
+
+                dfdata.columns=newcols
+
+                dfdata["Month"]=dfdata["Month"].apply(reorderMonth)
+
+                if not dfdata.empty:
+
+
+                    regex = r"Lot[0-4]"
+                    
+                    matches = re.finditer(regex, orgfile, re.MULTILINE)
+                    lot="NA"
+                    for matchNum, match in enumerate(matches, start=1):    
+                        lot=match.group()
+                        break
+                    logger.info("Lot:"+lot)
+
+                    if str(lot) !="4":
+                        dfdata["key"]=dfdata.apply(computeReport,axis=1)
+                    else:
+                        dfdata["key"]="Lot4 (BACDNB)"
+
+
+                    dfdata["FileLot"]=lot
+
+        #            dfdata["_id"]=dfdata["Month_BacID"]
+                    dfdata["_index"]="biac_kpi501"
+                    dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
+
+                    dfdata=dfdata.fillna("")
+
+        #            logger.info(dfdata["FileLot"])
+
+                    for month in dfdata["Month"].unique():
+                            deletequery={
+                                    "query":{
+                                        "bool": {
+                                            "must": [
+                                            {
+                                                "query_string": {
+                                                "query": "Month: "+month
+                                                }
+                                            },
+                                            {
+                                                "query_string": {
+                                                "query": "FileLot: "+lot
+                                                }
+                                            }
+                                            ]
+                                        }            
+                                    }   
+                                }
+                            logger.info("Deleting records")
+                            logger.info(deletequery)
+                            try:
+                                resdelete=es.delete_by_query(body=deletequery,index="biac_kpi501")
+                                logger.info(resdelete)
+                            except Exception as e3:            
+                                logger.error(e3)   
+                                logger.error("Unable to delete records.")            
+
+                    time.sleep(3)
+                    #DELETE COLUMNS WITH MIXED CONTENTS
+                    del dfdata["SRPresentation"]
+                    del dfdata["ReportDate"]
+                    pte.pandas_to_elastic(es, dfdata)
+                else:
+                    logger.info("Empty Data")        
             compute501()
 
 

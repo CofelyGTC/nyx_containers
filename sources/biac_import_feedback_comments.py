@@ -37,7 +37,12 @@ VERSION HISTORY
 * 24 Sep 2019 0.0.7 **AMA** Message localized in NL
 * 23 Oct 2019 0.0.7 **AMA** Lot 4 Feedback result works
 * 29 Oct 2019 1.0.0 **AMA** The system accepts KPI that are not numerical
-* 03 Dec 2019 1.0.1 **VME** Fix bug with the user 
+* 04 Nov 2019 1.0.1 **AMA** Can read lot 5 excel files
+* 05 Nov 2019 1.0.1 **AMA** Can read lot 5 docx files
+* 21 Nov 2019 1.1.0 **AMA** Can read lot 6/7 excel files
+* 25 Nov 2019 1.2.0 **AMA** Can read lot 6/7 docx files
+* 27 Nov 2019 1.3.0 **AMA** Removed one line of lot 6 and 7
+* 03 Dec 2019 1.3.2 **VME** Fix bug with the user 
 """  
 import re
 import json
@@ -65,7 +70,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.0.1"
+VERSION = "1.3.2"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -202,32 +207,77 @@ def messageReceivedXLSX(destination,message,headers):
         logger.info(user)
         logger.info(user_id)
 
-        df=pd.read_excel("./tmp/excel.xlsx",skiprows=7)
-        dforg=df.copy()
-        df=df[[df.columns[1],df.columns[10]]]
-        df.columns=["KPI","NEGO"]
-
-        nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
-        print(nscore)
-        
-        df=pd.read_excel("./tmp/excel.xlsx")
-
-#        print(df)
-        try:
-            reporttype=df.columns[8]
-            reportdate=datetime.strptime(df.columns[7],"%d/%m/%Y")
-        except: # LOT 4
-            logger.info("Unable to decode report date")
-            print(df.columns)
-            reporttype=df.columns[7]
-            reportdate=datetime.strptime(df.columns[6],"%d/%m/%Y")
-
-            dforg=dforg[[dforg.columns[2],dforg.columns[14]]]
-            dforg.columns=["KPI","NEGO"]
-            #dforg=dforg[dforg['NEGO']!="/"]
-
-            nscore=dforg[(pd.notnull(dforg['KPI'])) & (pd.notnull(dforg['NEGO']))]
+        dftop=pd.read_excel("./tmp/excel.xlsx",skiprows=0)
+        if dftop.columns[7]=="LOT5":
+            df=pd.read_excel("./tmp/excel.xlsx",skiprows=8)
+            dforg=df.copy()
+            df=df[[df.columns[0],df.columns[7]]]
+            df.columns=["KPI","NEGO"]
+            nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
             print(nscore)
+            reporttype=dftop.columns[7]
+            if(reporttype=="LOT5"):
+                reporttype="Lot5"
+
+            reportdate=datetime.strptime(dftop.columns[6],"%d/%m/%Y")
+            entity={"lot":5,"contract":"Lot5","title":"Lot5"}
+        elif dftop.columns[7]=="LOT6":
+            df=pd.read_excel("./tmp/excel.xlsx",skiprows=7)
+            dforg=df.copy()
+            df=df[[df.columns[0],df.columns[11]]]
+            df.columns=["KPI","NEGO"]
+            nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
+            print(nscore)
+            reporttype=dftop.columns[7]
+            if(reporttype=="LOT6"):
+                reporttype="Lot6"
+
+            reportdate=datetime.strptime(dftop.columns[6],"%d/%m/%Y")
+            entity={"lot":6,"contract":"Lot6","title":"Lot6"}
+        elif dftop.columns[7]=="LOT7":
+            df=pd.read_excel("./tmp/excel.xlsx",skiprows=7)
+            dforg=df.copy()
+            df=df[[df.columns[0],df.columns[11]]]
+            df.columns=["KPI","NEGO"]
+            nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
+            print(nscore)
+            reporttype=dftop.columns[7]
+            if(reporttype=="LOT7"):
+                reporttype="Lot7"
+
+            reportdate=datetime.strptime(dftop.columns[6],"%d/%m/%Y")
+            entity={"lot":7,"contract":"Lot7","title":"Lot7"}
+        else:
+            df=pd.read_excel("./tmp/excel.xlsx",skiprows=7)
+            dforg=df.copy()
+            df=df[[df.columns[1],df.columns[10]]]
+            df.columns=["KPI","NEGO"]
+
+            nscore=df[pd.notnull(df['KPI']) & pd.notnull(df['NEGO'])]
+            print(nscore)
+            
+            df=pd.read_excel("./tmp/excel.xlsx")
+
+    #        print(df)
+            try:
+                reporttype=df.columns[8]
+                reportdate=datetime.strptime(df.columns[7],"%d/%m/%Y")
+            except: # LOT 4
+                logger.info("Unable to decode report date")
+                print(df.columns)
+                reporttype=df.columns[7]
+                reportdate=datetime.strptime(df.columns[6],"%d/%m/%Y")
+
+                dforg=dforg[[dforg.columns[2],dforg.columns[14]]]
+                dforg.columns=["KPI","NEGO"]
+                #dforg=dforg[dforg['NEGO']!="/"]
+
+                nscore=dforg[(pd.notnull(dforg['KPI'])) & (pd.notnull(dforg['NEGO']))]
+                print(nscore)
+            
+            reporttype=reporttype.replace("Lot4 (DNB)","Lot4 (BACDNB)")
+            entity=getEntityObjXLS(es,reporttype)
+
 
             
 
@@ -247,9 +297,6 @@ def messageReceivedXLSX(destination,message,headers):
 
         reportdateNL=maanden[reportdate.month-1]
 
-        reporttype=reporttype.replace("Lot4 (DNB)","Lot4 (BACDNB)")
-
-        entity=getEntityObjXLS(es,reporttype)
 
         logger.info(entity)
         
@@ -338,13 +385,13 @@ def messageReceivedDOCX(destination,message,headers):
 
 
 
-    xlsbytes = base64.b64decode(message)
-    f = open('./tmp/excel.xlsx', 'wb')
-    f.write(xlsbytes)
+    docbytes = base64.b64decode(message)
+    f = open('./tmp/word.docx', 'wb')
+    f.write(docbytes)
     f.close()
 
     try:       
-        doc = Document('./tmp/excel.xlsx')
+        doc = Document('./tmp/word.docx')
 
         dict_comment = []
 
@@ -382,7 +429,8 @@ def messageReceivedDOCX(destination,message,headers):
                     contract=entityObj[finalp]['contract']
                     technic=entityObj[finalp]['technic']
                     key=entityObj[finalp]['key'] 
-                    title=finalp
+                    title=finalp                
+                    
                 
                 regex = 'KPI [a-zA-Z]{3,10} [0-9]{4}'
                 x = re.search(regex, paragraph.text.strip())
@@ -421,6 +469,7 @@ def messageReceivedDOCX(destination,message,headers):
             for paragraph in doc.paragraphs:
                 if paragraph.text.strip() != '' and paragraph.text.strip() != '\\n' :
                     regex = '@([kK][pP][iI])?([0-9]{1,3}[a-zA-Z]?):(.*)'
+                    print(">>>>"+paragraph.text.strip())
                     x = re.search(regex, paragraph.text.strip())
                     if x is not None:
                         kpi = x.groups()[1]

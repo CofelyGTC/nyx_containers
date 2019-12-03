@@ -81,6 +81,18 @@ class ReportStructure:
         for rec in self.entities:
             if "header" not in rec:
                 continue
+<<<<<<< HEAD
+            author=rec["header"]["auteur"].lower()
+            if "service" in rec["header"]:
+                service=rec["header"]["service"].lower()
+    #            print(">>>>>>>>>> <%s> <%s>" %(author,service))
+                if author.replace(" ","")==name.lower().replace(" ","") and service==bacservice.lower():
+                    return rec
+
+                if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name.lower():
+                    #print("LOT 1 OR 3"*100)
+                    return rec
+=======
             author=rec["header"]["auteur"]
             service=rec["header"]["service"]
 #            print(">>>>>>>>>> <%s> <%s>" %(author,service))
@@ -90,6 +102,7 @@ class ReportStructure:
             if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name:
                 #print("LOT 1 OR 3"*100)
                 return rec
+>>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
 
 
             
