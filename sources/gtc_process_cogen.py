@@ -11,6 +11,7 @@ VERSION HISTORY
 
 * 20 Sep 2019 0.0.1 **PDE** First version
 * 05 Nov 2019 1.0.0 **PDE** Logs removed
+* 06 Nov 2019 1.2.1 **AMA** Hours >48 set to -1
 
 
 """  
@@ -50,7 +51,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_PROCESS_COGEN"
-VERSION = "1.0.0"
+VERSION = "1.2.0"
 QUEUE   = ["GTC_PROCESS_COGEN_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -841,7 +842,7 @@ def insertIntoELK(onecogendf,definition):
         for col in onecogendf.columns:
             cleancol=col.replace(" ","_")
             if(col=="Hours"):
-                if(row[col]>24):
+                if(row[col]>48):
                     obj[cleancol]=-1
                 else:
                     obj[cleancol]=row[col]

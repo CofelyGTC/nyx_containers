@@ -10,6 +10,7 @@ from io import StringIO
 
 from logging.handlers import TimedRotatingFileHandler
 from amqstompclient import amqstompclient
+from elastic_helper import es_helper 
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
@@ -23,7 +24,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 import tzlocal
 
-VERSION="1.0.2"
+VERSION="1.0.5"
 MODULE="GTC_IMPORT_TELEPHONY"
 QUEUE=["TELEPHONY_IMPORT"]
 
@@ -75,37 +76,45 @@ def messageReceived(destination,message,headers):
     #    logger.info("File:%s" %headers["CamelSplitAttachmentId"])
     #    log_message("Import of file [%s] started." % headers["CamelSplitAttachmentId"])
 
+    dfconfig = es_helper.elastic_to_dataframe(es,index="nyx_config_telephony")
+    dfconfig=dfconfig.set_index(["DnisNr"])
+    dfconfight=dfconfig.to_dict('index')
+
     mess = base64.b64decode(message)
-    mesin=mess.decode("utf-8", "ignore")
-    full=basefile+"\r\n"+mesin
-    #f = open('./tmp/excel.xlsx', 'wb')
-    #f.write(xlsbytes)
-    #f.close()
-
     df = None
-    #try:
-    #    df = pd.read_csv('./tmp/excel.xlsx',delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
-    #except Exception as er:
-    #    logger.error('Unable to read csv')
-    #    logger.error(er)
-    
-
-    #te = df.copy()
 
     mesin=mess.decode("utf-8", "ignore")
 
-    te=pd.read_fwf(StringIO(full)
-               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
-               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
+#    te=pd.read_fwf(StringIO(full)
+##               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
+#               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
+
+    colspecs=[[0, 6],
+        [6, 13],
+        [13, 19],
+        [20, 24],#A4
+        [25, 27],#COde
+        [27, 30],#A6
+        [30, 37],#A7
+        [37, 57],#CALLED
+        [58, 88],#CALLER
+        [89, 96],#Rings
+        [97, 107],#DESK
+        [108, 123],#A12
+        [124, 133],#A13
+        [134, 138],#A14
+        [137, 143],#A15
+        [144, 155],
+        [156, 159]]
+    te=pd.read_fwf(StringIO(mesin),header=None,colspecs=colspecs
+                ,converters={"A13":str,"A4":str,"A15":str,"A16":str,"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str}
+                , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","Rings","Desk","A12","A13","A14","A15","A16","A17"])
 
 
-    te=te[100:]
-    te=te[89:]
+    #te=te[89:]  # IMPORTANT ghet rid of the base template file
 
-
-
-#        te = te[te.Called.notnull()]
-
+    te["Caller"]=te["Caller"].fillna("")
+    te["Code"]=te["Code"].fillna("")
     te['InternalCalled1']=te['Called'].str.replace(' ','')
     te['InternalCalled']=(te['InternalCalled1'].str.len()<6)
     te['InternalCaller1']=te['Caller'].str.replace(' ','')
@@ -169,7 +178,7 @@ def messageReceived(destination,message,headers):
     te['Duration']=te['DurationMinute2']*60+te['DurationSecond']
 
 
-    logger.info(te)
+    #logger.info(te)
     messagebody=""
 
     action={}
@@ -178,7 +187,7 @@ def messageReceived(destination,message,headers):
 
     del te2["A4"]
     del te2["A6"]
-    del te2["A10"]
+    #del te2["A10"]
     #del te2["A11"]
     del te2["A12"]
     del te2["A13"]
@@ -190,7 +199,9 @@ def messageReceived(destination,message,headers):
 
     te2["timestamp"]=te2["Date"]+te2["Hour"]
 
+    te2["Date2"]=pd.to_datetime(te2["timestamp"], format="%d%m%y%H%M%S")
     te2["Date"]=pd.to_datetime(te2["timestamp"], format="%d%m%y%H%M%S")
+    te2["Date"]=te2['Date'].dt.tz_localize(tz='Europe/Paris')
     del te2["timestamp"]
     del te2["Hour"]
 
@@ -199,10 +210,18 @@ def messageReceived(destination,message,headers):
 
     for index,row in te2.iterrows():
         obj={}
-        obj["@timestamp"]=int(row["Date"].timestamp())*1000
+        #obj["@timestamp"]=int(row["Date"].timestamp())*1000
+        obj["@timestamp"]=row['Date'].isoformat() 
         obj["Duration"]=row["Duration"]
         obj["Code"]=row["Code"].replace(' ','')
         obj["Called"]=row["Called"].replace(' ','')
+
+        try:
+            if int(obj["Called"]) in dfconfight:
+                obj["Client"]=dfconfight[int(obj["Called"])]["Name"] 
+        except:
+            pass       
+
         obj["Caller"]=row["Caller"].replace(' ','')
         try:
             obj["Desk"]=int(row["Desk"])
@@ -213,33 +232,49 @@ def messageReceived(destination,message,headers):
             obj["DeskCaller"]=int(row["DeskCaller"])
         except:
             obj["DeskCaller"]=row["DeskCaller"]
+        if str(obj["DeskCaller"])=='nan':
+            obj["DeskCaller"]=""
+
+
 
         obj["InternalCaller"]=row["InternalCaller"]
         obj["InternalCalled"]=row["InternalCalled"]
         obj["SolidusCalled"]=row["SolidusCalled"]
         obj["CallType"]=row["CallType"]
+        obj["Rings"]=row["Rings"]
 
-        action["index"]={"_index":"telephony","_type":"doc","_id":str(obj["@timestamp"])+'_'+obj["Called"]+'_'+obj["Caller"]}
+        action["index"]={"_index":"telephony","_type":"doc","_id":str(int(row["Date2"].timestamp())*1000)+'_'+obj["Called"]+'_'+obj["Caller"]}
 
         messagebody+=json.dumps(action)+"\r\n";
         messagebody+=json.dumps(obj)+"\r\n"
 
+        
+
+        # if "NaN" in messagebody:
+        #     print("BAD")
+        #     pass
+
         if(len(messagebody)>500000):
             logger.info ("BULK")
             try:
-                es.bulk(messagebody)
+                resbulk=es.bulk(messagebody)
+                #print(resbulk["errors"])
+                if resbulk["errors"]:
+                    logger.error("BULK ERROR")
+                    logger.info(resbulk)
+
             except:
-                logger.error("==================>Retry")
-                print("==================>Retry")
-                es.bulk(messagebody)
+                logger.error("Unable to bulk",exc_info=True)
+                logger.error(resbulk)
+                
             messagebody=""
 
     try:
-        es.bulk(messagebody)
+        if len(messagebody)>0:
+            resbulk=es.bulk(messagebody)
     except:
-        logger.error("==================>Retry")
-        print("==================>Retry")
-        es.bulk(messagebody)
+        logger.error("Unable to bulk",exc_info=True)
+        logger.error(resbulk)
     #print (messagebody)
     logger.info ("FINISHED")
 

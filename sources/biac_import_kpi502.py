@@ -69,7 +69,7 @@ QUEUE=["BIAC_EXCELS_KPI502"]
 goodmonth="NA"
 
 def computeOverdue(row):
-    """This functionb determines if a record is overdued. It depends on the lot and record type.
+    """This function determines if a record is overdued. It depends on the lot and record type.
     Returns:
         String -- The month as string or overdue
     """

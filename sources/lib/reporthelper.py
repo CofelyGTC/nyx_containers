@@ -84,14 +84,15 @@ class ReportStructure:
             if "header" not in rec:
                 continue
             author=rec["header"]["auteur"].lower()
-            service=rec["header"]["service"].lower()
-#            print(">>>>>>>>>> <%s> <%s>" %(author,service))
-            if author==name.lower() and service==bacservice.lower():
-                return rec
+            if "service" in rec["header"]:
+                service=rec["header"]["service"].lower()
+    #            print(">>>>>>>>>> <%s> <%s>" %(author,service))
+                if author.replace(" ","")==name.lower().replace(" ","") and service==bacservice.lower():
+                    return rec
 
-            if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name.lower():
-                #print("LOT 1 OR 3"*100)
-                return rec
+                if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name.lower():
+                    #print("LOT 1 OR 3"*100)
+                    return rec
 
 
             
