@@ -19,6 +19,7 @@ VERSION HISTORY
 * 17 Oct 2019 0.0.23 **VME** Add starts and stops fields to daily_cogen
 * 23 Oct 2019 0.0.24 **VME** Get targets from cogen_parameters
 * 24 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
+* 05 Nov 2019 0.0.26 **VME** Adding the drycooler and ht for heat production + modification of condition (thiopaq and cogen)
 
 """  
 import re
@@ -59,7 +60,7 @@ from lib import cogenhelper as ch
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.25"
+VERSION = "0.0.26"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):

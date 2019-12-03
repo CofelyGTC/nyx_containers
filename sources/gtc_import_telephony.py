@@ -72,19 +72,23 @@ def messageReceived(destination,message,headers):
     if "file" in headers:
         logger.info("File:%s" %headers["file"])
         log_message("Import of file [%s] started." % headers["file"])
-    #elif "CamelSplitAttachmentId" in headers:
-    #    logger.info("File:%s" %headers["CamelSplitAttachmentId"])
-    #    log_message("Import of file [%s] started." % headers["CamelSplitAttachmentId"])
 
+<<<<<<< HEAD
     dfconfig = es_helper.elastic_to_dataframe(es,index="nyx_config_telephony")
     dfconfig=dfconfig.set_index(["DnisNr"])
     dfconfight=dfconfig.to_dict('index')
+=======
+    mess = base64.b64decode(message)
+    mesin=mess.decode("utf-8", "ignore")
+    full=basefile+"\r\n"+mesin
+>>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
 
     mess = base64.b64decode(message)
     df = None
 
     mesin=mess.decode("utf-8", "ignore")
 
+<<<<<<< HEAD
 #    te=pd.read_fwf(StringIO(full)
 ##               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
 #               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
@@ -115,6 +119,17 @@ def messageReceived(destination,message,headers):
 
     te["Caller"]=te["Caller"].fillna("")
     te["Code"]=te["Code"].fillna("")
+=======
+    te=pd.read_fwf(StringIO(full)
+               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
+               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
+
+
+    te=te[100:]
+    te=te[89:]
+
+
+>>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
     te['InternalCalled1']=te['Called'].str.replace(' ','')
     te['InternalCalled']=(te['InternalCalled1'].str.len()<6)
     te['InternalCaller1']=te['Caller'].str.replace(' ','')
@@ -123,34 +138,29 @@ def messageReceived(destination,message,headers):
 
     te['Desk2']=pd.to_numeric(te['Desk'], errors='coerce',downcast='integer')
     te['DeskCaller']=pd.to_numeric(te['Caller'], errors='coerce',downcast='integer')
-    #te['Desk2']=te['Desk'].astype(int)
 
     del te['InternalCalled1']
     del te['InternalCaller1']
-
-    #te['Calltype']=(te['InternalCalled1'].str.match("93904"))
 
     calltype=[]
 
 
 
-    for index,row in te.iterrows():
-
-#            print ("#####"*20)
-#            print(row)
-
+    for index, row in te.iterrows():
         if(row["Caller"].find("91931")>=0):
             calltype.append("Test")
+
         elif (row["Desk2"]>76800) and (row["Desk2"]<76810) and (row["DeskCaller"]>76900) and (row["DeskCaller"]<76910):
             calltype.append("Transfer")
+
         elif (row["DeskCaller"]>76800) and (row["DeskCaller"]<76810) and (row["Desk2"]>76900) and (row["Desk2"]<76910):
             calltype.append("Transfer")
+
         elif(row["Desk2"]>76900) and (row["Desk2"]<76910):
             calltype.append("InDispa")
+
         elif(row["Desk2"]>76800) and (row["Desk2"]<76810):
             calltype.append("InDesk")
-    #    else:
-    #        calltype.append("Solidus")
 
         elif(row["SolidusCalled"]):
             if (not(row["InternalCaller"])):

@@ -1,0 +1,54 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "query_string": {
+            "query": "code: 7 AND area: "COGJET" AND value:[1 TO 1000000000]",
+            "analyze_wildcard": True
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": 1571401761178,
+              "lte": 1574861361178,
+              "format": "epoch_millis"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        
+      ]
+    }
+  },
+  "_source": {
+    "excludes": [
+      
+    ]
+  },
+  "aggs": {
+    "2": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "interval": "1d",
+        "time_zone": "Europe/Berlin",
+        "min_doc_count": 1
+      },
+      "aggs": {
+        "1": {
+          "min": {
+            "field": "value"
+          }
+        },
+        "3": {
+          "max": {
+            "field": "value"
+          }
+        }
+      }
+    }
+  }
+}

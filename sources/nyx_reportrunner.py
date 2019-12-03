@@ -20,6 +20,9 @@ VERSION HISTORY
 ===============
 
 * 06 Aug 2019 1.1.0 **AMA** Build with version 1.1.0.0 of opendistro JDBC
+* 03 Sep 2019 1.2.0 **AMA** elastic-helper dependency added
+* 22 Nov 2019 1.3.1 **AMA** Compatible with ES 7. Added notebook reporting.
+* 28 Nov 2019 1.4.0 **AMA** Packaged with libre office 6.3
 """
 import json
 import time
@@ -39,7 +42,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from logstash_async.handler import AsynchronousLogstashHandler
 
 
-VERSION="1.1.0"
+VERSION="1.4.0"
 QUEUE=["/queue/NYX_REPORT_STEP2"]
 
 ################################################################################
@@ -102,6 +105,19 @@ def messageReceived(destination,message,headers):
         if "exec" not in messagejson["report"]:
             status="Error"
             errormessage="exec not defined"
+        elif reporttype=="notebook":
+            word="./reports/notebooks/"+messagejson["report"]["notebook"]+".docx"
+            logger.info("Checkin path:"+word)
+            if not os.path.exists(word):
+                logger.error("Doc file "+word+" does not exist.")
+                status="Error"
+                errormessage="Doc file "+word+" does not exist."
+            noteb="./reports/notebooks/"+messagejson["report"]["notebook"]+".ipynb"
+            logger.info("Checkin path:"+noteb)
+            if not os.path.exists(noteb):
+                logger.error("Notebook file "+noteb+" does not exist.")
+                status="Error"
+                errormessage="Notebook file "+noteb+" does not exist."
         else:
             exec=messagejson["report"]["exec"]
             logger.info("Checkin path:"+exec)
@@ -152,7 +168,19 @@ def messageReceived(destination,message,headers):
                 logger.info(line)
             logger.info("Java Return Code:")
             logger.info(ret.returncode)
-
+        elif reporttype=="notebook":            
+            path="."
+            logger.info("PATH="+path)
+            ret=subprocess.Popen(["python3","nyx_buildreport.py",json.dumps(messagejson)],cwd=path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            #ret=subprocess.Popen([exec.split('/')[-1:][0]],cwd=path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout = ret.communicate()[0]
+            for line in stdout.decode("utf-8").split('\n'):
+                logger.info(line)
+            logger.info("Shell Return Code:")
+            logger.info(ret.returncode)
+            if ret.returncode !=0:
+                status="Error"
+                errormessage="Python file "+"nyx_buildreport.py"+" crashed. Return code="+str(ret.returncode)
         else:
             path='/'.join(exec.split('/')[0:-1])
             logger.info("PATH="+path)

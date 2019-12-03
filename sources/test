@@ -1,17 +1,54 @@
-Heure de fonctionnement moteur et nombre de démarrage D'Ieteren Kortenberg \"TagId\";\"TagName\";\"Value\";\"AlStatus\";\"AlType\";\"Quality\"
-47;\"DI01_H_FCTT_CO\";39229;0;0;65472
-48;\"DI01_NB_DM_CO\";8784;0;0;65472
-
-
-
-
-Heure de fonctionnement et nombre de démarrage moteur DUMOULIN \"TagId\";\"TagName\";\"Value\";\"AlStatus\";\"AlType\";\"Quality\"
-73;\"DU01_GE_C_START\";9105;0;0;65472
-96;\"DU01_Heure_moteur\";39947;0;0;65472
-
-
-
-
-Heure de fonctionnement moteur et nombre de démarrages Galactic \"TagId\";\"TagName\";\"Value\";\"AlStatus\";\"AlType\";\"Quality\"
-9;\"GA01_DEMAR_CO\";7669;0;0;65472
-81;\"GA01_H_FCT_CO\";59127;0;0;65472
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "query_string": {
+            "query": "code: 7 AND area: "COGJET" AND value:[1 TO 1000000000]",
+            "analyze_wildcard": True
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": 1571401761178,
+              "lte": 1574861361178,
+              "format": "epoch_millis"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        
+      ]
+    }
+  },
+  "_source": {
+    "excludes": [
+      
+    ]
+  },
+  "aggs": {
+    "2": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "interval": "1d",
+        "time_zone": "Europe/Berlin",
+        "min_doc_count": 1
+      },
+      "aggs": {
+        "1": {
+          "min": {
+            "field": "value"
+          }
+        },
+        "3": {
+          "max": {
+            "field": "value"
+          }
+        }
+      }
+    }
+  }
+}

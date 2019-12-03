@@ -26,6 +26,7 @@ VERSION HISTORY
 * 09 Oct 2019 0.0.6 **VME** Default value if no data
 * 14 Oct 2019 0.0.7 **VME** Bug fixing when no ronde for lot
 * 30 Oct 2019 0.0.8 **VME** Buf fixing r.text empty and better error log.
+* 02 Dec 2019 0.0.9 **VME** Buf fixing on starting months when no data
 """  
 import re
 import sys
@@ -60,7 +61,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -94,12 +95,13 @@ def compute_kib_heatmap(df_stats):
     try:
         df_stats['month'] = pd.to_datetime(df_stats['_timestamp'], unit='ms').dt.strftime('%Y-%m')
 
-        df_index = pd.date_range(start=min(df_stats['month']), end=max(df_stats['month']), freq='MS')   
+        df_index = pd.date_range(start=min(df_stats['month']), end=datetime.now().strftime('%Y-%m'), freq='MS')   
+        # df_index = pd.date_range(start=min(df_stats['month']), end=max(df_stats['month']), freq='MS')   
         df_index=df_index.strftime('%Y-%m')
 
         es_index="biac_kib_kpi102"
 
-        es.indices.delete(index=es_index, ignore=[400, 404]) 
+        
 
         lots = [
             {
@@ -141,7 +143,8 @@ def compute_kib_heatmap(df_stats):
                     action["index"] = {"_index": es_index,"_type": "doc"}
                     bulkbody.append(json.dumps(action))  
                     bulkbody.append(json.dumps(obj))  
-                    
+
+        es.indices.delete(index=es_index, ignore=[400, 404])            
         res=es.bulk("\r\n".join(bulkbody))
     except:
         logger.error("Unable to compute stats.",exc_info=True)
@@ -299,7 +302,8 @@ def compute_kpi102_monthly(df_kpi102):
     
     df_kpi102['month'] = pd.to_datetime(df_kpi102['_timestamp'], unit='ms').dt.strftime('%Y-%m')
 
-    df_index = pd.date_range(start=min(df_kpi102['month']), end=max(df_kpi102['month']), freq='MS')   
+    # df_index = pd.date_range(start=min(df_kpi102['month']), end=max(df_kpi102['month']), freq='MS')   
+    df_index = pd.date_range(start=min(df_kpi102['month']), end=datetime.now().strftime('%Y-%m'), freq='MS')   
     df_index = df_index.strftime('%Y-%m')
     df_empty = pd.DataFrame(df_index)
     df_empty = pd.DataFrame(list(product(df_index, [2, 3])))
