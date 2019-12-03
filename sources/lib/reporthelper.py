@@ -71,11 +71,9 @@ class ReportStructure:
         ent=self.getEntity(self.report)
 
         if name =="Dirk Van Leemput":
-#            name="Stefaan Pletinckx"
-            name="Hans van der Veken"
+            name="Stefaan Pletinckx"
         if name =="Wim Sintubin":
-#            name="Stefaan Pletinckx"
-            name="Miquel Lamproye"
+            name="Stefaan Pletinckx"
         
         name=name.replace("é","e")
         #print("KPI 500 NAME:"+name+" BAC:"+bacservice)
@@ -83,13 +81,13 @@ class ReportStructure:
         for rec in self.entities:
             if "header" not in rec:
                 continue
-            author=rec["header"]["auteur"].lower()
-            service=rec["header"]["service"].lower()
+            author=rec["header"]["auteur"]
+            service=rec["header"]["service"]
 #            print(">>>>>>>>>> <%s> <%s>" %(author,service))
-            if author==name.lower() and service==bacservice.lower():
+            if author==name and service==bacservice:
                 return rec
 
-            if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name.lower():
+            if "lot" in rec and (rec["lot"]==1 or rec["lot"]==3) and  author==name:
                 #print("LOT 1 OR 3"*100)
                 return rec
 
@@ -102,6 +100,6 @@ class ReportStructure:
             if "kpi500exception" in rec["header"]:
                 #print(rec["header"]["kpi500exception"])
                 for pair in rec["header"]["kpi500exception"]:
-                    if name.lower()==pair["name"].lower() and pair["service"].lower()==bacservice.lower():
+                    if name==pair["name"] and pair["service"]==bacservice:
                         return rec 
         return None   

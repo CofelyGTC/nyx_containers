@@ -22,12 +22,14 @@ VERSION HISTORY
 * 23 Jul 2019 0.0.2 **VME** Code commented
 * 24 Jul 2019 0.0.3 **VME** Modification of agg to fill the requirements for BACFIR dashboards (Maximo)
 * 25 Nov 2019 0.0.4 **VME** Adding lot4 (comes from another collection biac_spot_lot4)
+* 27 Nov 2019 0.0.5 **VME** Bug fixing
 """  
 import re
 import json
 import time
 import uuid
 import base64
+import tzlocal
 import platform
 import calendar
 import threading
@@ -49,7 +51,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 MODULE  = "BIAC_MONTH_KIZEO_2"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 QUEUE   = ["/topic/BIAC_KIZEO_IMPORTED_2"]
 
 def log_message(message):
@@ -93,6 +95,7 @@ def messageReceived(destination,message,headers):
     logger.info("==> "*10)
     logger.info("Message Received %s" % destination)
     logger.info(headers)
+    local_timezone = tzlocal.get_localzone()
 
     try: 
         logger.info('waiting 5 sec before doing the request to be sure date are correctly inserted by biac_import_kizeo.py')
@@ -133,8 +136,7 @@ def messageReceived(destination,message,headers):
         df_lot4 = es_helper.elastic_to_dataframe(es, index="biac_spot_lot4", query="kpi:302", scrollsize=1000, 
                                          start=start_dt, end=end_dt,
                                          datecolumns=["@timestamp"])
-        df_lot4['screen_name'] = 'BACDNB'
-        df_lot4['month'] = df_lot4['@timestamp'].dt.strftime('%Y-%m') 
+        
 
         if len(df_lot4) == 0:
             obj = {
@@ -142,13 +144,19 @@ def messageReceived(destination,message,headers):
                 'kpi': 302,
                 'contract': 'DNBBA',
                 'screen_name': 'DNBBA',
+                'month': '2019-01',
                 'conform': 0,
                 'not_conform': 0,
                 'check': 0,
-                '@timestamp': '2019-01-01 00:00:00+01:00',
+                '@timestamp': datetime(2019, 1, 1, tzinfo=local_timezone),
+                # '@timestamp': '2019-01-01 00:00:00+01:00',
             }
 
             df_lot4 = pd.DataFrame.from_dict({0: obj.values()}, orient='index', columns=obj.keys())
+
+        else:
+            df_lot4['screen_name'] = 'BACDNB'
+            df_lot4['month'] = df_lot4['@timestamp'].dt.strftime('%Y-%m') 
 
         df_lot4['lot'] = df_lot4['lot'].astype(str)
 
@@ -173,11 +181,14 @@ def messageReceived(destination,message,headers):
         df_grouped['_id']    = df_grouped['_id'].str.replace(' ', '_')
         df_grouped['_id']    = df_grouped['_id'].str.replace('/', '_')
 
-        df_grouped['percentage_conform'] = round(100*(df_grouped['check_conform'] / df_grouped['check_number']), 2)
+        df_grouped['percentage_conform'] = round(100*(df_grouped['check_conform'] / df_grouped['check_number']), 2).fillna(100)
         df_grouped['percentage_conform'] = df_grouped['percentage_conform'].apply(lambda x: ('%f' % x).rstrip('0').rstrip('.'))
 
-        df_grouped['percentage_no_conform'] = round(100*(df_grouped['check_no_conform'] / df_grouped['check_number']), 2)
+        df_grouped['percentage_no_conform'] = round(100*(df_grouped['check_no_conform'] / df_grouped['check_number']), 2).fillna(0)
         df_grouped['percentage_no_conform'] = df_grouped['percentage_no_conform'].apply(lambda x: ('%f' % x).rstrip('0').rstrip('.'))
+
+        df_grouped['percentage_conform'] = df_grouped['percentage_conform'].fillna(100)
+        df_grouped['percentage_no_conform'] = df_grouped['percentage_no_conform'].fillna(0)
 
         logger.info(df_grouped)
 
@@ -185,7 +196,7 @@ def messageReceived(destination,message,headers):
 
     except Exception as e:
         endtime = time.time()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         log_message("Process month Kizeo failed. Duration: %d Exception: %s." % ((endtime-starttime),str(e)))        
 
 

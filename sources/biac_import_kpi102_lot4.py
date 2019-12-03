@@ -27,6 +27,7 @@ VERSION HISTORY
 * 07 Oct 2019 0.0.4 **VME** Bug fixing - excluding the "LOT 4 - HS Cabines ~ Wekelijkse Ronde A (Rondier) (test cindy) (recovered)" form 
 * 30 Oct 2019 0.0.5 **VME** Bug fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
+* 02 Dec 2019 1.0.1 **VME** Buf fixing on starting months when no data
 """  
 import re
 import sys
@@ -61,7 +62,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI102_LOT4_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 QUEUE   = ["KPI102_LOT4_IMPORT"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -147,7 +148,8 @@ def compute_kib_index(es, df_all):
                 obj['globalpercentage'] = 0
 
             max_date = max(df_kib.index)            
-            if obj['@timestamp'].to_pydatetime() > datetime(max_date.year, max_date.month, max_date.day):
+            # if obj['@timestamp'].to_pydatetime() > datetime(max_date.year, max_date.month, max_date.day):
+            if obj['@timestamp'].to_pydatetime() > datetime.now():
                 del obj['globalpercentage']
         
             _id = 'heatmap_'+letter+'_'+str(index)
