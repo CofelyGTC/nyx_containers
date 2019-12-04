@@ -23,6 +23,7 @@ VERSION HISTORY
 * 24 Jul 2019 0.0.3 **VME** Modification of agg to fill the requirements for BACFIR dashboards (Maximo)
 * 25 Nov 2019 0.0.4 **VME** Adding lot4 (comes from another collection biac_spot_lot4)
 * 27 Nov 2019 0.0.5 **VME** Bug fixing
+* 04 Dec 2019 0.0.6 **VME** Fix buf when biac_spot_lot4 doesnt exist
 """  
 import re
 import json
@@ -36,6 +37,7 @@ import threading
 import os,logging
 import numpy as np
 import pandas as pd
+import elasticsearch
 from math import ceil
 
 from datetime import date
@@ -51,7 +53,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 MODULE  = "BIAC_MONTH_KIZEO_2"
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 QUEUE   = ["/topic/BIAC_KIZEO_IMPORTED_2"]
 
 def log_message(message):
@@ -132,10 +134,15 @@ def messageReceived(destination,message,headers):
         df_grouped=df_grouped.append(df_grouped2)
 
 
-        #handling lot4
-        df_lot4 = es_helper.elastic_to_dataframe(es, index="biac_spot_lot4", query="kpi:302", scrollsize=1000, 
-                                         start=start_dt, end=end_dt,
-                                         datecolumns=["@timestamp"])
+        df_lot4 = pd.DataFrame()
+
+        try:
+            #handling lot4
+            df_lot4 = es_helper.elastic_to_dataframe(es, index="biac_spot_lot4", query="kpi:302", scrollsize=1000, 
+                                            start=start_dt, end=end_dt,
+                                            datecolumns=["@timestamp"])
+        except elasticsearch.NotFoundError:
+            logger.warn('Index biac_spot_lot4 does not exist')
         
 
         if len(df_lot4) == 0:

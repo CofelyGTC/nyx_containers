@@ -468,7 +468,7 @@ def messageReceivedDOCX(destination,message,headers):
         if key != '':
             for paragraph in doc.paragraphs:
                 if paragraph.text.strip() != '' and paragraph.text.strip() != '\\n' :
-                    regex = '@([kK][pP][iI])?([0-9]{1,3}[a-zA-Z]?):(.*)'
+                    regex = '@([kK][pP][iI])? *([0-9]{1,3}[a-zA-Z]?) *:(.*)'
                     print(">>>>"+paragraph.text.strip())
                     x = re.search(regex, paragraph.text.strip())
                     if x is not None:
