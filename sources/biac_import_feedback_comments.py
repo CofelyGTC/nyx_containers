@@ -43,6 +43,7 @@ VERSION HISTORY
 * 25 Nov 2019 1.2.0 **AMA** Can read lot 6/7 docx files
 * 27 Nov 2019 1.3.0 **AMA** Removed one line of lot 6 and 7
 * 03 Dec 2019 1.3.2 **VME** Fix bug with the user 
+* 05 Dec 2019 1.3.3 **VME** Fix bug multiple comments in same paragraph
 """  
 import re
 import json
@@ -70,7 +71,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.3.2"
+VERSION = "1.3.3"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -470,29 +471,31 @@ def messageReceivedDOCX(destination,message,headers):
                 if paragraph.text.strip() != '' and paragraph.text.strip() != '\\n' :
                     regex = '@([kK][pP][iI])? *([0-9]{1,3}[a-zA-Z]?) *:(.*)'
                     print(">>>>"+paragraph.text.strip())
-                    x = re.search(regex, paragraph.text.strip())
-                    if x is not None:
-                        kpi = x.groups()[1]
-                        comment = x.groups()[2].strip()
-                        logger.info('     KPI COMMENT: '+kpi)
-                        logger.info('         COMMENT: '+comment)
+                    matches = re.findall(regex, paragraph.text.strip())
+                    if len(matches) > 0:
+                        
+                        for x in matches:
+                            kpi = x[1]
+                            comment = x[2].strip()
+                            logger.info('     KPI COMMENT: '+kpi)
+                            logger.info('         COMMENT: '+comment)
 
-                        obj = {
-                            'key': key,
-                            'title': title,
-                            'lot': lot,
-                            'contract': contract,
-                            'technic': technic,
-                            'report_date': report_date,
-                            'creation_date': datetime.now(),
-                            'kpi': kpi,
-                            'comment': comment,
-                            'user': user,
-                            'user_id': user_id,
-                        }
-                        results.append({'kpi': kpi,
-                        'comment': comment})
-                        dict_comment.append(obj)
+                            obj = {
+                                'key': key,
+                                'title': title,
+                                'lot': lot,
+                                'contract': contract,
+                                'technic': technic,
+                                'report_date': report_date,
+                                'creation_date': datetime.now(),
+                                'kpi': kpi,
+                                'comment': comment,
+                                'user': user,
+                                'user_id': user_id,
+                            }
+                            results.append({'kpi': kpi,
+                            'comment': comment})
+                            dict_comment.append(obj)
 
         df_comment=pd.DataFrame(dict_comment)     
 
