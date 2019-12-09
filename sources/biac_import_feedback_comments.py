@@ -42,6 +42,7 @@ VERSION HISTORY
 * 21 Nov 2019 1.1.0 **AMA** Can read lot 6/7 excel files
 * 25 Nov 2019 1.2.0 **AMA** Can read lot 6/7 docx files
 * 27 Nov 2019 1.3.0 **AMA** Removed one line of lot 6 and 7
+* 09 Dec 2019 1.4.0 **AMA** Fix the format of the KPI
 """  
 import re
 import json
@@ -69,7 +70,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -149,6 +150,12 @@ def getEntityObjXLS(es,entity):
         if row["_source"]["key"]==entity:
             return row["_source"]
     return None
+
+def cleankpi(x):
+    try:
+        return int(x)
+    except:
+        return x
 
 ################################################################################
 def messageReceived(destination,message,headers):
@@ -319,7 +326,7 @@ def messageReceivedXLSX(destination,message,headers):
                 'technic': entity.get("technic",""),
                 'report_date': reportdate,                
                 'creation_date': datetime.now(),
-                'kpi': result["kpi"],
+                'kpi': cleankpi(result["kpi"]),
                 'result': result["result"],
                 'user': user,
                 'user_id': user_id,
