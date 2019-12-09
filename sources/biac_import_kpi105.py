@@ -30,6 +30,7 @@ VERSION HISTORY
 * 30 Oct 2019 1.0.1 **VME** Buf fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.2 **AMA** Use data get rest api exports_info function to get record ids
 * 30 Oct 2019 1.0.3 **AMA** Fix a bug that added an additional day during the daylight saving month
+* 09 Dec 2019 1.0.4 **VME** Fix a bug with last day of month (december) + replace pte and etp by es_helper
 """ 
 import re
 import sys
@@ -52,8 +53,7 @@ from functools import wraps
 from datetime import datetime
 from datetime import timedelta
 from calendar import monthrange
-from lib import elastictopandas as etp
-from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 from amqstompclient import amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
@@ -63,7 +63,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI105_IMPORTER"
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 QUEUE   = ["KPI105_IMPORT"]
 
 def log_message(message):
@@ -115,13 +115,13 @@ def mkFirstOfMonth(dtDateTime):
     #into a datetime object
     return mkDateTime(formatDate(dtDateTime,"%Y-%m-01"))
 
-def mkLastOfMonth(dtDateTime):
-    dYear = dtDateTime.strftime("%Y")        #get the year
-    dMonth = str(int(dtDateTime.strftime("%m"))%12+1)#get next month, watch rollover
-    dDay = "1"                               #first day of next month
-    nextMonth = mkDateTime("%s-%s-%s"%(dYear,dMonth,dDay))#make a datetime obj for 1st of next month
-    delta = timedelta(seconds=1)    #create a delta of 1 second
-    return nextMonth - delta                 #subtract from nextMonth and return
+# def mkLastOfMonth(dtDateTime):
+#     dYear = dtDateTime.strftime("%Y")        #get the year
+#     dMonth = str(int(dtDateTime.strftime("%m"))%12+1)#get next month, watch rollover
+#     dDay = "1"                               #first day of next month
+#     nextMonth = mkDateTime("%s-%s-%s"%(dYear,dMonth,dDay))#make a datetime obj for 1st of next month
+#     delta = timedelta(seconds=1)    #create a delta of 1 second
+#     return nextMonth - delta                 #subtract from nextMonth and return
 
 def add_months(sourcedate, months):
     month = sourcedate.month - 1 + months
@@ -271,9 +271,7 @@ def computeStats105(lot=2):
             for date in dates:
                 value=0
                 if date in objs:
-                    if ronde in objs[date]:
-    #                    print(rondestats[ronde])
-#                        rondestats[ronde]["done"]+=1                    
+                    if ronde in objs[date]:              
                         value=1                
                 
 
@@ -459,9 +457,7 @@ def loadKPI105():
                 df_all.to_excel(writer)
 
             
-
-
-            pte.pandas_to_elastic(es, df_all)
+            es_helper.dataframe_to_elastic(es, df_all)
 
             obj={
                 'start': min(df_all['_timestamp']),
@@ -512,12 +508,13 @@ def compute_kpi105_monthly(start, end):
 
 
     start = mkFirstOfMonth(start)
-    end = mkLastOfMonth(end)
+    end = end.replace(day=calendar.monthrange(end.year, end.month)[1])
 
     logger.info(start)
     logger.info(end)
     
-    df_kpi105 = etp.genericIntervalSearch(es, 'biac_kpi105', query='*', start=start, end=end)
+    # df_kpi105 = etp.genericIntervalSearch(es, 'biac_kpi105', query='*', start=start, end=end)
+    df_kpi105 = es_helper.elastic_to_dataframe(es, 'biac_kpi105', query='*', start=start, end=end)
     df_kpi105['month'] = pd.to_datetime(df_kpi105['@timestamp'], unit='ms').dt.strftime('%Y-%m')
     df_kpi105=df_kpi105.groupby(['lot', 'month', 'ronde_number']).count()[['@timestamp']].rename(columns={'@timestamp': 'count'}).reset_index()
 
@@ -574,7 +571,9 @@ def compute_kpi105_monthly(start, end):
         df_merged['_id'] = df_merged['_id'].apply(lambda x: 'lot' + str(int(lot)) + '_' + str(x))
 
         logger.info("Storing "*20)
-        pte.pandas_to_elastic(es, df_merged)
+        # pte.pandas_to_elastic(es, df_merged)
+
+        es_helper.dataframe_to_elastic(es, df_merged)
 
         records_number += len(df_merged)
 

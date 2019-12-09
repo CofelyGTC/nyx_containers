@@ -30,6 +30,7 @@ VERSION HISTORY
 * 30 Oct 2019 0.0.8 **VME** Buf fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 * 30 Oct 2019 1.0.1 **AMA** Fix a bug that added an additional day during the daylight saving month
+* 09 Dec 2019 1.0.2 **VME** Fix a bug with end of month
 """       
 import re
 import sys
@@ -66,7 +67,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.0.2"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -461,7 +462,7 @@ def compute_kpi103_monthly(start, end):
 
 
     start = mkFirstOfMonth(start)
-    end = mkLastOfMonth(end)
+    end = end.replace(day=calendar.monthrange(end.year, end.month)[1])
 
     logger.info(start)
     logger.info(end)

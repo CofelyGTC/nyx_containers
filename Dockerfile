@@ -16,18 +16,14 @@ RUN rm -d -r /opt/sources/*.sh
 #RUN rm -d -r /opt/sources/reports
 
 WORKDIR /opt/sources
-CMD ["python", "nyx_xlsimporter.py"]
+# CMD ["python", "nyx_xlsimporter.py"]
 #CMD ["python", "nyx_reportrunner.py"]
 #CMD ["python", "biac_compute_instawork.py"]
 #CMD ["python", "biac_import_instawork.py"]
 #CMD ["python", "biac_import_spot_567.py"]
 # CMD ["python", "biac_import_kizeo.py"]
 # CMD ["python", "biac_import_feedback_comments.py"]
-<<<<<<< HEAD
-#CMD ["python", "biac_import_kpi105.py"]
-=======
 # CMD ["python", "biac_import_kpi105.py"]
->>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
 #CMD ["python", "biac_month_kizeo.py"]
 #CMD ["python", "biac_month_kizeo_2.py"]
 #CMD ["python", "biac_import_bags.py"]
@@ -69,10 +65,6 @@ CMD ["python", "nyx_xlsimporter.py"]
 #CMD ["python", "gtc_optibox_computed.py"]
 #CMD ["python", "gtc_cleaned_data.py"]
 #CMD ["python", "gtc_recompute_target_lutosa.py"]
-#CMD ["python", "biac_import_spot_4.py"]
+# CMD ["python", "biac_import_spot_4.py"]
 #CMD ["python", "biac_import_kpi102_lot4.py"]
-<<<<<<< HEAD
-CMD ["python", "gtc_import_telephony.py"]
-=======
-CMD ["python", "biac_import_availabilities.py"]
->>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
+# CMD ["python", "biac_import_availabilities.py"]

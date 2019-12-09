@@ -10,6 +10,7 @@ Sends:
 * /topic/BIAC_AVAILABILITY_IMPORTED
 * /topic/BIAC_AVAILABILITY_LOT5_IMPORTED
 * /topic/BIAC_AVAILABILITY_LOT7_IMPORTED
+* /topic/BIAC_AVAILABILITY_LOT3_IMPORTED
 
 Listens to:
 -------------------------------------
@@ -19,6 +20,7 @@ Listens to:
 * /queue/BIAC_FILE_6_400HZ
 * /queue/BIAC_FILE_5_tri
 * /queue/BIAC_FILE_7_screening
+* /queue/BIAC_FILE_3_Lot3Availability
 
 Collections:
 -------------------------------------
@@ -33,6 +35,7 @@ VERSION HISTORY
 * 01 Jun 2019 1.0.18 **PDB** Add Lot7 importation
 * 19 Nov 2019 1.0.19 **VME** Bug fixing on dates
 * 27 Noc 2019 1.0.21 **PDB** Bug Fixing
+* 05 Dec 2019 1.0.22 **VME** Add Lot3 importation
 """
 
 import json
@@ -58,9 +61,10 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.21"
+VERSION="1.0.22"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
-QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
+QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", 
+        "/queue/BIAC_FILE_3_Lot3Availability", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
 INDEX_PATTERN = "biac_availability"
 
 
@@ -263,20 +267,10 @@ def messageReceived(destination,message,headers):
     dfdata.reset_index(inplace=True)
 
     if interval == 'week':
-        # dfdata['dt'] = dfdata['EQ'].apply(
-        #     lambda x: first_day_year + ((x-1)*timedelta(days=7)))
         dfdata['dt'] = dfdata.apply(
             lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=7*(row['EQ']-1)), axis=1)
 
-    # elif interval == 'day' and lot=='6':
-    #     # dfdata['dt'] = dfdata['EQ'].apply(
-    #     #     lambda x: startDate + ((x)*timedelta(days=1)))
-    #     dfdata['dt'] = dfdata.apply(
-    #         lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=row['EQ']), axis=1)
-
     elif interval == 'day':
-        # dfdata['dt'] = dfdata['EQ'].apply(
-        #     lambda x: startDate + ((x-1)*timedelta(days=1)))
         dfdata['dt'] = dfdata.apply(
             lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=(row['EQ']-1)), axis=1)
 
@@ -301,6 +295,10 @@ def messageReceived(destination,message,headers):
 
     if lot != '6':
         regex = r"^gt[xh]"
+
+    
+    if lot == '3':
+        regex = r"^gt[a]"
 
     if lot == '6':
         for index, col in dfdata.iteritems():
@@ -439,7 +437,9 @@ def messageReceived(destination,message,headers):
     logger.info('sending message to /topic/BIAC_AVAILABILITY_IMPORTED')
     logger.info(obj)
 
-    if lot == '5':
+    if lot == '3':
+        conn.send_message('/topic/BIAC_AVAILABILITY_LOT3_IMPORTED', json.dumps(obj))
+    elif lot == '5':
         conn.send_message('/topic/BIAC_AVAILABILITY_LOT5_IMPORTED', json.dumps(obj))
     elif lot == '7':
         conn.send_message('/topic/BIAC_AVAILABILITY_LOT7_IMPORTED', json.dumps(obj))
