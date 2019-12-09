@@ -50,7 +50,7 @@ def pandas_to_elastic(es, df):
             action = {}
 
             action["index"] = {"_index": row["_index"],
-                               "_type": "_doc"}
+                               "_type": "doc"}
             if "_id" in row:
                 action["index"]["_id"]=row["_id"]
             

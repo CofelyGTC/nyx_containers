@@ -48,7 +48,6 @@ import threading
 import os,logging
 import numpy as np
 import pandas as pd
-
 from functools import wraps
 
 from datetime import date
@@ -467,7 +466,8 @@ def compute_kpi103_monthly(start, end):
     logger.info(start)
     logger.info(end)
     
-    df_kpi103 = etp.genericIntervalSearch(es, 'biac_kpi103', query='*', start=start, end=end,timestampfield="date")
+    # df_kpi103 = etp.genericIntervalSearch(es, 'biac_kpi103', query='*', start=start, end=end,timestampfield="date")
+    df_kpi103 = es_helper.elastic_to_dataframe(es, 'biac_kpi103', query='*', start=start, end=end,timestampfield="date")
 
     #logger.info(df_kpi103['date'].dt)
     
@@ -514,7 +514,7 @@ def compute_kpi103_monthly(start, end):
     df_merged.columns=['month', 'ronde_number', 'number_of_days', '_id', 'ronde_done', 'percent', '_index', '_timestamp']
     df_merged['ronde_done'] = df_merged['ronde_done'].astype(int)
 
-    pte.pandas_to_elastic(es, df_merged)
+    es_helper.dataframe_to_elastic(es, df_merged)
 
     endtime = time.time()
     log_message("Compute monthly KPI103 (process biac_import_kpi103.py) finished. Duration: %d Records: %d." % (endtime-starttime, df_merged.shape[0]))   

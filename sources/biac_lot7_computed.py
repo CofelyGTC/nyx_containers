@@ -1,27 +1,49 @@
+"""
+BIAC LOT 7 COMPUTED
+====================================
+Read Data from biac_availability* (-equipment:obw AND lot:7) to compute biac_month_availability. Computed data monthly, weekly and globaly
+
+
+Listens to:
+-------------------------------------
+
+* /topic/BIAC_AVAILABILITY_LOT7_IMPORTED
+
+Collections:
+-------------------------------------
+
+* **biac_month_availability** 
+
+VERSION HISTORY
+===============
+
+* 09 Dec 2019 1.0.9 **VME** Bug fixing previous month
+"""   
+
 import json
+import math
 import time
 import uuid
 import base64
+import tzlocal
 import threading
 import os,logging
+import numpy as np
 import pandas as pd
 
-from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+from copy import deepcopy
+from functools import wraps
 from datetime import datetime
 from datetime import timedelta
-from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
-from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
-import numpy as np
-
-import math
-from copy import deepcopy
+from elastic_helper import es_helper 
 from pandas.io.json import json_normalize
-import tzlocal
+from amqstompclient import amqstompclient
+from logging.handlers import TimedRotatingFileHandler
+from logstash_async.handler import AsynchronousLogstashHandler
+from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
-VERSION="1.0.8"
+
+VERSION="1.0.9"
 MODULE="BIAC_LOT7_COMPUTED"
 QUEUE=["/topic/BIAC_AVAILABILITY_LOT7_IMPORTED"]
 
@@ -204,7 +226,6 @@ def messageReceived(destination,message,headers):
     obj = json.loads(message)
 
     start_ts = obj['start_ts']
-    #end_ts = obj['end_ts']
     end_ts = int(datetime.timestamp(now)+7200)*1000
 
 
@@ -237,14 +258,9 @@ def messageReceived(destination,message,headers):
     df_grouped['year_week'] = df_grouped['year_week'].apply(lambda x: str(x))
     df_grouped.index = df_grouped['equipment'] + \
         df_grouped['month'].str.replace('-', '')
-        
-    #+'_W' + df_grouped['year_week'].str.replace('-', '')
 
     df_grouped['year'] = df_grouped['month'].apply(lambda x: x[:4])
 
-    #df_grouped['@timestamp'] = df_grouped.apply(lambda row: week_to_ts(row['week'], row['month']), axis=1)
-    #df_grouped['@timestamp'] = df_grouped['@timestamp'].apply(
-    #    lambda x: int(x.timestamp()*1000))
     df_grouped['str_max_week'] = df_grouped['max_week'].apply(
         get_str_max_week)
     df_grouped['str_max_week_abs'] = df_grouped.apply(
@@ -322,7 +338,7 @@ def messageReceived(destination,message,headers):
         dfs.append(df)
     
     for df in dfs:
-        pte.pandas_to_elastic(es, df)
+        es_helper.dataframe_to_elastic(es, df)
 
     logger.info("<== "*10)
 
