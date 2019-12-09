@@ -24,6 +24,7 @@ VERSION HISTORY
 * 25 Nov 2019 0.0.4 **VME** Adding lot4 (comes from another collection biac_spot_lot4)
 * 27 Nov 2019 0.0.5 **VME** Bug fixing
 * 04 Dec 2019 0.0.6 **VME** Fix buf when biac_spot_lot4 doesnt exist
+* 09 Dec 2019 1.0.0 **VME** Replacing pte by es_helper
 """  
 import re
 import json
@@ -45,15 +46,13 @@ from functools import wraps
 from datetime import datetime
 from datetime import timedelta
 from elastic_helper import es_helper
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
 from amqstompclient import amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 MODULE  = "BIAC_MONTH_KIZEO_2"
-VERSION = "0.0.6"
+VERSION = "1.0.0"
 QUEUE   = ["/topic/BIAC_KIZEO_IMPORTED_2"]
 
 def log_message(message):
@@ -156,7 +155,6 @@ def messageReceived(destination,message,headers):
                 'not_conform': 0,
                 'check': 0,
                 '@timestamp': datetime(2019, 1, 1, tzinfo=local_timezone),
-                # '@timestamp': '2019-01-01 00:00:00+01:00',
             }
 
             df_lot4 = pd.DataFrame.from_dict({0: obj.values()}, orient='index', columns=obj.keys())
@@ -199,7 +197,7 @@ def messageReceived(destination,message,headers):
 
         logger.info(df_grouped)
 
-        pte.pandas_to_elastic(es, df_grouped)
+        es_helper.dataframe_to_elastic(es, df_grouped)
 
     except Exception as e:
         endtime = time.time()
