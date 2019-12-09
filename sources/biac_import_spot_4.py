@@ -23,6 +23,7 @@ VERSION HISTORY
 * 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 * 27 Nov 2019 1.0.1 **VME** Delete data before inserting to weakly handle the deletion of records in Kizeo + send message to kizeo month 2
 * 03 Dec 2019 1.0.2 **VME** Delete data even when no data from kizeo 
+* 05 Dec 2019 1.0.3 **VME** Bug fix
 """  
 import re
 import sys
@@ -58,7 +59,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_SPOT4_IMPORTER"
-VERSION = "1.0.1"
+VERSION = "1.0.3"
 QUEUE   = []
 
 localtz = timezone('Europe/Paris')
@@ -212,11 +213,12 @@ def loadKizeo():
             conn.send_message('/topic/BIAC_KIZEO_IMPORTED', json.dumps(obj))
             conn.send_message('/topic/BIAC_KIZEO_IMPORTED_2', json.dumps(obj))
 
-        try:
-            es.indices.delete('biac_spot_lot4')
-        except:
-            logger.info('already no data')
-            pass      
+        else:
+            try:
+                es.indices.delete('biac_spot_lot4')
+            except:
+                logger.info('already no data')
+                pass      
 
     except Exception as e:
         endtime = time.time()
