@@ -1,27 +1,51 @@
+"""
+BIAC LOT 5 COMPUTED
+====================================
+Read Data from biac_availability* (-equipment:obw AND lot:5) to compute biac_month_availability. Computed data monthly, weekly and globaly
+
+
+Listens to:
+-------------------------------------
+
+* /topic/BIAC_AVAILABILITY_LOT5_IMPORTED
+
+Collections:
+-------------------------------------
+
+* **biac_month_availability** 
+
+VERSION HISTORY
+===============
+
+* 09 Dec 2019 1.0.8 **VME** Bug fixing previous month
+* 09 Dec 2019 1.0.9 **VME** Replacing pte by es_helper
+"""   
+
+
 import json
 import time
+import math
 import uuid
 import base64
+import tzlocal
 import threading
 import os,logging
+import numpy as np
 import pandas as pd
 
-from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+from copy import deepcopy
+from functools import wraps
 from datetime import datetime
 from datetime import timedelta
-from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
-from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
-import numpy as np
-
-import math
-from copy import deepcopy
+from elastic_helper import es_helper 
+from amqstompclient import amqstompclient
 from pandas.io.json import json_normalize
-import tzlocal
+from logging.handlers import TimedRotatingFileHandler
+from logstash_async.handler import AsynchronousLogstashHandler
+from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
-VERSION="1.0.7"
+
+VERSION="1.0.9"
 MODULE="BIAC_LOT5_COMPUTED"
 QUEUE=["/topic/BIAC_AVAILABILITY_LOT5_IMPORTED"]
 
@@ -142,8 +166,8 @@ def getPreviousMonth(lastmonth):
     year = int(lastmonth[:4])
     month = int(lastmonth[-2:])
     
-    if month == 12:
-        month = 1
+    if month == 1:
+        month = 12
         year = year-1
     else:
         month -=1
@@ -306,7 +330,7 @@ def messageReceived(destination,message,headers):
     dfs.append(kpi5)
 
     for df in dfs:
-        pte.pandas_to_elastic(es, df)
+        es_helper.dataframe_to_elastic(es, df)
 
     logger.info("<== "*10)
 

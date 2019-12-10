@@ -18,6 +18,7 @@ VERSION HISTORY
 ===============
 
 * 01 Aug 2019 1.0.14 **VME** Bug fixing when month switching
+* 09 Dec 2019 1.0.15 **VME** Bug fixing previous month
 """   
 
 import json
@@ -43,7 +44,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 
 
-VERSION="1.0.14"
+VERSION="1.0.15"
 MODULE="BIAC_MONTH_AVAILABILITY"
 QUEUE=["/topic/BIAC_AVAILABILITY_IMPORTED"]
 
@@ -232,8 +233,8 @@ def getPreviousMonth(lastmonth):
     year = int(lastmonth[:4])
     month = int(lastmonth[-2:])
     
-    if month == 12:
-        month = 1
+    if month == 1:
+        month = 12
         year = year-1
     else:
         month -=1
