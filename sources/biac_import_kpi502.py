@@ -156,7 +156,7 @@ def computeReport(row):
     if row["Sheet"]=="Lot 4":
         return "Lot4 (BACDNB)"        
     
-    res=rps.getKPI500Config(row['Cc 5'], row['BAC Service'])
+    res=rp.getKPI500Config(row['Cc 5'], row['BAC Service'])
     if res==None:
         logger.info(" %s => %s  "%(row['Cc 5'], row['BAC Service']))
         return "NA"
