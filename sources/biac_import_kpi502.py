@@ -35,6 +35,7 @@ VERSION HISTORY
 * 16 Sep 2019 0.1.0 **AMA** Do no longer keep data below < Mai 2018
 * 19 Sep 2019 0.1.1 **AMA** Do no longer keep data below < Mai 2018
 * 23 Sep 2019 0.1.2 **AMA** Fix a bug that prevented the original collection to be erased properly
+* 10 Dec 2020 1.0.0 **AMA** Use elastic helper
 """
 import re
 import json
@@ -47,8 +48,7 @@ import os,logging
 import numpy as np
 import pandas as pd
 
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
+from elastic_helper import es_helper 
 from lib import reporthelper as rp
 from logging.handlers import TimedRotatingFileHandler
 from amqstompclient import amqstompclient
@@ -56,13 +56,12 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 from functools import wraps
-from lib import pandastoelastic as pte
 from dateutil.relativedelta import relativedelta
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.1.2"
+VERSION="1.0.0"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502"]
 
@@ -310,7 +309,8 @@ def messageReceived(destination,message,headers):
 
         res4tabledf=pd.DataFrame(res4table)  
         #print(res4tabledf)
-        pte.pandas_to_elastic(es,res4tabledf)
+        es_helper.dataframe_to_elastic(es,res4tabledf)
+        
         #A/0
         #res5=compute_previous_months(int(filedate.split("-")[1]),int(filedate.split("-")[0]),6,skip=0)
         res5=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),6,skip=0)
@@ -356,8 +356,8 @@ def messageReceived(destination,message,headers):
 
 # WRITE DATA
         res5tabledf=pd.DataFrame(res5table)  
-        pte.pandas_to_elastic(es,res5tabledf)
-        pte.pandas_to_elastic(es,dfdata2)
+        es_helper.dataframe_to_elastic(es,res5tabledf)
+        es_helper.dataframe_to_elastic(es,dfdata2)
 
         ## NOW COMPUTE MONTH
 
@@ -388,7 +388,7 @@ def messageReceived(destination,message,headers):
         
         logger.info("Waiting for deletion to finish")
         time.sleep(3)
-        df_kpi502 = etp.genericIntervalSearch(es,"biac_kpi502",query='ShortStatusFU: Actievereist AND Month: '+goodmonth)
+        df_kpi502 = es_helper.elastic_to_dataframe(es,"biac_kpi502",query='ShortStatusFU: Actievereist AND Month: '+goodmonth)
         df_kpi502_4= df_kpi502[df_kpi502["ShortStatus"]==4]
 
         df_kpi502_4_overdue=df_kpi502_4[df_kpi502_4["MonthFU"].str.contains("OVERDUE")].shape[0]
@@ -508,10 +508,10 @@ def messageReceived(destination,message,headers):
 
         df_month_kpi502=pd.DataFrame(recs+[firerec])
 
-        pte.pandas_to_elastic(es,df_month_kpi502)
+        es_helper.dataframe_to_elastic(es,df_month_kpi502)
 
         df_month_kpi502_stats=pd.DataFrame(recsokko)
-        pte.pandas_to_elastic(es,df_month_kpi502_stats)
+        es_helper.dataframe_to_elastic(es,df_month_kpi502_stats)
 
     except Exception as e:
         endtime = time.time()
