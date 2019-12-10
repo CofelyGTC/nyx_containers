@@ -36,6 +36,7 @@ VERSION HISTORY
 * 19 Nov 2019 1.0.19 **VME** Bug fixing on dates
 * 27 Noc 2019 1.0.21 **PDB** Bug Fixing
 * 05 Dec 2019 1.0.22 **VME** Add Lot3 importation
+* 10 Dec 2019 1.0.23 **VME** Fix bug weekly
 """
 
 import json
@@ -61,7 +62,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.22"
+VERSION="1.0.23"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", 
         "/queue/BIAC_FILE_3_Lot3Availability", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
@@ -267,8 +268,19 @@ def messageReceived(destination,message,headers):
     dfdata.reset_index(inplace=True)
 
     if interval == 'week':
+
+        last_row = dfdata[dfdata['EQ'] == dfdata['EQ'].max()]
+
+        dfdata['EQ'] = dfdata['EQ'].values - 1
+
+        dfdata =  dfdata.append(last_row, ignore_index=True)
+
         dfdata['dt'] = dfdata.apply(
-            lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=7*(row['EQ']-1)), axis=1)
+            lambda row:  datetime.strptime(str(int(row['year']))+'-W'+str(int(row['EQ'])) + '-1', "%Y-W%W-%w"), axis=1)
+            # lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=7*(row['EQ']-1)), axis=1)
+
+        
+
 
     elif interval == 'day':
         dfdata['dt'] = dfdata.apply(
@@ -282,6 +294,10 @@ def messageReceived(destination,message,headers):
     dfdata = dfdata.resample('1d').pad()
 
     dfdata.reset_index(inplace=True)
+
+    if interval == 'week':
+        dfdata = dfdata[dfdata['EQ'] != dfdata['EQ'].max()]
+        dfdata['EQ'] = dfdata['EQ'].values + 1
 
     dfdata['week_of_month'] = dfdata.dt.apply(week_of_month)
     dfdata['_index'] = dfdata.dt.map(
