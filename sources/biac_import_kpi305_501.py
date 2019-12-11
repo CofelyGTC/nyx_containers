@@ -85,7 +85,7 @@ def log_message(message):
 def computeReport(row):
     logger.info("Compute Report")
     logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
-    res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
+    res=rp.getKPI500Config(row["CofelyResp"],row["BACService"])
     if res==None:
         logger.error("BAD" *100)
         return "NA"

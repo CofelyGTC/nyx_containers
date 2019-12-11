@@ -37,7 +37,7 @@ WORKDIR /opt/sources
 #CMD ["python", "biac_month_availability.py"]
 #CMD ["python", "biac_lot7_computed.py"]
 #CMD ["python", "biac_lot5_computed.py"]
-#CMD ["python", "biac_import_kpi502.py"]
+CMD ["python", "biac_import_kpi502.py"]
 #CMD ["python", "lass_logis_dbfeeder.py"]
 #CMD ["python", "par_import_coswin.py"]
 #CMD ["python", "biac_import_maximo.py"]
