@@ -30,6 +30,7 @@ VERSION HISTORY
 * 09 Dec 2019 1.0.1 **VME** Replacing pte by es_helper
 * 10 Dec 2019 1.0.2 **VME** Fix bug due to typo
 * 10 Dec 2019 1.0.3 **VME** Undo 1.0.2 that was not a typo
+* 11 Dec 2019 1.0.4 **VME** Fix a bug 1.0.4 that prevented lot 1 to work properly
 """  
 
 import re
@@ -56,7 +57,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.3"
+VERSION="1.0.4"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -460,10 +461,12 @@ def messageReceived(destination,message,headers):
                         break
                     logger.info("Lot:"+lot)
 
-                    if str(lot) !="4":
-                        dfdata["key"]=dfdata.apply(computeReport,axis=1)
+                    if "4" in str(lot):
+                        dfdata["key"]="Lot4 (BACDNB)"                    
+                    elif "1" in str(lot):
+                        dfdata["key"]="Lot1 (BACHEA)"                    
                     else:
-                        dfdata["key"]="Lot4 (BACDNB)"
+                        dfdata["key"]=dfdata.apply(computeReport,axis=1)
 
 
                     dfdata["FileLot"]=lot
