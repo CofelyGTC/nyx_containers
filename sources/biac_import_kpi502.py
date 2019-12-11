@@ -35,7 +35,7 @@ VERSION HISTORY
 * 16 Sep 2019 0.1.0 **AMA** Do no longer keep data below < Mai 2018
 * 19 Sep 2019 0.1.1 **AMA** Do no longer keep data below < Mai 2018
 * 23 Sep 2019 0.1.2 **AMA** Fix a bug that prevented the original collection to be erased properly
-* 10 Dec 2020 1.0.0 **AMA** Use elastic helper
+* 10 Dec 2020 1.0.1 **AMA** Use elastic helper
 """
 import re
 import json
@@ -61,7 +61,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502"]
 
@@ -155,7 +155,7 @@ def computeReport(row):
     if row["Sheet"]=="Lot 4":
         return "Lot4 (BACDNB)"        
     
-    res=rp.getKPI500Config(row['Cc 5'], row['BAC Service'])
+    res=rps.getKPI500Config(row['Cc 5'], row['BAC Service'])
     if res==None:
         logger.info(" %s => %s  "%(row['Cc 5'], row['BAC Service']))
         return "NA"
@@ -589,6 +589,8 @@ def messageReceived(destination,message,headers):
 
 
     logger.info("<== "*10)
+
+rps=None
 
 if __name__ == '__main__':    
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")

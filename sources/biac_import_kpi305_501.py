@@ -82,7 +82,7 @@ def log_message(message):
 def computeReport(row):
     logger.info("Compute Report")
     logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
-    res=rp.getKPI500Config(row["CofelyResp"],row["BACService"])
+    res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
     if res==None:
         logger.error("BAD" *100)
         return "NA"
@@ -620,6 +620,8 @@ def messageReceived(destination,message,headers):
         
 
     logger.info("<== "*10)
+
+rps=None
 
 if __name__ == '__main__':    
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
