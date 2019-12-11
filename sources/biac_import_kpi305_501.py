@@ -28,6 +28,8 @@ VERSION HISTORY
 * 24 Oct 2019 0.0.2 **AMA** Do no longer crash with empty data frames. Add the lot4 if it does not exist yet.
 * 12 Nov 2019 1.0.0 **AMA** Match report author and incoming 501/305 value without the white spaces (Van Der Veken issue)
 * 09 Dec 2019 1.0.1 **VME** Replacing pte by es_helper
+* 10 Dec 2019 1.0.2 **VME** Fix bug due to typo
+* 10 Dec 2019 1.0.3 **VME** Undo 1.0.2 that was not a typo
 """  
 
 import re
@@ -54,11 +56,12 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.1"
+VERSION="1.0.3"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
 goodmonth="NA"
+rps=None
 
 def reorderMonth(x):
     if x.find("-")==4:
