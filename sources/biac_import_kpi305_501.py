@@ -26,7 +26,11 @@ VERSION HISTORY
 ===============
 
 * 24 Oct 2019 0.0.2 **AMA** Do no longer crash with empty data frames. Add the lot4 if it does not exist yet.
-* 12 NOV 2019 1.0.0 **AMA** Match report author and incoming 501/305 value without the white spaces (Van Der Veken issue)
+* 12 Nov 2019 1.0.0 **AMA** Match report author and incoming 501/305 value without the white spaces (Van Der Veken issue)
+* 09 Dec 2019 1.0.1 **VME** Replacing pte by es_helper
+* 10 Dec 2019 1.0.2 **VME** Fix bug due to typo
+* 10 Dec 2019 1.0.3 **VME** Undo 1.0.2 that was not a typo
+* 11 Dec 2019 1.0.4 **VME** Fix a bug 1.0.4 that prevented lot 1 to work properly
 """  
 
 import re
@@ -40,25 +44,25 @@ import os,logging
 import numpy as np
 import pandas as pd
 
-from amqstompclient import amqstompclient
-from datetime import datetime
 from datetime import date
-from datetime import timedelta
 from functools import wraps
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
+from datetime import datetime
+from datetime import timedelta
+from lib import reporthelper as rp
+from elastic_helper import es_helper 
+from amqstompclient import amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
-from lib import reporthelper as rp
 
 
-VERSION="1.0.0"
+VERSION="1.0.4"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
 goodmonth="NA"
+rps=None
 
 def reorderMonth(x):
     if x.find("-")==4:
@@ -94,7 +98,10 @@ def compute305():
     global goodmonth
     time.sleep(3)
 
-    orgdf=etp.genericIntervalSearch(es,"biac_kpi305",query="*",doctype="doc",start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),sort=None,timestampfield="CheckMonth")
+    orgdf = es_helper.elastic_to_dataframe(es,"biac_kpi305",query="*",
+                                            start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),
+                                            sort=None,timestampfield="CheckMonth")
+    # orgdf=etp.genericIntervalSearch(es,"biac_kpi305",query="*",doctype="doc",start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),sort=None,timestampfield="CheckMonth")
 
     months=orgdf["Month"].unique()
 
@@ -222,7 +229,10 @@ def compute501():
     time.sleep(5)
     logger.info(">>> COMPUTE 501 WAIT")
 
-    orgdf=etp.genericIntervalSearch(es,"biac_kpi501",query="*",doctype="doc",start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),sort=None,timestampfield="CheckMonth")
+    orgdf=es_helper.elastic_to_dataframe(es,"biac_kpi501",query="*",
+                                            start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),
+                                            sort=None,timestampfield="CheckMonth")
+    # orgdf=etp.genericIntervalSearch(es,"biac_kpi501",query="*",doctype="doc",start=datetime.now()-timedelta(days=365),end=datetime.now()+timedelta(days=365),sort=None,timestampfield="CheckMonth")
 
     months=orgdf["Month"].unique()
 
@@ -451,10 +461,12 @@ def messageReceived(destination,message,headers):
                         break
                     logger.info("Lot:"+lot)
 
-                    if str(lot) !="4":
-                        dfdata["key"]=dfdata.apply(computeReport,axis=1)
+                    if "4" in str(lot):
+                        dfdata["key"]="Lot4 (BACDNB)"                    
+                    elif "1" in str(lot):
+                        dfdata["key"]="Lot1 (BACHEA)"                    
                     else:
-                        dfdata["key"]="Lot4 (BACDNB)"
+                        dfdata["key"]=dfdata.apply(computeReport,axis=1)
 
 
                     dfdata["FileLot"]=lot
@@ -499,7 +511,7 @@ def messageReceived(destination,message,headers):
                     #DELETE COLUMNS WITH MIXED CONTENTS
                     del dfdata["SRPresentation"]
                     del dfdata["ReportDate"]
-                    pte.pandas_to_elastic(es, dfdata)
+                    es_helper.dataframe_to_elastic(es, dfdata)
                 else:
                     logger.info("Empty Data")        
             compute501()
@@ -593,7 +605,7 @@ def messageReceived(destination,message,headers):
             logger.info(dfdata.dtypes)
             logger.info("****="*30)
 
-            pte.pandas_to_elastic(es, dfdata)        
+            es_helper.dataframe_to_elastic(es, dfdata)        
             compute305()
 
             conn.send_message('/topic/BIAC_KPI305_IMPORTED', {})
@@ -614,6 +626,8 @@ def messageReceived(destination,message,headers):
         
 
     logger.info("<== "*10)
+
+rps=None
 
 if __name__ == '__main__':    
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")

@@ -28,6 +28,7 @@ VERSION HISTORY
 * 30 Oct 2019 0.0.21 **VME** Buf fixing r.text empty and better error log.
 * 30 Oct 2019 1.0.0  **AMA** Use data get rest api exports_info function to get record ids
 * 25 Nov 2019 1.0.1  **VME** change the end date of the message to other container that create monthly collections (replace max of the timestamp by now)
+* 09 Dec 2019 1.0.2  **VME** Replacing pte by es_helper
 """  
 import re
 import sys
@@ -48,7 +49,7 @@ import pandas as pd
 from functools import wraps
 from datetime import datetime
 from datetime import timedelta
-from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 from amqstompclient import amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
@@ -57,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -249,7 +250,7 @@ def create_default_records(es):
     df_all['_id'] = df_all.apply(lambda row: row['lot'] + '_' + str(row['kpi']) + '_' + str(row['screen_name']), axis=1)
 
     del df_all['technic']
-    pte.pandas_to_elastic(es, df_all)
+    es_helper.dataframe_to_elastic(es, df_all)
 
 
 
@@ -297,7 +298,7 @@ def create_default_records_2(es):
     df_all['_id'] = df_all.apply(lambda row: row['lot'] + '_' + str(row['kpi']) + '_' + str(row['screen_name']), axis=1)
     del df_all['technic']
 
-    pte.pandas_to_elastic(es, df_all)
+    es_helper.dataframe_to_elastic(es, df_all)
 
 ################################################################################
 def messageReceived(destination,message,headers):
