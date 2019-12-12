@@ -47,7 +47,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.6"
+VERSION="1.0.5"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -163,8 +163,7 @@ def messageReceived(destination,message,headers):
     file = 'dataFile.xlsm'
     dfrepdef = pd.read_excel(file, sheetname='REPDEF')
     dfdata = pd.read_excel(file, sheetname='REPORT', skiprows=7)
-    #logger.info(dfdata)
-    filter_col = [col for col in dfdata if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK') or col.startswith('Lot')]
+    filter_col = [col for col in dfdata if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK')]
     columns = ['Unnamed: 2', 'Unnamed: 3', 'EQ']
     columns2 = columns + filter_col
     dfdata2 = dfdata[columns2]
@@ -181,7 +180,6 @@ def messageReceived(destination,message,headers):
     bulkbody = ''
     for index, row in dfdata2.iterrows():
         for col in row.index:
-            print(col)
             if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK') or col.startswith('Lot'):
                 #print(col+ ':'+str(row[col]))
                 start_date = getTimestamp(row.startDate)

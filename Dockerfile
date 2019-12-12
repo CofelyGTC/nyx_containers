@@ -45,7 +45,7 @@ WORKDIR /opt/sources
 #CMD ["python", "gtc_sites_data.py"]
 #CMD ["python", "biac_lot2_monthly.py"]
 #CMD ["python", "biac_import_kpi103.py"]
-#CMD ["python", "biac_monthly_lot2.py"]
+CMD ["python", "biac_monthly_lot2.py"]
 #CMD ["python", "biac_import_kpi102.py"]
 #CMD ["python", "biac_import_waterloop.py"]
 #CMD ["python", "biac_lot2_monthly.py"]
