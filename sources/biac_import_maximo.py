@@ -32,6 +32,7 @@ VERSION HISTORY
 * 03 Jun 2019 1.0.20 **PDB** Finished version for basic applications
 * 01 Aug 2019 2.0.1 **AMA** Add Historical system
 * 01 Aug 2019 2.1.0 **AMA** Filter worktypes PM and ADM to two different collections.
+* 18 Dec 2019 2.1.1 **AMA** Added the KPI 503 field
 """
 
 import re
@@ -55,7 +56,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 from elastic_helper import es_helper 
 
-VERSION="2.1.0"
+VERSION="2.1.1"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -433,7 +434,8 @@ def messageReceived(destination,message,headers):
                 "overdue": overdue,
                 "actualFinishMax": actualFinishMax*1000,
                 "actualFinish": actualFinish*1000,
-                "KPI302": KPI302
+                "KPI302": KPI302,
+                "KPI503": KPI503
             }
 
             ispm=(worktype=="PM")

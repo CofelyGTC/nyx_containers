@@ -45,6 +45,7 @@ VERSION HISTORY
 * 03 Dec 2019 1.3.2 **VME** Fix bug with the user 
 * 05 Dec 2019 1.3.3 **VME** Fix bug multiple comments in same paragraph
 * 09 Dec 2019 1.4.0 **AMA** Fix the format of the KPI
+* 12 Dec 2019 1.4.1 **AMA** Force lot 1 all et lot 3 all to the appropriate contract.
 """  
 import re
 import json
@@ -72,7 +73,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.4.0"
+VERSION = "1.4.2"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -98,9 +99,11 @@ def set_xlsx_status(es,user,reporttype,reportdate):
         statusobj=es.get(index="biac_feedback_status",id=key,doc_type="doc")["_source"]
         statusobj["xlsx"]=True
         statusobj["user"]=user
+        statusobj["xlsx_date"]=datetime.utcnow().isoformat()+"Z"
     except:
         statusobj={"user":user,"reporttype":reporttype,"reportdate":reportdate,"xlsx":True,"docx":False,"sent":False,"creation_date":datetime.now()}
-    es.index(index="biac_feedback_status",doc_type="doc",body=statusobj,id=key)
+    res=es.index(index="biac_feedback_status",doc_type="doc",body=statusobj,id=key)
+    logger.info(res)
 
 def set_docx_status(es,user,reporttype,reportdate):
     key=(reportdate.strftime("%d%m%Y")+"_"+reporttype).lower().replace(" ","").replace(")","").replace("(","_")
@@ -109,6 +112,7 @@ def set_docx_status(es,user,reporttype,reportdate):
         statusobj=es.get(index="biac_feedback_status",id=key,doc_type="doc")["_source"]
         statusobj["docx"]=True
         statusobj["user"]=user
+        statusobj["docx_date"]=datetime.utcnow().isoformat()+"Z"
     except:
         statusobj={"user":user,"reporttype":reporttype,"reportdate":reportdate,"xlsx":False,"docx":True,"sent":False,"creation_date":datetime.now()}
     es.index(index="biac_feedback_status",doc_type="doc",body=statusobj,id=key)
@@ -488,7 +492,7 @@ def messageReceivedDOCX(destination,message,headers):
                             logger.info('         COMMENT: '+comment)
 
                             obj = {
-                                'key': key,
+                                'key': key.replace("Lot3 (All)","Lot3 (BACEXT)").replace("Lot1 (All)","Lot1 (BACHEA)"),
                                 'title': title,
                                 'lot': lot,
                                 'contract': contract,
