@@ -45,6 +45,7 @@ VERSION HISTORY
 * 03 Dec 2019 1.3.2 **VME** Fix bug with the user 
 * 05 Dec 2019 1.3.3 **VME** Fix bug multiple comments in same paragraph
 * 09 Dec 2019 1.4.0 **AMA** Fix the format of the KPI
+* 17 Dec 2019 1.5.0 **VME** Fix the format of the KPI in the recap mail
 """  
 import re
 import json
@@ -72,7 +73,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -311,7 +312,7 @@ def messageReceivedXLSX(destination,message,headers):
         results=[{"kpi":x[1][0],"result":x[1][1]} for x in nscore.iterrows()]
 
         
-        scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Resultaat:</b>"+str(x["result"])+ "</li>" for x in results])
+        scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"]).replace('.0', '')+" <b>Resultaat:</b>"+str(x["result"])+ "</li>" for x in results])
         scorebody="<ul>"+scorebody+"</ul>"
 
         returnmail={"mail":user_id, "results":results,"user":user,'reportdate_nl': reportdateNL,"reportdate":reportdate.strftime("%d/%m/%Y"),"scorebody":scorebody,"entity":entity}
@@ -516,7 +517,7 @@ def messageReceivedDOCX(destination,message,headers):
 
             es_helper.dataframe_to_elastic(es, df_comment)
 
-            scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"])+" <b>Commentaar:</b>"+str(x["comment"])+ "</li>" for x in results])
+            scorebody="".join(["<li><b>KPI:</b>"+str(x["kpi"]).replace('.0', '')+" <b>Commentaar:</b>"+str(x["comment"])+ "</li>" for x in results])
             scorebody="<ul>"+scorebody+"</ul>"
             returnmail={"mail":user_id, "results":results,"user":user,'reportdate_nl': reportdateNL,"reportdate":report_date.strftime("%d/%m/%Y"),"scorebody":scorebody,"title":title}
             logger.info(json.dumps(returnmail))
