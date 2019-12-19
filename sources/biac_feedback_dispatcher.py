@@ -27,6 +27,7 @@ VERSION HISTORY
 * 11 Sep 2019 0.0.4 **AMA** Changed the result ready check duration
 * 24 Sep 2019 0.0.5 **AMA** Improved the NL translation
 * 25 Sep 2019 0.0.6 **AMA** Changed time period to 60 days -> now
+* 16 Dec 2019 0.0.7 **VME** Adding tempo (24 hours) before sending the mail once xlsx and docx are here
 """ 
 import json
 import time
@@ -52,7 +53,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.6"
+VERSION="0.0.7"
 MODULE="BIAC_FEEDBACK_DISPATCHER"
 QUEUE=[]
 
@@ -103,122 +104,144 @@ def log_message(message):
 def checkCommentsStatus():
     logger.info(">>>>>>>> CHECKING FEEDBACK STATUS")
     start_dt,end_dt=get_month_day_range(datetime.now()-timedelta(days=60))
-    df = es_helper.elastic_to_dataframe(es,query="xlsx: true AND docx: true AND sent: false", index="biac_feedback_status", start=start_dt, end=datetime.now(),timestampfield="reportdate")
+    end_dt = datetime.now()
+    df = es_helper.elastic_to_dataframe(es,query="xlsx: true AND docx: true AND ((-_exists_:sent) OR sent:false)", 
+                                    index="biac_feedback_status", start=start_dt, end=end_dt,
+                                    timestampfield="reportdate", datecolumns=['xlsx_date', 'docx_date', 'reportdate'])
+
 
     if not df.empty:
-        for index,row in df.iterrows():
-            id=row["_id"]
-            logger.info("Executing record:"+id)
-            rec=es.get(index="biac_feedback_status",doc_type="doc",id=id)["_source"]            
-            logger.info(rec)
-            rec["sent"]=True            
+        now = datetime.now(pytz.timezone('Europe/Paris'))
+        date_window = (now - timedelta(hours=3))
 
-            creds={"token":"feedbackdispatcher",
-                "user":{"firstname":"Feedback",
-                        "lastname":"Dispatcher",
-                        "id":"FeedbackDispatcher",
-                        "login":"FeedbackDispatcher",
-                        "user":"FeedbackDispatcher",
-                        "language":"en",
-                        "privileges": ["admin"]
-                        
-                        }}
+        if 'xlsx_date' not in df.columns:
+            df['xlsx_date'] = None
 
-            report={
-                    "description" : "Generates the report of the Lot 1,2 and 3",
-                    "title":"Feedback KPI report Lot 1,2,3",
-                    "exec" : "./reports/pythondef/Lot2KPI.py",
-                    "icon" : "plane-departure",
-                    "output" : [
-                    "docx"
-                    ],
-                    "parameters" : [
-                    {
-                        "name" : "param1",
-                        "title" : "Date",
-                        "type" : "date",
-                        "value" : start_dt.isoformat()
-                    },
-                    {                    
-                        "name" : "param2",
-                        "title" : "Contract / Technic",
-                        "type" : "combo",
-                        "value" : row["reporttype"]
-                    },
-                    {
-                        "name" : "param3",
-                        "title" : "Type",
-                        "type" : "text",
-                        "value" : "Final"
-                    }
-                    ]
-                }
+        df['xlsx_date'] = df['xlsx_date'].fillna(date_window)
 
-            maanden=['Januari',
-                'Februari',
-                'Maart',
-                'April',
-                'Mei',
-                'Juni',
-                'Juli',
-                'Augustus',
-                'September',
-                'Oktober',
-                'November',
-                'December']
+        if 'docx_date' not in df.columns:
+            df['docx_date'] = None
 
-            task={
-                    "mailAttachmentName": "KPI rapport ${KPI} ${DATE}-val",
-                    "attachmentName" : "KPI rapport ${KPI} ${DATE}-val",
-                    "icon" : "file-excel",
-                    "mailSubject" : "SLA-KPI gevalideerde rapport ${DATE} ${YEAR} ${KPI}",
-                    "mailTemplate" : """
-                    <body>
-                    <h2>KPI gevalideerde rapport ${KPI} </h2>
-                    <br/>
-                    Goedemorgen,<br/>
-                    <br/>
-                    Hierbij het gevalideerde rapport van de KPI voor ${KPI}, met inbegrip van de commentaren en de nieuwe berekende scores.<br/>  
-                    Percentagewijzigingen, zoals deze tijdens de maandelijkse vergadering door BAC geaccepteerd werden, zijn in de overzichtstabel aangepast.
-                    De titel werd door 'Gevalideerd' vervangen en de naam van het rapport werd in "val"  veranderd.
-                    Het gevalideerde rapport moet behouden worden.
+        df['docx_date'] = df['docx_date'].fillna(date_window)
 
-                    <br/>      
+        df['last_update'] = df.apply(lambda row: max(row['docx_date'], row['xlsx_date']), axis=1)
 
-                    <br/>
-                    Mvg,<br/>
-                    <br/>
-                    <br/>
-                    <img border="0" width="81" height="42" style="width:.8437in;height:.4375in" id="CofelyLogo" src="cid:cofely_logo.png" alt="cofely_logo.png">
-                    <br/>
-                    </body>                                        
-                    """,
-                            "mailingList" : [                            
-                            ],          
+        df = df[df['last_update'] <= date_window]
+
+        if not df.empty:
+            for index, row in df.iterrows():
+                id=row["_id"]
+                logger.info("Executing record:"+id)
+                rec=es.get(index="biac_feedback_status",doc_type="doc",id=id)["_source"]            
+                logger.info(rec)
+                rec["sent"]=True            
+
+                creds={"token":"feedbackdispatcher",
+                    "user":{"firstname":"Feedback",
+                            "lastname":"Dispatcher",
+                            "id":"FeedbackDispatcher",
+                            "login":"FeedbackDispatcher",
+                            "user":"FeedbackDispatcher",
+                            "language":"en",
+                            "privileges": ["admin"]
+                            
+                            }}
+
+                report={
+                        "description" : "Generates the report of the Lot 1,2 and 3",
+                        "title":"Feedback KPI report Lot 1,2,3",
+                        "exec" : "./reports/pythondef/Lot2KPI.py",
+                        "icon" : "plane-departure",
+                        "output" : [
+                        "docx"
+                        ],
+                        "parameters" : [
+                        {
+                            "name" : "param1",
+                            "title" : "Date",
+                            "type" : "date",
+                            "value" : row['reportdate'].isoformat()
+                        },
+                        {                    
+                            "name" : "param2",
+                            "title" : "Contract / Technic",
+                            "type" : "combo",
+                            "value" : row["reporttype"]
+                        },
+                        {
+                            "name" : "param3",
+                            "title" : "Type",
+                            "type" : "text",
+                            "value" : "Final"
                         }
-            entity=getEntityObj(es,row["reporttype"])
-            for dest in entity["header"]["list"]:
-                if "email" in dest:                    
-                    task["mailingList"].append(dest["email"])
+                        ]
+                    }
 
-            #task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",start_dt.strftime("%B")))
-            task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",maanden [start_dt.month-1]).replace("${YEAR}",str(start_dt.year)))
+                maanden=['Januari',
+                    'Februari',
+                    'Maart',
+                    'April',
+                    'Mei',
+                    'Juni',
+                    'Juli',
+                    'Augustus',
+                    'September',
+                    'Oktober',
+                    'November',
+                    'December']
 
-            message={
-                    "id":"id_" + str(uuid.uuid4()),
-                    "creds":creds,
-                    "report":report,
-                    "privileges":["admin"],
-                    "task":task,
-                    "entity":entity,
-                    "mailAttachmentName":task["mailAttachmentName"],
-                    "mailSubject":task["mailSubject"]
-            }
-            logger.info(message)
-            conn.send_message("/queue/NYX_REPORT_STEP1",json.dumps(message))
+                task={
+                        "mailAttachmentName": "KPI rapport ${KPI} ${DATE}-val",
+                        "attachmentName" : "KPI rapport ${KPI} ${DATE}-val",
+                        "icon" : "file-excel",
+                        "mailSubject" : "SLA-KPI gevalideerde rapport ${DATE} ${YEAR} ${KPI}",
+                        "mailTemplate" : """
+                        <body>
+                        <h2>KPI gevalideerde rapport ${KPI} </h2>
+                        <br/>
+                        Goedemorgen,<br/>
+                        <br/>
+                        Hierbij het gevalideerde rapport van de KPI voor ${KPI}, met inbegrip van de commentaren en de nieuwe berekende scores.<br/>  
+                        Percentagewijzigingen, zoals deze tijdens de maandelijkse vergadering door BAC geaccepteerd werden, zijn in de overzichtstabel aangepast.
+                        De titel werd door 'Gevalideerd' vervangen en de naam van het rapport werd in "val"  veranderd.
+                        Het gevalideerde rapport moet behouden worden.
+
+                        <br/>      
+
+                        <br/>
+                        Mvg,<br/>
+                        <br/>
+                        <br/>
+                        <img border="0" width="81" height="42" style="width:.8437in;height:.4375in" id="CofelyLogo" src="cid:cofely_logo.png" alt="cofely_logo.png">
+                        <br/>
+                        </body>                                        
+                        """,
+                                "mailingList" : [                            
+                                ],          
+                            }
+                entity=getEntityObj(es,row["reporttype"])
+                for dest in entity["header"]["list"]:
+                    if "mail" in dest:                    
+                        task["mailingList"].append(dest["mail"])
+
+                #task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",start_dt.strftime("%B")))
+                task=json.loads(json.dumps(task).replace("${KPI}",entity["title"]).replace("${DATE}",maanden [row['reportdate'].month-1]).replace("${YEAR}",str(row['reportdate'].year)))
+
+                message={
+                        "id":"id_" + str(uuid.uuid4()),
+                        "creds":creds,
+                        "report":report,
+                        "privileges":["admin"],
+                        "task":task,
+                        "entity":entity,
+                        "mailAttachmentName":task["mailAttachmentName"],
+                        "mailSubject":task["mailSubject"]
+                }
+                logger.info(message)
+                conn.send_message("/queue/NYX_REPORT_STEP1",json.dumps(message))
 
 
-            es.index(index="biac_feedback_status",doc_type="doc",id=id,body=rec)
+                es.index(index="biac_feedback_status",doc_type="doc",id=id,body=rec)
 
 
 
@@ -300,8 +323,8 @@ if __name__ == '__main__':
 
             try:
                 
-                if lastrun+timedelta(seconds=60) <datetime.now():
-                    lastrun=datetime.now()
+                if lastrun < datetime.now():
+                    lastrun = datetime.now()+timedelta(seconds=60)
                     checkCommentsStatus()
                     
             except:

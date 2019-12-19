@@ -21,7 +21,6 @@ VERSION HISTORY
 ===============
 
 * 01 Aug 2019 1.0.5 **VME** Bug fixing : nan values + code cleaning
-* 12 Dec 2019 1.0.7 **VME** Bug fixing : KPI extraction from file name
 """  
 
 
@@ -48,7 +47,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.7"
+VERSION="1.0.5"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -164,8 +163,7 @@ def messageReceived(destination,message,headers):
     file = 'dataFile.xlsm'
     dfrepdef = pd.read_excel(file, sheetname='REPDEF')
     dfdata = pd.read_excel(file, sheetname='REPORT', skiprows=7)
-    #logger.info(dfdata)
-    filter_col = [col for col in dfdata if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK') or col.startswith('Lot')]
+    filter_col = [col for col in dfdata if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK')]
     columns = ['Unnamed: 2', 'Unnamed: 3', 'EQ']
     columns2 = columns + filter_col
     dfdata2 = dfdata[columns2]
@@ -212,17 +210,11 @@ def messageReceived(destination,message,headers):
                         "lot": lot,
                         "filename": filename,
                         "display": display,
+                        "kpi": filename[3:6],
                         "numInterval": int(row['EQ']),
                         "value": int(row[equipment]),
                         "floatvalue": row[equipment]
                     }
-
-                    if str(lot) == '2':
-                        newrec['kpi']= filename[3:6]
-                    else:
-                        newrec['kpi']= filename[7:10]
-
-
                     bulkbody += json.dumps(action)+"\r\n"
                     bulkbody += json.dumps(newrec) + "\r\n"
                 except:
