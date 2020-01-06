@@ -1,3 +1,28 @@
+"""
+BIAC GTC IMPORT TELEPHONY
+====================================
+
+This process decodes MITTEL log file and store recordxs into ealstic search./
+
+Listens to:
+-------------------------------------
+
+* /queue/TELEPHONY_IMPORT
+
+
+Collections:
+-------------------------------------
+
+* **telephony** (Raw Data)
+* **nyx_config_telephony** (Raw Data)
+
+
+
+VERSION HISTORY
+===============
+
+* 19 Dec 2019 1.0.8 **AMA** OutOther renamed. Added to doc
+"""  
 import json
 import time
 import uuid
@@ -24,7 +49,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 import tzlocal
 
-VERSION="1.0.5"
+VERSION="1.0.8"
 MODULE="GTC_IMPORT_TELEPHONY"
 QUEUE=["TELEPHONY_IMPORT"]
 
@@ -72,23 +97,16 @@ def messageReceived(destination,message,headers):
     if "file" in headers:
         logger.info("File:%s" %headers["file"])
         log_message("Import of file [%s] started." % headers["file"])
-
-<<<<<<< HEAD
+    
     dfconfig = es_helper.elastic_to_dataframe(es,index="nyx_config_telephony")
     dfconfig=dfconfig.set_index(["DnisNr"])
     dfconfight=dfconfig.to_dict('index')
-=======
-    mess = base64.b64decode(message)
-    mesin=mess.decode("utf-8", "ignore")
-    full=basefile+"\r\n"+mesin
->>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
 
     mess = base64.b64decode(message)
     df = None
 
     mesin=mess.decode("utf-8", "ignore")
 
-<<<<<<< HEAD
 #    te=pd.read_fwf(StringIO(full)
 ##               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
 #               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
@@ -117,19 +135,9 @@ def messageReceived(destination,message,headers):
 
     #te=te[89:]  # IMPORTANT ghet rid of the base template file
 
+
     te["Caller"]=te["Caller"].fillna("")
     te["Code"]=te["Code"].fillna("")
-=======
-    te=pd.read_fwf(StringIO(full)
-               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
-               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
-
-
-    te=te[100:]
-    te=te[89:]
-
-
->>>>>>> ec6eb76d3b3e0802a068501e704fa46f9b6eb672
     te['InternalCalled1']=te['Called'].str.replace(' ','')
     te['InternalCalled']=(te['InternalCalled1'].str.len()<6)
     te['InternalCaller1']=te['Caller'].str.replace(' ','')
@@ -178,7 +186,7 @@ def messageReceived(destination,message,headers):
                     calltype.append("Out")
 
             else:
-                calltype.append("OutOther")
+                calltype.append("Other")
 
     te['CallType']=calltype
     te['DurationSecond']=te['Duration']%100
@@ -202,10 +210,13 @@ def messageReceived(destination,message,headers):
     del te2["A12"]
     del te2["A13"]
     del te2["A14"]
-    del te2["A15"]
-    del te2["A16"]
-    del te2["A17"]
+    #del te2["A15"]
+    #del te2["A16"]
+    #del te2["A17"]
     del te2["A7"]
+    te2["A15"].fillna(0,inplace=True)
+    te2["A16"].fillna(0,inplace=True)
+    te2["A17"].fillna(0,inplace=True)
 
     te2["timestamp"]=te2["Date"]+te2["Hour"]
 
@@ -252,6 +263,10 @@ def messageReceived(destination,message,headers):
         obj["SolidusCalled"]=row["SolidusCalled"]
         obj["CallType"]=row["CallType"]
         obj["Rings"]=row["Rings"]
+
+        obj["A15"]=row["A15"]
+        obj["A16"]=row["A16"]
+        obj["A17"]=row["A17"]
 
         action["index"]={"_index":"telephony","_type":"doc","_id":str(int(row["Date2"].timestamp())*1000)+'_'+obj["Called"]+'_'+obj["Caller"]}
 
@@ -307,60 +322,58 @@ def messageReceived(destination,message,headers):
 
 ###################################################################################################################################################
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
-logger = logging.getLogger()
-
-lshandler=None
-
-if os.environ["USE_LOGSTASH"]=="true":
-    logger.info ("Adding logstash appender")
-    lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
-    lshandler.setLevel(logging.ERROR)
-    logger.addHandler(lshandler)
-
-handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
-                                when="d",
-                                interval=1,
-                                backupCount=30)
-
-logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
-handler.setFormatter( logFormatter )
-logger.addHandler(handler)
-
-logger.info("==============================")
-logger.info("Starting: %s" % MODULE)
-logger.info("Module:   %s" %(VERSION))
-logger.info("==============================")
 
 
-#>> AMQC
-server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
-                ,"heartbeats":(180000,180000),"earlyack":True}
-
-lastvaluecache={}
-dayvaluecache={}
-conn=amqstompclient.AMQClient(server
-    , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
-#conn,listener= amqHelper.init_amq_connection(activemq_address, activemq_port, activemq_user,activemq_password, "RestAPI",VERSION,messageReceived)
-connectionparameters={"conn":conn}
-
-file = open("./telephony/TelephonycleanSub2.bkp", "r")
-basefile= file.read()
 
 #>> ELK
 es=None
-logger.info (os.environ["ELK_SSL"])
-
-if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
-else:
-    host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
-    es = ES(hosts=[host_params])
 
 
 if __name__ == '__main__':    
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+    logger = logging.getLogger()
+
+    lshandler=None
+
+    if os.environ["USE_LOGSTASH"]=="true":
+        logger.info ("Adding logstash appender")
+        lshandler=AsynchronousLogstashHandler("logstash", 5001, database_path='logstash_test.db')
+        lshandler.setLevel(logging.ERROR)
+        logger.addHandler(lshandler)
+
+    handler = TimedRotatingFileHandler("logs/"+MODULE+".log",
+                                    when="d",
+                                    interval=1,
+                                    backupCount=30)
+
+    logFormatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s')
+    handler.setFormatter( logFormatter )
+    logger.addHandler(handler)
+
+    logger.info("==============================")
+    logger.info("Starting: %s" % MODULE)
+    logger.info("Module:   %s" %(VERSION))
+    logger.info("==============================")
+
+    #>> AMQC
+    server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
+                    ,"heartbeats":(180000,180000),"earlyack":True}
+
+    lastvaluecache={}
+    dayvaluecache={}
+    conn=amqstompclient.AMQClient(server
+        , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
+    connectionparameters={"conn":conn}
+    logger.info (os.environ["ELK_SSL"])
+
+    if os.environ["ELK_SSL"]=="true":
+        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
+        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    else:
+        host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
+        es = ES(hosts=[host_params])
+
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     while True:
         time.sleep(5)
