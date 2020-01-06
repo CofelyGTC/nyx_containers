@@ -28,6 +28,7 @@ VERSION HISTORY
 * 24 Sep 2019 0.0.5 **AMA** Improved the NL translation
 * 25 Sep 2019 0.0.6 **AMA** Changed time period to 60 days -> now
 * 16 Dec 2019 0.0.7 **VME** Adding tempo (24 hours) before sending the mail once xlsx and docx are here
+* 06 Jan 2019 0.0.8 **VME** Changing the .py to launch depending on the report
 """ 
 import json
 import time
@@ -53,7 +54,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.7"
+VERSION="0.0.8"
 MODULE="BIAC_FEEDBACK_DISPATCHER"
 QUEUE=[]
 
@@ -148,8 +149,8 @@ def checkCommentsStatus():
                             }}
 
                 report={
-                        "description" : "Generates the report of the Lot 1,2 and 3",
-                        "title":"Feedback KPI report Lot 1,2,3",
+                        "description" : "Generates the report of the",
+                        "title":"Feedback KPI report ",
                         "exec" : "./reports/pythondef/Lot2KPI.py",
                         "icon" : "plane-departure",
                         "output" : [
@@ -176,6 +177,18 @@ def checkCommentsStatus():
                         }
                         ]
                     }
+
+                report['title'] += row['reporttype']
+                report['description'] += row['reporttype']
+
+                if row['reporttype'] == 'Lot4 (BACDNB)':
+                    report['exec'] = './reports/pythondef/Lot4KPI.py'
+                elif row['reporttype'] == 'Lot5':
+                    report['exec'] = './reports/pythondef/Lot5KPI.py'
+                elif row['reporttype'] == 'Lot6':
+                    report['exec'] = './reports/pythondef/Lot6KPI.py'
+                elif row['reporttype'] == 'Lot7':
+                    report['exec'] = './reports/pythondef/Lot7KPI.py'
 
                 maanden=['Januari',
                     'Februari',
