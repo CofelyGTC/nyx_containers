@@ -74,7 +74,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.5.0"
+VERSION = "1.5.2"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
