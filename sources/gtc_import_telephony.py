@@ -22,6 +22,8 @@ VERSION HISTORY
 ===============
 
 * 19 Dec 2019 1.0.8 **AMA** OutOther renamed. Added to doc
+* 07 Jan 2019 1.1.0 **AMA** Format customized to match the raw log format
+* 08 Jan 2019 1.2.0 **AMA** Set file header if not present
 """  
 import json
 import time
@@ -49,7 +51,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 import tzlocal
 
-VERSION="1.0.8"
+VERSION="1.2.0"
 MODULE="GTC_IMPORT_TELEPHONY"
 QUEUE=["TELEPHONY_IMPORT"]
 
@@ -97,6 +99,9 @@ def messageReceived(destination,message,headers):
     if "file" in headers:
         logger.info("File:%s" %headers["file"])
         log_message("Import of file [%s] started." % headers["file"])
+    else:
+        headers["file"]="From_Rest_API"
+    
     
     dfconfig = es_helper.elastic_to_dataframe(es,index="nyx_config_telephony")
     dfconfig=dfconfig.set_index(["DnisNr"])
@@ -111,6 +116,24 @@ def messageReceived(destination,message,headers):
 ##               , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","A10","Desk","A12","A13","A14","A15","A16","A17"]
 #               ,delim_whitespace=True, header=None,converters={"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str})
 
+    # colspecs=[[0, 6],
+    #     [6, 13],
+    #     [13, 19],
+    #     [20, 24],#A4
+    #     [25, 27],#COde
+    #     [27, 30],#A6
+    #     [30, 37],#A7
+    #     [37, 57],#CALLED
+    #     [58, 88],#CALLER
+    #     [89, 96],#Rings
+    #     [97, 107],#DESK
+    #     [108, 123],#A12
+    #     [124, 133],#A13
+    #     [134, 138],#A14
+    #     [137, 143],#A15
+    #     [144, 155],
+    #     [156, 159]]
+
     colspecs=[[0, 6],
         [6, 13],
         [13, 19],
@@ -118,22 +141,29 @@ def messageReceived(destination,message,headers):
         [25, 27],#COde
         [27, 30],#A6
         [30, 37],#A7
-        [37, 57],#CALLED
-        [58, 88],#CALLER
+        [37, 60],#CALLED
+        [61, 88],#CALLER
         [89, 96],#Rings
         [97, 107],#DESK
         [108, 123],#A12
-        [124, 133],#A13
-        [134, 138],#A14
-        [137, 143],#A15
-        [144, 155],
-        [156, 159]]
+        [124, 135],#A13
+        [137, 140],#A14
+        [139, 145],#A15
+        [146, 156],
+        [157, 161]]
+
+    logger.info("Remove LIFE SIGNS")
+    mesin=mesin.split("\n")
+    mesin=[_.strip() for _ in mesin if "Cofely" not in _]
+    mesin="\n".join(mesin)
+
+    logger.info("Panda read...")
     te=pd.read_fwf(StringIO(mesin),header=None,colspecs=colspecs
                 ,converters={"A13":str,"A4":str,"A15":str,"A16":str,"Date":str,"Hour":str,"Called":str,"Caller":str,"Desk":str}
                 , names=["Date","Hour","Duration","A4","Code","A6","A7","Called","Caller","Rings","Desk","A12","A13","A14","A15","A16","A17"])
 
-
-    #te=te[89:]  # IMPORTANT ghet rid of the base template file
+    logger.info("Done")
+    #te=te[89:]  # IMPORTANT get rid of the base template file
 
 
     te["Caller"]=te["Caller"].fillna("")
@@ -222,7 +252,7 @@ def messageReceived(destination,message,headers):
 
     te2["Date2"]=pd.to_datetime(te2["timestamp"], format="%d%m%y%H%M%S")
     te2["Date"]=pd.to_datetime(te2["timestamp"], format="%d%m%y%H%M%S")
-    te2["Date"]=te2['Date'].dt.tz_localize(tz='Europe/Paris')
+    te2["Date"]=te2['Date'].dt.tz_localize(tz='Europe/Paris',ambiguous=True)
     del te2["timestamp"]
     del te2["Hour"]
 
@@ -235,7 +265,7 @@ def messageReceived(destination,message,headers):
         obj["@timestamp"]=row['Date'].isoformat() 
         obj["Duration"]=row["Duration"]
         obj["Code"]=row["Code"].replace(' ','')
-        obj["Called"]=row["Called"].replace(' ','')
+        obj["Called"]=str(row["Called"]).replace(' ','')
 
         try:
             if int(obj["Called"]) in dfconfight:
@@ -268,10 +298,10 @@ def messageReceived(destination,message,headers):
         obj["A16"]=row["A16"]
         obj["A17"]=row["A17"]
 
-        action["index"]={"_index":"telephony","_type":"doc","_id":str(int(row["Date2"].timestamp())*1000)+'_'+obj["Called"]+'_'+obj["Caller"]}
-
-        messagebody+=json.dumps(action)+"\r\n";
-        messagebody+=json.dumps(obj)+"\r\n"
+        if "nan" not in obj["Called"]+'_'+obj["Caller"]:
+            action["index"]={"_index":"telephony","_type":"doc","_id":str(int(row["Date2"].timestamp())*1000)+'_'+obj["Called"]+'_'+obj["Caller"]}        
+            messagebody+=json.dumps(action)+"\r\n";
+            messagebody+=json.dumps(obj)+"\r\n"
 
         
 
@@ -279,18 +309,24 @@ def messageReceived(destination,message,headers):
         #     print("BAD")
         #     pass
 
-        if(len(messagebody)>500000):
+        if(len(messagebody)>50000):
             logger.info ("BULK")
             try:
                 resbulk=es.bulk(messagebody)
                 #print(resbulk["errors"])
                 if resbulk["errors"]:
                     logger.error("BULK ERROR")
-                    logger.info(resbulk)
+                    for item in resbulk["items"]:
+                    
+                        for key in item:
+                            if "error" in item[key]:                                
+                                logger.error(item)
+                    logger.info(messagebody)
+                        
 
             except:
                 logger.error("Unable to bulk",exc_info=True)
-                logger.error(resbulk)
+                logger.info(resbulk)
                 
             messagebody=""
 
