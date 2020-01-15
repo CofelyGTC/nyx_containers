@@ -22,6 +22,7 @@ VERSION HISTORY
 
 * 01 Aug 2019 1.0.5 **VME** Bug fixing : nan values + code cleaning
 * 12 Dec 2019 1.0.7 **VME** Bug fixing : KPI extraction from file name
+* 15 Jan 2020 1.0.8 **AMA** Bug Fixing : Lot 2 monthly works as expected
 """  
 
 
@@ -48,7 +49,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.7"
+VERSION="1.0.8"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -124,7 +125,7 @@ def getDisplayStop(now):
 
 ################################################################################
 def messageReceived(destination,message,headers):
-    global es
+    global es,INDEX_PATTERN
     starttime = time.time()
     imported_records=0
     reserrors = []
@@ -139,7 +140,7 @@ def messageReceived(destination,message,headers):
 
     now = datetime.now()
 
-#####################
+    #####################
     # TO MODIFY ########
     lot = 2
     category = 'lot2_monthly'
