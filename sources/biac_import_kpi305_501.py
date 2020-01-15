@@ -31,6 +31,7 @@ VERSION HISTORY
 * 10 Dec 2019 1.0.2 **VME** Fix bug due to typo
 * 10 Dec 2019 1.0.3 **VME** Undo 1.0.2 that was not a typo
 * 11 Dec 2019 1.0.4 **VME** Fix a bug 1.0.4 that prevented lot 1 to work properly
+* 13 Jan 2020 1.0.5 **AMA** Load second 501 sheet
 """  
 
 import re
@@ -57,7 +58,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.4"
+VERSION="1.0.5"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -403,10 +404,12 @@ def messageReceived(destination,message,headers):
             dfdatas = pd.ExcelFile(file)
 
             sheettoload=""
-            for sheet in dfdatas.sheet_names:
-                if "Lot" in sheet or "Sheet1" in sheet:
-                    sheettoload=sheet
-                    break
+            #for sheet in dfdatas.sheet_names:
+            #    if "Lot" in sheet or "Sheet1" in sheet:
+            #        sheettoload=sheet
+            #        break
+            sheettoload = dfdatas.sheet_names[1]
+
             if sheettoload=="":
                 logger.info("No worksheet to load...")
             else:

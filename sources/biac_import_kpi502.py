@@ -35,7 +35,9 @@ VERSION HISTORY
 * 16 Sep 2019 0.1.0 **AMA** Do no longer keep data below < Mai 2018
 * 19 Sep 2019 0.1.1 **AMA** Do no longer keep data below < Mai 2018
 * 23 Sep 2019 0.1.2 **AMA** Fix a bug that prevented the original collection to be erased properly
-* 10 Dec 2020 1.0.1 **AMA** Use elastic helper
+* 10 Dec 2010 1.0.1 **AMA** Use elastic helper
+* 06 Jan 2020 1.0.3 **AMA** Create the new Kibana collection
+* 07 Jan 2020 1.0.6 **AMA** Lot 4 added in the new Kibana collection
 """
 import re
 import json
@@ -61,9 +63,9 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.1"
+VERSION="1.0.6"
 MODULE="BIAC_KPI502_IMPORTER"
-QUEUE=["BIAC_EXCELS_KPI502"]
+QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
 goodmonth="NA"
 
@@ -162,12 +164,161 @@ def computeReport(row):
     return res['key']
 
 ################################################################################
+def recomputeKPI502():
+    logger.info("Creating Kibana Dashboard 502")
+    keys="Lot1 (BACHEA),Lot2 ELEC (BACELE),Lot2 FIRE (BACFIR),Lot2 ACCESS (BACFIR),Lot2 CRADLE (BACFIR),Lot2 HVAC PB/NT (BACHVA),Lot2 SANI (BACSAN),Lot2 HVAC PA (BACSAN),Lot3 (BACEXT),Lot4 (BACDNB)".split(",")
+    es.indices.delete(index='biac_kpi502_kib', ignore=[400, 404])
+    time.sleep(1)
+
+    for key in keys:
+        logger.info("Computing %s" %(key))
+        compute502barchart_v3(key)
+
+
+
+
+
+def generate_kibana_dash(kib_df,rec_type,key):
+    bulkbody=[]
+
+    for index,row in kib_df.iterrows():
+        action = {}
+        action["index"] = {"_index": "biac_kpi502_kib","_type": "doc"}
+        record={"type":rec_type,"month":row["Month"],"key":key,"value":0,"label":"","active":1}
+        bulkbody.append(json.dumps(action))
+        bulkbody.append(json.dumps(record))   
+        if "OVERDUE" not in row["Month"]:
+            record={"type":rec_type,"month":row["Month"],"key":key,"value":row["Cur"],"label":"Current","active":1}
+            bulkbody.append(json.dumps(action))
+            bulkbody.append(json.dumps(record))   
+
+            if row["Good"]>0:
+                record={"type":rec_type,"month":row["Month"],"key":key,"value":row["Good"],"label":"Previous","active":1}
+                bulkbody.append(json.dumps(action))
+                bulkbody.append(json.dumps(record))   
+        else:
+            if row["Cur"]>0:        
+                record={"type":rec_type,"month":row["Month"],"key":key,"value":row["Cur"],"label":"Overdue","active":1}
+                bulkbody.append(json.dumps(action))
+                bulkbody.append(json.dumps(record))   
+            if row["NewOverdue"]>0:        
+                record={"type":rec_type,"month":row["Month"],"key":key,"value":row["NewOverdue"],"label":"New Overdue","active":1}
+                bulkbody.append(json.dumps(action))
+                bulkbody.append(json.dumps(record))   
+
+
+    res=es.bulk(bulkbody)
+
+def compute502barchart_v3(reporttype):
+
+    print('==============> KPI502 bar graph')
+
+    cur_active=es_helper.elastic_to_dataframe(es,"biac_kpi502","active:1 AND key: \""+reporttype+"\"")
+    startdate=datetime.strptime(cur_active["filedate"].iloc[0],"%Y-%m")
+
+    
+    start=startdate#-timedelta(days=2)
+
+    start_overdue_4=start+ relativedelta(months=-13)
+    start_overdue_4=str(start_overdue_4.year)+"-"+(str(start_overdue_4.month)).zfill(2)
+
+    start_overdue_5=start+ relativedelta(months=-7)
+    start_overdue_5=str(start_overdue_5.year)+"-"+(str(start_overdue_5.month)).zfill(2)
+
+
+    print(start_overdue_5)
+#    startminusonemonth=start-timedelta(days=32)
+    startminusonemonth=start-relativedelta(months=1)
+
+    filedate=str(start.year)+"-"+(str(start.month)).zfill(2)
+    filedateminusonemonth=str(startminusonemonth.year)+"-"+(str(startminusonemonth.month)).zfill(2)
+    print("FileDate: %s" %(filedate))
+
+    queryadd=" AND key: \""+reporttype.replace("Lot4 (DNB)","Lot4 (BACDNB)")+"\""
+    if "All" in reporttype:
+        queryadd=" AND  Lot: \"Lot 2\""
+
+        print(queryadd)
+
+    query='(ShortStatusFU: Actievereist OR ValueCount:0) AND filedate:'+filedate+queryadd
+    queryminusonemonth='(ShortStatusFU: Actievereist OR ValueCount:0) AND filedate:'+filedateminusonemonth+queryadd
+
+    print(query)
+    print(queryminusonemonth)
+
+
+    cur_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",query)
+    prev_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",queryminusonemonth)
+
+    cur_df_4=cur_df[cur_df["ShortStatus"]==4].copy()
+    cur_df_4_gr=cur_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
+    cur_df_4_gr.columns=["value"]
+
+    prev_df_4=prev_df[prev_df["ShortStatus"]==4].copy()
+    prev_df_4_gr=prev_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
+    prev_df_4_gr.columns=["value"]
+
+    merge_4_gr=cur_df_4_gr.merge(prev_df_4_gr,how="left", left_index=True, right_index=True)
+    merge_4_gr.columns=["Cur","Prev"]
+    merge_4_gr.fillna(0,inplace=True)
+    merge_4_gr["Good"]=merge_4_gr["Prev"]-merge_4_gr["Cur"]
+    merge_4_gr["Good"]=merge_4_gr["Good"].apply(lambda x:0 if x<0 else x)
+    merge_4_gr["Month"]=merge_4_gr.index
+    merge_4_gr["Month"]=merge_4_gr["Month"].apply(lambda x:" "+str(x) if x=="OVERDUE" else x)
+    merge_4_gr=merge_4_gr.sort_values("Month",ascending=False).reset_index(drop=True)
+    merge_4_gr.loc[merge_4_gr["Month"].str.contains("OVERDUE")>0,"Good"]=0
+
+    merge_4_gr["Total"]=merge_4_gr["Cur"]+merge_4_gr["Good"]            
+
+    cur_df_4[(cur_df_4["MonthFU"]=="OVERDUE") & (cur_df_4["Month"]==start_overdue_4)]
+    newoverdue_4=cur_df_4[(cur_df_4["MonthFU"]=="OVERDUE") & (cur_df_4["Month_"]==start_overdue_4)].shape[0]
+
+    merge_4_gr["NewOverdue"]=0
+    merge_4_gr.loc[merge_4_gr["Month"].str.contains("OVERDUE"),"NewOverdue"]=newoverdue_4
+    merge_4_gr.loc[merge_4_gr["Month"].str.contains("OVERDUE"),"Cur"]=merge_4_gr.loc[merge_4_gr["Month"].str.contains("OVERDUE"),"Cur"]-newoverdue_4
+
+    cur_df_5=cur_df[cur_df["ShortStatus"]==5].copy()
+    cur_df_5_gr=cur_df_5.groupby("MonthFU").agg({"ValueCount":["sum"]})
+    cur_df_5_gr.columns=["value"]
+
+    prev_df_5=prev_df[prev_df["ShortStatus"]==5].copy()
+    prev_df_5_gr=prev_df_5.groupby("MonthFU").agg({"ValueCount":["sum"]})
+    prev_df_5_gr.columns=["value"]
+
+    merge_5_gr=cur_df_5_gr.merge(prev_df_5_gr,how="left", left_index=True, right_index=True)
+    merge_5_gr.columns=["Cur","Prev"]
+    merge_5_gr.fillna(0,inplace=True)
+    merge_5_gr["Good"]=merge_5_gr["Prev"]-merge_5_gr["Cur"]
+    merge_5_gr["Good"]=merge_5_gr["Good"].apply(lambda x:0 if x<0 else x)
+    merge_5_gr["Month"]=merge_5_gr.index
+    merge_5_gr["Month"]=merge_5_gr["Month"].apply(lambda x:" "+str(x) if x=="OVERDUE" else x)
+    merge_5_gr=merge_5_gr.sort_values("Month",ascending=False).reset_index(drop=True)
+    merge_5_gr.loc[merge_5_gr["Month"].str.contains("OVERDUE")>0,"Good"]=0
+
+
+    merge_5_gr["Total"]=merge_5_gr["Cur"]+merge_5_gr["Good"]  
+    newoverdue_5=cur_df_5[(cur_df_5["MonthFU"]=="OVERDUE") & (cur_df_5["Month_"]==start_overdue_5)].shape[0]
+
+    merge_5_gr["NewOverdue"]=0
+    merge_5_gr.loc[merge_5_gr["Month"].str.contains("OVERDUE"),"NewOverdue"]=newoverdue_5
+    merge_5_gr.loc[merge_5_gr["Month"].str.contains("OVERDUE"),"Cur"]=merge_5_gr.loc[merge_5_gr["Month"].str.contains("OVERDUE"),"Cur"]-newoverdue_5
+
+    generate_kibana_dash(merge_4_gr,4,reporttype)
+    generate_kibana_dash(merge_5_gr,5,reporttype)
+
+################################################################################
 def messageReceived(destination,message,headers):
     global es,goodmonth
     records=0
     starttime = time.time()
     logger.info("==> "*10)
     logger.info("Message Received %s" % destination)
+
+
+    if destination=="/topic/RECOMPUTE_502":
+        recomputeKPI502()
+        return
+    
     logger.info(headers)
 
     filepath=""
@@ -579,7 +730,7 @@ def messageReceived(destination,message,headers):
         logger.error(e3)   
         logger.error("Unable to update records biac_month_kpi502.") 
 
-
+    recomputeKPI502()
 
     endtime = time.time()    
     try:
