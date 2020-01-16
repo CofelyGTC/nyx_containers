@@ -22,6 +22,7 @@ VERSION HISTORY
 
 * 01 Aug 2019 1.0.5 **VME** Bug fixing : nan values + code cleaning
 * 12 Dec 2019 1.0.7 **VME** Bug fixing : KPI extraction from file name
+* 16 Jan 2020 1.0.8 **VME** Bug fixing : determine last month with year changing
 """  
 
 
@@ -48,7 +49,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.7"
+VERSION="1.0.8"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -177,6 +178,8 @@ def messageReceived(destination,message,headers):
     equipment = columns2[-1]
     es_index= INDEX_PATTERN
     
+    dfdata2['display'] = 0
+    dfdata2.loc[dfdata2['startDate'].max() == dfdata2['startDate'], 'display'] = 1
     
 
     bulkbody = ''
@@ -190,9 +193,6 @@ def messageReceived(destination,message,headers):
 
                 equipment = col
                 ts= start_date * 1000
-                display = 0
-                if row.stopDate.month == now.month - 1:
-                    display = 1
 
                 es_id = str(id_report) + '_' +str(col) + '_' + str(ts)
 
@@ -211,7 +211,7 @@ def messageReceived(destination,message,headers):
                         "equipment": equipment,
                         "lot": lot,
                         "filename": filename,
-                        "display": display,
+                        "display": row['display'],
                         "numInterval": int(row['EQ']),
                         "value": int(row[equipment]),
                         "floatvalue": row[equipment]
@@ -299,10 +299,11 @@ logger.info("Starting: %s" % MODULE)
 logger.info("Module:   %s" %(VERSION))
 logger.info("==============================")
 
-
 #>> AMQC
 server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
+                ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
+                ,"heartbeats":(1200000,1200000),"earlyack":True}
+                
 logger.info(server)                
 conn=amqstompclient.AMQClient(server
     , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)

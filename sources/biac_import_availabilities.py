@@ -37,6 +37,7 @@ VERSION HISTORY
 * 27 Noc 2019 1.0.21 **PDB** Bug Fixing
 * 05 Dec 2019 1.0.22 **VME** Add Lot3 importation
 * 10 Dec 2019 1.0.23 **VME** Fix bug weekly
+* 16 Jan 2020 1.0.24 **VME** Fix bug weekly to determine the year of the file
 """
 
 import json
@@ -62,7 +63,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.23"
+VERSION="1.0.24"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", 
         "/queue/BIAC_FILE_3_Lot3Availability", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
@@ -245,29 +246,20 @@ def messageReceived(destination,message,headers):
     name = dfdef.get_value(0, 'name').lower()
     name = name.replace('%', '')
 
-    first_day_year = startDate.to_pydatetime().replace(
-        month=1, day=1, hour=0, minute=0, second=0)
-
-
-
-    cur_year = first_day_year.year
-
-    year = []
-    old = 0
-
-    for i in dfdata.index:
-        if i < old:
-            cur_year += 1
-
-        year.append(cur_year)
-        old = i
-
-
-    dfdata['year'] = year
-
     dfdata.reset_index(inplace=True)
 
     if interval == 'week':
+        year_start = startDate.year
+        year_end   = stopDate.year
+
+        logger.info(year_start)
+        logger.info(year_end)
+
+        dfdata['year'] = year_start
+        if startDate.month == 12 and year_start != year_end:
+            dfdata['year'] = year_start + 1
+
+        logger.info(dfdata['EQ'].max())
 
         last_row = dfdata[dfdata['EQ'] == dfdata['EQ'].max()]
 
@@ -283,6 +275,25 @@ def messageReceived(destination,message,headers):
 
 
     elif interval == 'day':
+
+        first_day_year = startDate.to_pydatetime().replace(
+        month=1, day=1, hour=0, minute=0, second=0)
+
+        cur_year = first_day_year.year
+
+        year = []
+        old = 0
+
+        for i in dfdata.index:
+            if i < old:
+                cur_year += 1
+
+            year.append(cur_year)
+            old = i
+
+
+        dfdata['year'] = year
+
         dfdata['dt'] = dfdata.apply(
             lambda row:  datetime(int(row['year']), 1, 1) + timedelta(days=(row['EQ']-1)), axis=1)
 
@@ -497,7 +508,9 @@ if __name__ == '__main__':
 
     #>> AMQC
     server={"ip":os.environ["AMQC_URL"],"port":os.environ["AMQC_PORT"]
-                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]}
+                    ,"login":os.environ["AMQC_LOGIN"],"password":os.environ["AMQC_PASSWORD"]
+                    ,"heartbeats":(1200000,1200000),"earlyack":True}
+                    
     logger.info(server)
     conn=amqstompclient.AMQClient(server
         , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
