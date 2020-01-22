@@ -198,7 +198,10 @@ def loadKizeo():
             df_all['lot'] = 4
 
             try:
-                es.indices.delete('biac_spot_lot4')
+                # es.indices.delete('biac_spot_lot4')
+                es.delete_by_query(index='biac_spot_lot4', doc_type='', body={"query":{"match_all": {}}})
+
+                 
             except:
                 logger.warn('unable to delete biac_spot_lot4')
                 pass
@@ -215,7 +218,8 @@ def loadKizeo():
 
         else:
             try:
-                es.indices.delete('biac_spot_lot4')
+                # es.indices.delete('biac_spot_lot4')
+                es.delete_by_query(index='biac_spot_lot4', doc_type='', body={"query":{"match_all": {}}})
             except:
                 logger.info('already no data')
                 pass      
