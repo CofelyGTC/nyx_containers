@@ -24,6 +24,7 @@ VERSION HISTORY
 * 27 Nov 2019 1.0.1 **VME** Delete data before inserting to weakly handle the deletion of records in Kizeo + send message to kizeo month 2
 * 03 Dec 2019 1.0.2 **VME** Delete data even when no data from kizeo 
 * 05 Dec 2019 1.0.3 **VME** Bug fix
+* 22 Jan 2020 1.0.4 **VME** delete by query instead of deleting indices to always have an existing indice in order to have a working generic table when no data
 """  
 import re
 import sys
