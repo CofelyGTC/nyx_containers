@@ -47,6 +47,7 @@ VERSION HISTORY
 * 09 Dec 2019 1.4.0 **AMA** Fix the format of the KPI
 * 12 Dec 2019 1.4.1 **AMA** Force lot 1 all et lot 3 all to the appropriate contract.
 * 17 Dec 2019 1.5.0 **VME** Fix the format of the KPI in the recap mail
+* 10 Feb 2020 1.6.0 **VME** Fix bug on key (lot 1 and 3)
 """  
 import re
 import json
@@ -74,7 +75,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_FEEDBACK_COMMENTS_IMPORTER"
-VERSION = "1.5.2"
+VERSION = "1.6.0"
 QUEUE   = ["BAC_FEEDBACK_XLSX","BAC_FEEDBACK_DOCX"]
 
 
@@ -479,6 +480,7 @@ def messageReceivedDOCX(destination,message,headers):
         results=[]
 
         if key != '':
+            key=key.replace("Lot3 (All)","Lot3 (BACEXT)").replace("Lot1 (All)","Lot1 (BACHEA)")
             for paragraph in doc.paragraphs:
                 if paragraph.text.strip() != '' and paragraph.text.strip() != '\\n' :
                     regex = '@([kK][pP][iI])? *([0-9]{1,3}[a-zA-Z]?) *:(.*)'
@@ -492,8 +494,10 @@ def messageReceivedDOCX(destination,message,headers):
                             logger.info('     KPI COMMENT: '+kpi)
                             logger.info('         COMMENT: '+comment)
 
+                            
+
                             obj = {
-                                'key': key.replace("Lot3 (All)","Lot3 (BACEXT)").replace("Lot1 (All)","Lot1 (BACHEA)"),
+                                'key': key,
                                 'title': title,
                                 'lot': lot,
                                 'contract': contract,
