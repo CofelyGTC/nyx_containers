@@ -12,6 +12,7 @@ VERSION HISTORY
 
 * 27 Nov 2019 1.0.16 **AMA** First version
 * 30 Nov 2019 1.0.17 **AMA** Common Section added
+* 11 Feb 2020 1.1.0  **AMA** Linked with elastic helper that destroys scroll ids
 """
 import re
 import json
@@ -35,7 +36,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.17"
+VERSION="1.1.0"
 MODULE="NYX_Lambda"
 QUEUE=[]
 

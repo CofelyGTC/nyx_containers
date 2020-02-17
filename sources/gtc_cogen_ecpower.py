@@ -10,6 +10,7 @@ VERSION HISTORY
 ===============
 
 * 04 Nov 2019 0.0.1 **PDE** First version
+* 11 Feb 2020 0.0.4 **AMA** Increased the login waiting time
 
 
 """  
@@ -52,7 +53,7 @@ import dateutil.parser
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_COGEN_ECPOWER"
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 QUEUE   = ["GTC_COGEN_ECPOWER_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -120,7 +121,8 @@ def doTheWork(start):
 
     loginbutton = driver.find_element_by_class_name('submit ')
     loginbutton.click()
-    time.sleep(2)
+    logger.info("Wait end of login for 10 seconds")
+    time.sleep(10)
 
     dt = datetime.now()
     dtstr = dt.strftime('%Y/%m/%d %H:%M:%S')
@@ -135,6 +137,7 @@ def doTheWork(start):
         starts = 0
 
         url="https://service.ecpower.dk/jsp/statistikgen2.jsp?anlaegid="+cogen["id"]+"&showresult=true&from=01-01-15+00%3A00&to="+endtime+"&B1=Get+data"
+        logger.info(url)
         driver.get(url)
 
         tables=driver.find_elements_by_xpath("//table")
@@ -162,7 +165,8 @@ def doTheWork(start):
         rowdatastarts = tag+'_starts,'+dtstr+',2,'+str(starts)+',0\n'   
         finaldata+= rowdatahours
         finaldata+= rowdatastarts  
-        time.sleep(2)
+        logger.info("Wait 5 seconds...")
+        time.sleep(5)
 
     logger.info(finaldata)
     outputfile = open('./ECPOWER/NyxAWS_'+dt.strftime('%Y%m%d_%H%M%S')+'.csv', 'w+')

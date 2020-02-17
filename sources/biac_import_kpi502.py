@@ -38,6 +38,7 @@ VERSION HISTORY
 * 10 Dec 2010 1.0.1 **AMA** Use elastic helper
 * 06 Jan 2020 1.0.3 **AMA** Create the new Kibana collection
 * 07 Jan 2020 1.0.6 **AMA** Lot 4 added in the new Kibana collection
+* 17 Feb 2020 1.1.0 **AMA** Use the new 502 computation method (new overdues)
 """
 import re
 import json
@@ -63,7 +64,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.6"
+VERSION="1.1.0"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
@@ -539,8 +540,15 @@ def messageReceived(destination,message,headers):
         
         logger.info("Waiting for deletion to finish")
         time.sleep(3)
+
+        goodmonth_dt = datetime.strptime(goodmonth, '%m-%Y')
+        
+        
+
+
         df_kpi502 = es_helper.elastic_to_dataframe(es,"biac_kpi502",query='ShortStatusFU: Actievereist AND Month: '+goodmonth)
         df_kpi502_4= df_kpi502[df_kpi502["ShortStatus"]==4]
+
 
         df_kpi502_4_overdue=df_kpi502_4[df_kpi502_4["MonthFU"].str.contains("OVERDUE")].shape[0]
 
@@ -576,22 +584,41 @@ def messageReceived(destination,message,headers):
             newrec={"key":key,"type":"summary","_id":goodmonth+"_"+key,"_index":"biac_month_kpi502","filedate":filedate,"Month":goodmonth}
             
             
+            if key.startswith("Lot4"):
+                limitmonth4=(goodmonth_dt-relativedelta(months=6)).strftime('%Y-%m')        
+                limitmonth5=(goodmonth_dt-relativedelta(months=3)).strftime('%Y-%m')        
+            else:
+                limitmonth4=(goodmonth_dt-relativedelta(months=12)).strftime('%Y-%m')        
+                limitmonth5=(goodmonth_dt-relativedelta(months=6)).strftime('%Y-%m')   
+
+            logger.info(">>>>>KEY:"+key)
+            logger.info(">>>>>LIMIT4:"+limitmonth4)
+            logger.info(">>>>>LIMIT5:"+limitmonth5)
 
             df_kpi502_4= df_kpi502[(df_kpi502["ShortStatus"]==4)  & (df_kpi502["key"]==key)]
+
+            newoverdues_4=0
 
             for index,row in df_kpi502_4.iterrows():
                 newrec_okko={"key":key,"type":"stat","_index":"biac_month_kpi502","filedate":filedate,"Month":goodmonth}
                 if "OVERDUE" in row["MonthFU"]:
-                    newrec_okko["sub_type"]="overdue_remarks"
+                    if row["Month_"]==limitmonth4:
+                        newrec_okko["sub_type"]="new_overdue_remarks"
+                        newoverdues_4+=1
+                    else:
+                        newrec_okko["sub_type"]="overdue_remarks"
+                    
                 else:
                     newrec_okko["sub_type"]="ok_remarks"
-                
+                newrec_okko["@timestamp"]=datetime.utcnow().isoformat()
                 recsokko.append(newrec_okko)
                     
                     
                     
 
-            df_kpi502_4_overdue=df_kpi502_4[df_kpi502_4["MonthFU"].str.contains("OVERDUE")].shape[0]
+            logger.info(">>>>>"+str(df_kpi502_4[df_kpi502_4["Month_"]==limitmonth4].shape[0]))
+            #df_kpi502_4_overdue=df_kpi502_4[df_kpi502_4["MonthFU"].str.contains("OVERDUE")].shape[0]
+            df_kpi502_4_overdue=newoverdues_4
 
             kpi502_4_percentage=1
             if df_kpi502_4.shape[0]:
@@ -606,16 +633,25 @@ def messageReceived(destination,message,headers):
             
             df_kpi502_5= df_kpi502[(df_kpi502["ShortStatus"]==5)  & (df_kpi502["key"]==key)]
             
+            newoverdues_5=0
+
             for index,row in df_kpi502_5.iterrows():
                 newrec_okko={"key":key,"type":"stat","_index":"biac_month_kpi502","filedate":filedate,"Month":goodmonth}
                 if "OVERDUE" in row["MonthFU"]:
-                    newrec_okko["sub_type"]="overdue_breaches"
+                    
+                    if row["Month_"]==limitmonth5:
+                        newrec_okko["sub_type"]="new_overdue_breaches"
+                        newoverdues_5+=1
+                    else:
+                        newrec_okko["sub_type"]="overdue_breaches"
                 else:
                     newrec_okko["sub_type"]="ok_breaches"
                 
+                newrec_okko["@timestamp"]=datetime.utcnow().isoformat()
                 recsokko.append(newrec_okko)
             
-            df_kpi502_5_overdue=df_kpi502_5[df_kpi502_5["MonthFU"].str.contains("OVERDUE")].shape[0]
+            #df_kpi502_5_overdue=df_kpi502_5[df_kpi502_5["MonthFU"].str.contains("OVERDUE")].shape[0]
+            df_kpi502_5_overdue=newoverdues_5
 
             kpi502_5_percentage=1
             if df_kpi502_5.shape[0]:
