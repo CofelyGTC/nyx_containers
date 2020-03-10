@@ -21,15 +21,18 @@ Collections:
 VERSION HISTORY
 ===============
 
-* 08 Aug 2019 0.0.1 **AMA** First Version
-* 19 Aug 2019 0.0.2 **AMA** Title of the report is set
-* 22 Aug 2019 0.0.3 **AMA** Rename the report type parameter
-* 11 Sep 2019 0.0.4 **AMA** Changed the result ready check duration
-* 24 Sep 2019 0.0.5 **AMA** Improved the NL translation
-* 25 Sep 2019 0.0.6 **AMA** Changed time period to 60 days -> now
-* 16 Dec 2019 0.0.7 **VME** Adding tempo (24 hours) before sending the mail once xlsx and docx are here
-* 06 Jan 2019 0.0.8 **VME** Changing the .py to launch depending on the report
+* 08 Aug 2019 0.0.1  **AMA** First Version
+* 19 Aug 2019 0.0.2  **AMA** Title of the report is set
+* 22 Aug 2019 0.0.3  **AMA** Rename the report type parameter
+* 11 Sep 2019 0.0.4  **AMA** Changed the result ready check duration
+* 24 Sep 2019 0.0.5  **AMA** Improved the NL translation
+* 25 Sep 2019 0.0.6  **AMA** Changed time period to 60 days -> now
+* 16 Dec 2019 0.0.7  **VME** Adding tempo (24 hours) before sending the mail once xlsx and docx are here
+* 06 Jan 2019 0.0.8  **VME** Changing the .py to launch depending on the report
+* 17 Jan 2020 0.0.9  **VME** Fixing the parameters for lot 4, 5, 6 and 7
+* 09 Mar 2020 0.0.10 **VME** Fixing a bug in previous fix (parameters for lot 4, 5, 6 and 7)
 """ 
+
 import json
 import time
 import uuid
@@ -54,7 +57,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="0.0.8"
+VERSION="0.0.10"
 MODULE="BIAC_FEEDBACK_DISPATCHER"
 QUEUE=[]
 
@@ -178,17 +181,37 @@ def checkCommentsStatus():
                         ]
                     }
 
+
+                parameters_4567 = [
+                    {
+                        "name" : "param1",
+                        "title" : "Date",
+                        "type" : "date",
+                        "value" : row['reportdate'].isoformat()
+                    },
+                    {
+                        "name" : "param2",
+                        "title" : "Type",
+                        "type" : "text",
+                        "value" : "Final"
+                    }
+                ]
+
                 report['title'] += row['reporttype']
                 report['description'] += row['reporttype']
 
                 if row['reporttype'] == 'Lot4 (BACDNB)':
                     report['exec'] = './reports/pythondef/Lot4KPI.py'
+                    report['parameters'] = parameters_4567
                 elif row['reporttype'] == 'Lot5':
                     report['exec'] = './reports/pythondef/Lot5KPI.py'
+                    report['parameters'] = parameters_4567
                 elif row['reporttype'] == 'Lot6':
                     report['exec'] = './reports/pythondef/Lot6KPI.py'
+                    report['parameters'] = parameters_4567
                 elif row['reporttype'] == 'Lot7':
                     report['exec'] = './reports/pythondef/Lot7KPI.py'
+                    report['parameters'] = parameters_4567
 
                 maanden=['Januari',
                     'Februari',

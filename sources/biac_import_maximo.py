@@ -50,6 +50,7 @@ from functools import wraps
 from datetime import datetime
 from datetime import timedelta
 from amqstompclient import amqstompclient
+from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
@@ -105,6 +106,41 @@ def getDisplayStart(now):
     #logger.info('Display start : ' + str(start))
 
     return int(start.timestamp())
+
+################################################################################
+def getDisplayDate503():
+    now = datetime.now()
+    start_month = datetime(now.year, now.month, 1)
+    return start_month - relativedelta(months=4), start_month - relativedelta(months=3)
+
+################################################################################
+def compute_str_months(dt):
+    today = datetime.now().date()
+    start_month = datetime(today.year, today.month, 1).date()
+    end_month = start_month + relativedelta(months=+1)
+    
+    # print(f"comute_str_months, start : {start_month}  - end : {end_month}")
+    if start_month <= dt and dt < end_month:
+        return '+0m'
+    else:
+        offset = -1
+        i = 0
+        if dt >= end_month:
+            offset = 1
+        
+            while dt >= end_month:
+                i += 1
+                end_month += relativedelta(months=offset)
+            
+            return f"-{i}m"
+        else:
+            while dt < start_month:
+                i += 1
+                start_month += relativedelta(months=offset)
+                
+            
+            return f"+{i}m"
+
 
 ################################################################################
 
@@ -309,6 +345,7 @@ def messageReceived(destination,message,headers):
 
         if not flag_histo:
             es.indices.delete(index="biac_maximo", ignore=[400, 404])
+            es.indices.delete(index="biac_503maximo", ignore=[400, 404])
             time.sleep(3)
 
         df['Contract'] = df['Contract'].apply(lambda x: x.upper())
@@ -320,6 +357,12 @@ def messageReceived(destination,message,headers):
         df['screen_name'] = df.apply(extract_screen_name, axis=1)
         df[['lot', 'technic', 'Contract', 'Pm execution team']]
 
+        now = datetime.now()
+        displayStart = getDisplayStart(now)
+        displayStop = getDisplayStop(now)
+
+        start_dt_503, stop_dt_503 = getDisplayDate503()
+
         for index, row in df.iterrows():
             woid  = row[0]
             contract= row[1]
@@ -330,9 +373,7 @@ def messageReceived(destination,message,headers):
             completedDate = getTsDate(row[5])
             pmExecutionTeam = row['Pm execution team']
             woExecutionTeam = row['Wo execution team']
-            now = datetime.now()
-            displayStart = getDisplayStart(now)
-            displayStop = getDisplayStop(now)
+            
             displaykpi302Start = getDisplayKPI302(now)
             nowts = int(now.timestamp())
 
@@ -358,13 +399,21 @@ def messageReceived(destination,message,headers):
 
             overdue = 0
 
+            ispm=(worktype=="PM")
+
+
             try:
-                if displayStart <= scheduledStart < displayStop:
-                    display = 1
 
-
-                if scheduledStart < displayStart:
-                    overdue = 1
+                if ispm:
+                    if displayStart <= scheduledStart < displayStop:
+                        display = 1
+                    elif scheduledStart < displayStart:
+                        overdue = 1
+                else:
+                    if start_dt_503.timestamp() <= scheduledStart < stop_dt_503.timestamp():
+                        display = 1
+                    elif scheduledStart < start_dt_503.timestamp():
+                        overdue = 1
             except Exception as e:
                 logger.warning('Scheduled start not int : ' + str(scheduledStart) +  '-' + str(row['ScheduledStart']))
                 logger.info(e)
@@ -435,14 +484,14 @@ def messageReceived(destination,message,headers):
                 "actualFinishMax": actualFinishMax*1000,
                 "actualFinish": actualFinish*1000,
                 "KPI302": KPI302,
-                "KPI503": KPI503
+                "KPI503": KPI503,
             }
 
-            ispm=(worktype=="PM")
-            # if not ispm:
-            #     logger.info("===>COUCOCUOCOUC")
-            #     logger.info(row)
+            
 
+            if not ispm:
+                dt = datetime.fromtimestamp(scheduledStart).date()
+                newrec['strMonths'] = compute_str_months(dt)
 
             if not flag_histo:
                 es_id = woid+'_'+str(scheduledStart)
