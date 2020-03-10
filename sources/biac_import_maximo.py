@@ -32,7 +32,8 @@ VERSION HISTORY
 * 03 Jun 2019 1.0.20 **PDB** Finished version for basic applications
 * 01 Aug 2019 2.0.1 **AMA** Add Historical system
 * 01 Aug 2019 2.1.0 **AMA** Filter worktypes PM and ADM to two different collections.
-* 18 Dec 2019 2.1.1 **AMA** Added the KPI 503 field
+* 18 Dec 2019 2.1.1 **VME** Added the KPI 503 field
+* 18 Dec 2019 2.1.2 **VME** Added the KPI503computed field
 """
 
 import re
@@ -57,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 from elastic_helper import es_helper 
 
-VERSION="2.1.1"
+VERSION="2.1.2"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -111,7 +112,7 @@ def getDisplayStart(now):
 def getDisplayDate503():
     now = datetime.now()
     start_month = datetime(now.year, now.month, 1)
-    return start_month - relativedelta(months=4), start_month - relativedelta(months=3)
+    return  start_month - relativedelta(months=4), start_month - relativedelta(months=3)
 
 ################################################################################
 def compute_str_months(dt):
@@ -386,16 +387,18 @@ def messageReceived(destination,message,headers):
             targetStart = getTsDate(row['TargetStart'])
             scheduledStart = getTsDate(row['ScheduledStart'])
             actualStartMax = getTsDate(row['ActualStart max'])
-            actualStart= getTsDate(row['ActualStart'])
+            actualStart = getTsDate(row['ActualStart'])
             KPI301 = row['KPI301']
             assetDescription = row['Asset description']
             routeDescription = row['Route description']
             actualFinishMax = getTsDate(row['ActualFinish max'])
             actualFinish = getTsDate(row['ActualFinish'])
             KPI302 = row['KPI302']
-            KPI503=""
+            KPI503 = ""
+            KPI503computed =" "
             if "KPI503" in row:
-                KPI503= row['KPI503']
+                KPI503 = row['KPI503']
+                KPI503computed = row['KPI503']
 
             overdue = 0
 
@@ -412,8 +415,12 @@ def messageReceived(destination,message,headers):
                 else:
                     if start_dt_503.timestamp() <= scheduledStart < stop_dt_503.timestamp():
                         display = 1
+                        KPI503computed = 'New overdue'
                     elif scheduledStart < start_dt_503.timestamp():
                         overdue = 1
+                        KPI503computed = 'Overdue'
+                        
+
             except Exception as e:
                 logger.warning('Scheduled start not int : ' + str(scheduledStart) +  '-' + str(row['ScheduledStart']))
                 logger.info(e)
@@ -485,6 +492,7 @@ def messageReceived(destination,message,headers):
                 "actualFinish": actualFinish*1000,
                 "KPI302": KPI302,
                 "KPI503": KPI503,
+                "KPI503computed": KPI503computed,
             }
 
             
