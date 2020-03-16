@@ -23,6 +23,7 @@ VERSION HISTORY
 * 16 Oct 2019 0.0.2 **VME** Bug fixing on targets when day off
 * 23 Oct 2019 0.0.3 **VME** Get targets from cogen_parameters
 * 24 Oct 2019 0.0.4 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN 
+* 12 Mar 2020 0.0.5 **VME** Compute the number of days in a year (it's not always 365 ;) 
 """
 
 import sys
@@ -58,7 +59,7 @@ from lib import cogenhelper as ch
 
 import tzlocal # $ pip install tzlocal
 
-VERSION="0.0.4"
+VERSION="0.0.5"
 MODULE="GTC_RECOMPUTE_TARGET_LUTOSA"
 QUEUE=["RECOMPUTE_TARGET_LUTOSA"]
 
@@ -96,7 +97,7 @@ def compute_targets(year):
                                                  datecolumns=['date'],
                                                  timestampfield='date')
     
-    open_days = 365
+    open_days = (datetime(year, 12, 31) - datetime(year, 1, 1) ).days+1
     
     logger.info('size df_calendar: '+str(len(df_calendar)))
     if len(df_calendar) > 0:

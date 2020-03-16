@@ -20,6 +20,7 @@ VERSION HISTORY
 * 23 Oct 2019 0.0.24 **VME** Get targets from cogen_parameters
 * 24 Oct 2019 0.0.25 **VME** Add day_on condition for avail_ratio Thiopaq and COGEN
 * 05 Nov 2019 0.0.26 **VME** Adding the drycooler and ht for heat production + modification of condition (thiopaq and cogen)
+* 12 Mar 2020 0.0.27 **VME** Fixing bug when no data
 
 """  
 import re
@@ -60,7 +61,7 @@ from lib import cogenhelper as ch
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.26"
+VERSION = "0.0.27"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -85,6 +86,51 @@ def log_message(message):
     logger.info("LOG_MESSAGE")
     logger.info(message_to_send)
     conn.send_message("/queue/NYX_LOG",json.dumps(message_to_send))
+
+def compute_avail_debit_entry_thiopac(df_raw):
+    if df_raw.empty:
+        return {
+            'value': 0,
+            'value_minus_120': 0,
+            'value_120_220': 0,
+            'value_220_330': 0,
+            'value_330_600': 0,
+            'percent_value_minus_120': 0,
+            'percent_value_120_220': 0,
+            'percent_value_220_330': 0,
+            'percent_value_330_600': 0
+        }
+    
+    tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
+    df_debit_biogas = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
+    
+    df_debit_biogas['bit_minus_120'] = 0
+    df_debit_biogas['bit_120_220'] = 0
+    df_debit_biogas['bit_220_330'] = 0
+    df_debit_biogas['bit_330_600'] = 0
+    df_debit_biogas.loc[(df_debit_biogas['value']<120), 'bit_minus_120'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>=120) & (df_debit_biogas['value']<220), 'bit_120_220'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>=220) & (df_debit_biogas['value']<=330), 'bit_220_330'] = 1
+    df_debit_biogas.loc[(df_debit_biogas['value']>330) & (df_debit_biogas['value']<600), 'bit_330_600'] = 1
+    
+    obj = {
+        
+        'value': df_debit_biogas['value'].sum()/60,
+        'value_minus_120': df_debit_biogas.loc[df_debit_biogas['bit_minus_120'] == 1, 'value'].sum()/60,
+        'value_120_220': df_debit_biogas.loc[df_debit_biogas['bit_120_220'] == 1, 'value'].sum()/60,
+        'value_220_330': df_debit_biogas.loc[df_debit_biogas['bit_220_330'] == 1, 'value'].sum()/60,
+        'value_330_600': df_debit_biogas.loc[df_debit_biogas['bit_330_600'] == 1, 'value'].sum()/60,
+    }
+    
+    if df_debit_biogas.shape[0] != 0:
+    
+        obj['percent_value_minus_120'] = sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0]
+        obj['percent_value_120_220']   = sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0]
+        obj['percent_value_220_330']   = sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0]
+        obj['percent_value_330_600']   = sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0]
+    
+    return obj
+
 
 def getDate(ts):
     #ts = int(ts)/1000
@@ -120,6 +166,8 @@ def calc_dispo_thiopaq(raw):
     return condition
 
 def get_dispo_thiopaq(df_raw):
+    if df_raw.empty:
+        return 0
     df_debit_biogas = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
     df_debit_biogas.columns = ['@timestamp', 'value_debit']
     df_pression_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'][['@timestamp', 'value']]
@@ -141,6 +189,8 @@ def get_dispo_thiopaq(df_raw):
 
 
 def compute_fct_thiopaq(df_raw):
+    if df_raw.empty:
+        return 0
     df_debit = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
     df_debit.columns = ['@timestamp', 'value_debit']
     df_h2s_thiopaq = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_H2S_Ap_Thiopaq'][['@timestamp', 'value']]
@@ -161,6 +211,8 @@ def calc_fct_thiopaq(raw):
     return result
 
 def get_tps_fct_thiopaq(df_raw):
+    if df_raw.empty:
+        return 0
     df_fct = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Thiopaq_Fct'][['@timestamp', 'value']]
     fct = df_fct['value'].mean()*24
     return fct
@@ -180,6 +232,8 @@ def get_tps_fct_real_thiopaq(fct_max, tps_fct):
     
 
 def get_tps_fct_surpresseur(df_raw):
+    if df_raw.empty:
+        return 0
     df_surp1 = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Surp1_Fct'][['@timestamp', 'value']]
     df_surp1.columns = ['@timestamp', 'surp1']
     df_surp2 = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Surp2_Fct'][['@timestamp', 'value']]
@@ -196,6 +250,12 @@ def calc_surpr(raw):
         return 0
     
 def get_total_biogaz_thiopaq(df_raw):
+    if df_raw.empty:
+        return {
+            '120': 0, 
+            '220': 0, 
+            '330': 0
+        }
     df_debit = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'][['@timestamp', 'value']]
     df_debit['filtre120220'] = df_debit['value'].apply(lambda x: getFiltre(x , 120))
     df_debit['filtre220330'] = df_debit['value'].apply(lambda x: getFiltre(x , 220))
@@ -219,40 +279,10 @@ def getFiltre(value, filtre):
 
     return 0
 
-def compute_avail_debit_entry_thiopac(df_raw):
-    tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
-    df_debit_biogas = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
-    
-    df_debit_biogas['bit_minus_120'] = 0
-    df_debit_biogas['bit_120_220'] = 0
-    df_debit_biogas['bit_220_330'] = 0
-    df_debit_biogas['bit_330_600'] = 0
-    df_debit_biogas.loc[(df_debit_biogas['value']<120), 'bit_minus_120'] = 1
-    df_debit_biogas.loc[(df_debit_biogas['value']>=120) & (df_debit_biogas['value']<220), 'bit_120_220'] = 1
-    df_debit_biogas.loc[(df_debit_biogas['value']>=220) & (df_debit_biogas['value']<=330), 'bit_220_330'] = 1
-    df_debit_biogas.loc[(df_debit_biogas['value']>330) & (df_debit_biogas['value']<600), 'bit_330_600'] = 1
-    
-    obj = {
-        
-        'value': df_debit_biogas['value'].sum()/60,
-        'value_minus_120': df_debit_biogas.loc[df_debit_biogas['bit_minus_120'] == 1, 'value'].sum()/60,
-        'value_120_220': df_debit_biogas.loc[df_debit_biogas['bit_120_220'] == 1, 'value'].sum()/60,
-        'value_220_330': df_debit_biogas.loc[df_debit_biogas['bit_220_330'] == 1, 'value'].sum()/60,
-        'value_330_600': df_debit_biogas.loc[df_debit_biogas['bit_330_600'] == 1, 'value'].sum()/60,
-    }
-    
-    if df_debit_biogas.shape[0] != 0:
-    
-        obj['percent_value_minus_120'] = sum(df_debit_biogas['bit_minus_120']) / df_debit_biogas.shape[0]
-        obj['percent_value_120_220']   = sum(df_debit_biogas['bit_120_220']) / df_debit_biogas.shape[0]
-        obj['percent_value_220_330']   = sum(df_debit_biogas['bit_220_330']) / df_debit_biogas.shape[0]
-        obj['percent_value_330_600']   = sum(df_debit_biogas['bit_330_600']) / df_debit_biogas.shape[0]
-    
-    return obj
-
-
 
 def compute_gasnat_entry(df_raw):
+    if df_raw.empty:
+        return 0
     tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_GazNat_Thiopaq'
     df_debit_gasnat = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
     entry_gasnat = df_debit_gasnat['value'].sum()/60
@@ -260,6 +290,8 @@ def compute_gasnat_entry(df_raw):
 
 
 def compute_entry_biogas_cogen(df_raw):
+    if df_raw.empty:
+        return 0, 0
     tag_name = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Cogen'
     df_entree_biogas = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']]
     
@@ -272,6 +304,8 @@ def compute_entry_biogas_cogen(df_raw):
 
 
 def compute_prod_therm_cogen(df_raw):
+    if df_raw.empty:
+        return 0, 0
     tag_name_1 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Ther_HT'
     tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Ther_Drycooler'
     
@@ -293,6 +327,8 @@ def compute_prod_therm_cogen(df_raw):
 
 
 def compute_avail_moteur(df_raw):
+    if df_raw.empty:
+        return 0
     df_moteur = df_raw[df_raw['area_name']=='LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct']
     
     percent_value = sum(df_moteur['value']) / 1440
@@ -300,6 +336,8 @@ def compute_avail_moteur(df_raw):
     return percent_value
 
 def compute_starts_and_stops(df_raw):
+    if df_raw.empty:
+        return 0, 0
     tag_name = 'LUTOSA_ExportNyxAWS_LUTOSA_Etat_Mot_Fct'
 
     df_fct = df_raw[df_raw['area_name']==tag_name][['@timestamp', 'value']] 
@@ -313,6 +351,8 @@ def compute_starts_and_stops(df_raw):
 
 
 def compute_prod_elec_cogen(df_raw):
+    if df_raw.empty:
+        return 0
     tag_name_1 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_IntoMoteur'
     tag_name_2 = 'LUTOSA_ExportNyxAWS_LUTOSA_Cpt_Elec_OutToMoteur'
     
@@ -334,6 +374,14 @@ def compute_prod_elec_cogen(df_raw):
 
 
 def compute_dispo_thiopaq(df_raw):
+    if df_raw.empty:
+        return {
+            'max_theorical_avail_thiopaq_hour': 0,
+            'avail_thiopaq_hour': 0,
+            'avail_thiopaq_ratio': 0
+        }
+    
+    
     tag_name_1 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
     tag_name_2 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Pression_Thiopaq_Entree'
 
@@ -370,6 +418,13 @@ def compute_dispo_thiopaq(df_raw):
 
 
 def compute_dispo_cogen(df_raw):
+    if df_raw.empty:
+        return {
+            'max_theorical_avail_cogen_hour': 0,
+            'avail_cogen_hour': 0,
+            'avail_cogen_ratio': 0
+        }
+    
     tag_name_1 = 'LUTOSA_ExportNyxAWS_COGLTS_BIOLTS_Valeur_Debit_Biogaz_Thiopaq'
 
 
@@ -395,8 +450,6 @@ def compute_dispo_cogen(df_raw):
         
     
     return obj
-
-
 
 
 def create_obj(df_raw, start):
@@ -471,7 +524,7 @@ def create_obj(df_raw, start):
                                                     datecolumns=['date'],
                                                     timestampfield='date')
     
-    open_days = 365
+    open_days =  (end_year - start_year).days+1
     
     logger.info('size df_calendar: '+str(len(df_calendar)))
     if len(df_calendar) > 0:

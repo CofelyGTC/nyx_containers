@@ -380,7 +380,7 @@ if __name__ == '__main__':
                     START = proceed_computation(START)
                     
                 except Exception as e2:
-                    logger.error("Unable to load kizeo.")
+                    logger.error("Error compute alarm Lutosa.")
                     logger.error(e2,exc_info=True)
             
         except Exception as e:
