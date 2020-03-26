@@ -1,3 +1,25 @@
+"""
+BIAC_MAILS
+====================================
+
+
+Listens to:
+-------------------------------------
+
+
+
+Collections:
+-------------------------------------
+
+
+
+
+VERSION HISTORY
+===============
+
+* 25 Mar 2020 1.0.0 **AMA** Escape a double backslash
+""" 
+
 import re
 import json
 import time
@@ -23,8 +45,9 @@ import numpy as np
 from sqlalchemy import create_engine
 
 
+
 MODULE  = "BIAC_MAILS"
-VERSION = "0.0.4"
+VERSION = "1.0.0"
 QUEUE   = []
 MAILS=0
 ATTACHMENTS=0
@@ -119,6 +142,14 @@ def decodePart(part,orgmes,fileHT):
             logger.error("Unable to decode subject")
                                 
         ATTACHMENTS+=1
+
+        def clean_string(instr):
+            return instr.replace("\\","").replace("\r","_").replace("\n","_")
+
+        //logger.info(orgmes)
+        orgmes['From']=clean_string(orgmes['From'])
+        orgmes['To']=clean_string(orgmes['To'])
+        //logger.info(orgmes)
 
         conn.send_message("/queue/MAIL_LOG",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":orgmes['From'],"To":orgmes['To'],"Subject":subject})
         conn.send_message("/queue/AVAILABILITIES_IMPORT",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":orgmes['From'],"To":orgmes['To'],"Subject":subject})

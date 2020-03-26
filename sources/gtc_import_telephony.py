@@ -22,8 +22,9 @@ VERSION HISTORY
 ===============
 
 * 19 Dec 2019 1.0.8 **AMA** OutOther renamed. Added to doc
-* 07 Jan 2019 1.1.0 **AMA** Format customized to match the raw log format
-* 08 Jan 2019 1.2.0 **AMA** Set file header if not present
+* 07 Jan 2020 1.1.0 **AMA** Format customized to match the raw log format
+* 08 Jan 2020 1.2.0 **AMA** Set file header if not present
+* 03 Mar 2020 1.3.0 **AMA** Desk filled with NA if required
 """  
 import json
 import time
@@ -51,7 +52,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 import tzlocal
 
-VERSION="1.2.0"
+VERSION="1.3.0"
 MODULE="GTC_IMPORT_TELEPHONY"
 QUEUE=["TELEPHONY_IMPORT"]
 
@@ -168,6 +169,7 @@ def messageReceived(destination,message,headers):
 
     te["Caller"]=te["Caller"].fillna("")
     te["Code"]=te["Code"].fillna("")
+    te["Desk"]=te["Desk"].fillna(0)
     te['InternalCalled1']=te['Called'].str.replace(' ','')
     te['InternalCalled']=(te['InternalCalled1'].str.len()<6)
     te['InternalCaller1']=te['Caller'].str.replace(' ','')

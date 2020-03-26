@@ -39,6 +39,7 @@ VERSION HISTORY
 * 06 Jan 2020 1.0.3 **AMA** Create the new Kibana collection
 * 07 Jan 2020 1.0.6 **AMA** Lot 4 added in the new Kibana collection
 * 17 Feb 2020 1.1.0 **AMA** Use the new 502 computation method (new overdues)
+* 03 Mar 2020 1.2.0 **AMA** DOn't cound old overdues in percentages
 """
 import re
 import json
@@ -64,7 +65,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
@@ -598,6 +599,7 @@ def messageReceived(destination,message,headers):
             df_kpi502_4= df_kpi502[(df_kpi502["ShortStatus"]==4)  & (df_kpi502["key"]==key)]
 
             newoverdues_4=0
+            oldoverdues_4=0
 
             for index,row in df_kpi502_4.iterrows():
                 newrec_okko={"key":key,"type":"stat","_index":"biac_month_kpi502","filedate":filedate,"Month":goodmonth}
@@ -607,6 +609,7 @@ def messageReceived(destination,message,headers):
                         newoverdues_4+=1
                     else:
                         newrec_okko["sub_type"]="overdue_remarks"
+                        oldoverdues_4+=1
                     
                 else:
                     newrec_okko["sub_type"]="ok_remarks"
@@ -621,19 +624,27 @@ def messageReceived(destination,message,headers):
             df_kpi502_4_overdue=newoverdues_4
 
             kpi502_4_percentage=1
-            if df_kpi502_4.shape[0]:
-                kpi502_4_percentage=(df_kpi502_4.shape[0]-df_kpi502_4_overdue)/df_kpi502_4.shape[0]        
+            if df_kpi502_4.shape[0]-oldoverdues_4>0:
+                kpi502_4_percentage=(df_kpi502_4.shape[0]-oldoverdues_4-newoverdues_4)/(df_kpi502_4.shape[0]-oldoverdues_4)
+            else:
+                kpi502_4_percentage=1
                 
             df_kpi502_4_obj={"total":df_kpi502_4.shape[0],"overdue":df_kpi502_4_overdue,"percentage":round(kpi502_4_percentage*100,2)}
 
             newrec["Total_Remarks"]=df_kpi502_4.shape[0]
             newrec["Overdues_Remarks"]=df_kpi502_4_overdue
+
+            newrec["Old_Overdues_Remarks"]=oldoverdues_4
+            newrec["New_Overdues_Remarks"]=newoverdues_4
+
+
             newrec["KPI_Remarks"]=round(kpi502_4_percentage*100,2)
             
             
             df_kpi502_5= df_kpi502[(df_kpi502["ShortStatus"]==5)  & (df_kpi502["key"]==key)]
             
             newoverdues_5=0
+            oldoverdues_5=0
 
             for index,row in df_kpi502_5.iterrows():
                 newrec_okko={"key":key,"type":"stat","_index":"biac_month_kpi502","filedate":filedate,"Month":goodmonth}
@@ -644,6 +655,7 @@ def messageReceived(destination,message,headers):
                         newoverdues_5+=1
                     else:
                         newrec_okko["sub_type"]="overdue_breaches"
+                        oldoverdues_5+=1
                 else:
                     newrec_okko["sub_type"]="ok_breaches"
                 
@@ -654,14 +666,20 @@ def messageReceived(destination,message,headers):
             df_kpi502_5_overdue=newoverdues_5
 
             kpi502_5_percentage=1
-            if df_kpi502_5.shape[0]:
-                kpi502_5_percentage=(df_kpi502_5.shape[0]-df_kpi502_5_overdue)/df_kpi502_5.shape[0]
+            if df_kpi502_5.shape[0]-oldoverdues_5>0:
+                kpi502_5_percentage=(df_kpi502_5.shape[0]-oldoverdues_5-newoverdues_5)/(df_kpi502_5.shape[0]-oldoverdues_5)
+            else:
+                kpi502_5_percentage=1
 
 
         #    logger.info(df_kpi502_5)
             newrec["Total_Breaches"]=df_kpi502_5.shape[0];
             newrec["Overdues_Breaches"]=df_kpi502_5_overdue;
             newrec["KPI_Breaches"]=round(kpi502_5_percentage*100,2);
+
+            newrec["Old_Overdues_Breaches"]=oldoverdues_5
+            newrec["New_Overdues_Breaches"]=newoverdues_5
+
 
             newrec["Total"]=df_kpi502_4.shape[0]+df_kpi502_5.shape[0];
             newrec["Overdues"]=df_kpi502_4_overdue+df_kpi502_5_overdue;
@@ -683,13 +701,13 @@ def messageReceived(destination,message,headers):
         firerec["type"]="summary"
         firerec["_index"]="biac_month_kpi502"
         firerec["key"]="ALL (BACFIR)"
-        if firerec["Total_Breaches"]>0:
-            firerec["KPI_Breaches"]=round(100*(firerec["Total_Breaches"]-firerec["Overdues_Breaches"])/firerec["Total_Breaches"],2)
+        if firerec["Total_Breaches"]-firerec["Old_Overdues_Breaches"]>0:
+            firerec["KPI_Breaches"]=round(100*(firerec["Total_Breaches"]-firerec["Old_Overdues_Breaches"]-firerec["New_Overdues_Breaches"])/(firerec["Total_Breaches"]-firerec["Old_Overdues_Breaches"]),2)
         else:
             firerec["KPI_Breaches"]=100
             
         if firerec["Total_Remarks"]>0:
-            firerec["KPI_Remarks"]=round(100*(firerec["Total_Remarks"]-firerec["Overdues_Remarks"])/firerec["Total_Remarks"],2)
+            firerec["KPI_Remarks"]=round(100*(firerec["Total_Remarks"]-firerec["Old_Overdues_Remarks"]-firerec["New_Overdues_Remarks"])/(firerec["Total_Remarks"]-firerec["Old_Overdues_Remarks"]),2)
         else:
             firerec["KPI_Remarks"]=100
 
