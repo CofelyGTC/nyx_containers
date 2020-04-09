@@ -26,7 +26,7 @@ import collections
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="1.0.3"
+VERSION="1.0.5"
 MODULE="GTC_IMPORT_ONERP"
 QUEUE=["DISPATCHING_EVENTS"]
 
@@ -44,6 +44,12 @@ def log_message(message):
     conn.send_message("/queue/NYX_LOG",json.dumps(message_to_send))
 
 
+def cleanTitle(t):
+    if "span>" in t:
+        sp=t.split("span>")
+        return sp[len(sp)-1]
+    return t
+
 ################################################################################
 def messageReceived(destination,message,headers):
     global es
@@ -53,7 +59,7 @@ def messageReceived(destination,message,headers):
     logger.info("Message Received %s" % destination)
     logger.info(headers)
 
-    inmes=json.loads(message)
+    inmes=json.loads(message)    
 
     client = "ONERP"
     #area=inmes['area'];
@@ -66,21 +72,28 @@ def messageReceived(destination,message,headers):
 
     logger.info("index:"+indexname)
     bulkbody=""
+
     action={}
     action["index"]={"_index":indexname,"_type":"doc"}
     jsonaction=json.dumps(action)
     logger.info("action:"+jsonaction)
-    #logger.info("user : "+ inmes['user'])
 
+    action2={}
+    action2["index"]={"_index":"ONERP_ALERTDISPA".lower(),"_type":"doc","_id":"id"+str(inmes["evtID"])}
+    jsonaction2=json.dumps(action2)
+    logger.info("action:"+jsonaction2)
+    
+    inmes["dispatchingTS"]=inmes["utcDispatching"].replace(" ","T")+"Z"
+    inmes["sourceTS"]=inmes["utcSource"].replace(" ","T")+"Z"
 
-    #for dat in inmes["data"]:
-    #    dat["client"]=sender;
-    #    dat["area"]=area;
-    #    dat["area_name"]=area+"_"+dat["name"];
-    #    dat["client_area_name"]=client+"_"+area+"_"+dat["name"];
-    #dat[""] = ;
+    if "alrMsg" in inmes:
+        inmes["alrMsg"]=cleanTitle(inmes["alrMsg"])
+
     jsonobj=json.dumps(inmes)
-    bulkbody+=jsonaction+"\n"
+#    bulkbody+=jsonaction+"\n"
+#    bulkbody+=jsonobj+"\n"
+
+    bulkbody+=jsonaction2+"\n"
     bulkbody+=jsonobj+"\n"
 
     logger.info("Final %s=" %(bulkbody))

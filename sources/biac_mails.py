@@ -146,13 +146,15 @@ def decodePart(part,orgmes,fileHT):
         def clean_string(instr):
             return instr.replace("\\","").replace("\r","_").replace("\n","_")
 
-        //logger.info(orgmes)
-        orgmes['From']=clean_string(orgmes['From'])
-        orgmes['To']=clean_string(orgmes['To'])
-        //logger.info(orgmes)
+        #logger.info(orgmes)
+        mailfrom=clean_string(orgmes['From'])
+        mailto=clean_string(orgmes['To'])
+        logger.info(mailfrom)
+        logger.info(mailto)
 
-        conn.send_message("/queue/MAIL_LOG",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":orgmes['From'],"To":orgmes['To'],"Subject":subject})
-        conn.send_message("/queue/AVAILABILITIES_IMPORT",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":orgmes['From'],"To":orgmes['To'],"Subject":subject})
+
+        conn.send_message("/queue/MAIL_LOG",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":mailfrom,"To":mailto,"Subject":subject})
+        conn.send_message("/queue/AVAILABILITIES_IMPORT",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":mailfrom,"To":mailto,"Subject":subject})
 
 
 def send_attachment(msg):
