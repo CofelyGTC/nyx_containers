@@ -58,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 from elastic_helper import es_helper 
 
-VERSION="2.1.2"
+VERSION="2.1.5"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -348,6 +348,8 @@ def messageReceived(destination,message,headers):
             es.indices.delete(index="biac_maximo", ignore=[400, 404])
             es.indices.delete(index="biac_503maximo", ignore=[400, 404])
             time.sleep(3)
+            
+        df = df[df['Contract'] !=0]  
 
         df['Contract'] = df['Contract'].apply(lambda x: x.upper())
 
@@ -403,11 +405,12 @@ def messageReceived(destination,message,headers):
             overdue = 0
 
             ispm=(worktype=="PM")
+            issafe=(worktype=="SAFE" or worktype=="GRIS")
 
 
             try:
 
-                if ispm:
+                if ispm or issafe:
                     if displayStart <= scheduledStart < displayStop:
                         display = 1
                     elif scheduledStart < displayStart:
@@ -497,7 +500,7 @@ def messageReceived(destination,message,headers):
 
             
 
-            if not ispm:
+            if not ispm or not issafe:
                 dt = datetime.fromtimestamp(scheduledStart).date()
                 newrec['strMonths'] = compute_str_months(dt)
 
@@ -506,6 +509,9 @@ def messageReceived(destination,message,headers):
                 action = {}
                 if ispm:
                     action["index"] = {"_index": 'biac_maximo',
+                        "_type": "doc", "_id": es_id}
+                elif issafe:
+                    action["index"] = {"_index": 'biac_safemaximo',
                         "_type": "doc", "_id": es_id}
                 else:
                     action["index"] = {"_index": 'biac_503maximo',
@@ -520,6 +526,9 @@ def messageReceived(destination,message,headers):
                 action = {}
                 if ispm:
                     action["index"] = {"_index": 'biac_histo_maximo',
+                        "_type": "doc", "_id": es_id}
+                elif issafe:
+                    action["index"] = {"_index": 'biac_safehisto_maximo',
                         "_type": "doc", "_id": es_id}
                 else:
                     action["index"] = {"_index": 'biac_503histo_maximo',
@@ -574,6 +583,7 @@ def messageReceived(destination,message,headers):
 
         if not flag_histo:
             conn.send_message('/topic/BIAC_MAXIMO_IMPORTED', json.dumps(obj))
+            conn.send_message('/topic/BIAC_MAXIMOBIS_IMPORTED', json.dumps(obj))
     except Exception as e:
         endtime = time.time()
         logger.error(e)

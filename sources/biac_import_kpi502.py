@@ -40,6 +40,7 @@ VERSION HISTORY
 * 07 Jan 2020 1.0.6 **AMA** Lot 4 added in the new Kibana collection
 * 17 Feb 2020 1.1.0 **AMA** Use the new 502 computation method (new overdues)
 * 03 Mar 2020 1.2.0 **AMA** DOn't cound old overdues in percentages
+* 12 May 2021 1.2.1 **PDB** Fix bug in reference Date
 """
 import re
 import json
@@ -65,11 +66,22 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.2.0"
+VERSION="1.2.2"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
 goodmonth="NA"
+
+def fixDate(row):
+    try:
+        x = int(row['Reference Date'].timestamp()*1000)
+    except Exception as er:
+        print(er)
+        print(row)
+        month = row['Month']
+        newdt = datetime(int(month[:4]),int(month[-2:]),1)
+        x = int(newdt.timestamp()*1000)
+    return x    
 
 def computeOverdue(row):
     """This function determines if a record is overdued. It depends on the lot and record type.
@@ -160,6 +172,7 @@ def computeReport(row):
         return "Lot4 (BACDNB)"        
     
     res=rps.getKPI500Config(row['Cc 5'], row['BAC Service'])
+    logger.info(res)
     if res==None:
         logger.info(" %s => %s  "%(row['Cc 5'], row['BAC Service']))
         return "NA"
@@ -405,7 +418,8 @@ def messageReceived(destination,message,headers):
         dfdata2=dfdata2.drop(dfdata2[dfdata2["Month"]==''].index)
         dfdata2['_index'] = "biac_kpi502"
         #dfdata2['_timestamp'] = dfdata2['Reference Date'].apply(lambda x: getTimestamp(x)*1000)
-        dfdata2['_timestamp'] = dfdata2['Reference Date'].apply(lambda x: int(x.timestamp()*1000))
+        #dfdata2['_timestamp'] = dfdata2['Reference Date'].apply(lambda x: int(x.timestamp()*1000))
+        dfdata2['_timestamp'] = dfdata2.apply(lambda row: fixDate(row), axis=1)
         dfdata2['_id'] = dfdata2.apply(lambda row: get_id(row['Month'], row['SRid']), axis=1)
         dfdata2['_id']=dfdata2['_id'].apply(lambda x:goodmonth+"-"+x)
         logger.info(dfdata2)

@@ -230,7 +230,7 @@ def messageReceived(destination,message,headers):
                     logger.warning('unable to insert equipment: '+str(equipment)+' week: '+str(start_date)+' value: '+str(row[equipment])+ ' (type: '+str(type(row[equipment])))
 
 
-    # logger.info(bulkbody)
+    logger.info(bulkbody)
     logger.info("BULK READY:" + str(len(bulkbody)))
     bulkres = es.bulk(bulkbody, request_timeout=30)
     logger.info("BULK DONE")

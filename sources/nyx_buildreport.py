@@ -233,6 +233,33 @@ for paragraph in template.paragraphs:
             paragraph.text=paragraph.text.replace(match,"")
             exec(reportfunctions[match])
 
+
+# Fill headers
+
+for section in template.sections:
+    header = section.header
+    if re.search(pattern, header.text):                
+        match= re.search(pattern, header.text).group(0)
+        print(">>>>> FOUND PARAGRAPH :%s" %(match))                    
+        header.text=replaceText(replacementHT,header.text)        
+        if match in reportfunctions:
+            header.text=header.text.replace(match,"")
+            exec(reportfunctions[match])
+
+# Fill footer
+
+for section in template.sections:
+    footer = section.footer
+    if re.search(pattern, footer.text):                
+        match= re.search(pattern, footer.text).group(0)
+        print(">>>>> FOUND PARAGRAPH :%s" %(match))                    
+        footer.text=replaceText(replacementHT,footer.text)        
+        if match in reportfunctions:
+            footer.text=footer.text.replace(match,"")
+            exec(reportfunctions[match])            
+
+
+
 # SAVE REPORT
 
 if not localmode:

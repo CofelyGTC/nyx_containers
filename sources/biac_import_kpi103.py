@@ -31,6 +31,7 @@ VERSION HISTORY
 * 30 Oct 2019 1.0.0 **AMA** Use data get rest api exports_info function to get record ids
 * 30 Oct 2019 1.0.1 **AMA** Fix a bug that added an additional day during the daylight saving month
 * 09 Dec 2019 1.0.2 **VME** Fix a bug with end of month
+* 18 Aug 2021 1.0.3 **PDB** Fix a bug due to 'Wateranalyse' reports
 """       
 import re
 import sys
@@ -66,7 +67,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -171,7 +172,7 @@ def loadKPI103():
 
         df_all=pd.DataFrame()
         for i in form_list:
-            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()):
+            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()) and not 'Wateranalyse' in i['name']:
                 logger.info('MATCH')
                 logger.info(i['name'])
                 
@@ -234,6 +235,7 @@ def loadKPI103():
 
         if len(df_all) > 0:
             df_all.columns=["date","creation_date","ronde_number"]
+            
             
             df_all['_id']='biac_kpi103'+"_"+df_all['date'].dt.strftime("%d%B%Y")+"_"+df_all['ronde_number'].astype(str)#+"_"+df_all["operator"]
             df_all['_id'].apply(lambda x:x.lower().replace(" ",""))            
