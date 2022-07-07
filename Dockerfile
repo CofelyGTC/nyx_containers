@@ -17,7 +17,7 @@ RUN rm -d -r /opt/sources/*.sh
 
 WORKDIR /opt/sources
 # CMD ["python", "nyx_xlsimporter.py"]
-#CMD ["python", "nyx_reportrunner.py"]
+CMD ["python", "nyx_reportrunner.py"]
 #CMD ["python", "biac_compute_instawork.py"]
 #CMD ["python", "biac_import_instawork.py"]
 #CMD ["python", "biac_import_spot_567.py"]
@@ -51,7 +51,7 @@ WORKDIR /opt/sources
 #CMD ["python", "biac_import_waterloop.py"]
 #CMD ["python", "biac_lot2_monthly.py"]
 #CMD ["python", "biac_lot2_availabilities.py"]
-CMD ["python", "biac_import_kpi103.py"]
+#CMD ["python", "biac_import_kpi103.py"]
 #CMD ["python", "biac_monthly_lot2.py"]
 #CMD ["python", "biac_import_kpi102.py"]
 #CMD ["python", "biac_import_feedback_comments.py"]

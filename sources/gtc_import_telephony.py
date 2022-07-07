@@ -90,6 +90,7 @@ def messageReceived(destination,message,headers):
     logger.info("==> "*10)
     logger.info("Message Received %s" % destination)
     logger.info(headers)
+    logger.info(message)
     now = datetime.now()
 
     local_timezone = tzlocal.get_localzone()

@@ -23,6 +23,7 @@ VERSION HISTORY
 ===============
 
 * 23 Jul 2019 0.0.4 **VME** Code commented
+* 25 Mar 2022 0.0.5 **PDB** Correction new date format
 """  
 import re
 import json
@@ -48,7 +49,7 @@ from sqlalchemy import create_engine
 
 
 MODULE  = "BIAC_BAGS_IMPORTER"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 QUEUE   = ["BAGS_IMPORT"]
 
 def sizeof_fmt(num, suffix='B'):
@@ -133,6 +134,8 @@ def messageReceived(destination,message,headers):
             '16_to_25', 'more_than_25',
             'percent_more_16', 'site']
 
+        df_global['date'] = df_global['date'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y'))    
+
         del df_global['percent_more_16']
 
         df_global['more_than_16'] = df_global['16_to_25'] + df_global['more_than_25']
@@ -147,6 +150,8 @@ def messageReceived(destination,message,headers):
         df_glob2 = df_global.copy()
         df_glob2['color'] = df_glob2['color'].replace('green', 0).replace('red', 1)
 
+        
+
         df_month = df_glob2.set_index('date').groupby(pd.Grouper(freq='M'))\
                 .agg({'availability':'mean', 'color': 'sum'}).reset_index()\
                 .rename(columns={'color':'bad_days'})
@@ -158,6 +163,8 @@ def messageReceived(destination,message,headers):
         df_global['percent_recomputed'] = df_global['percent_recomputed'].apply(lambda x: ('%f' % x).rstrip('0').rstrip('.'))
         df_global['availability'] = df_global['availability'].apply(lambda x: ('%f' % x).rstrip('0').rstrip('.'))
         df_month['availability'] = df_month['availability'].apply(lambda x: ('%f' % x).rstrip('0').rstrip('.'))
+
+        logger.info(df_global.head())
 
         df_global['_id']    = df_global.apply(lambda row: row['site']+'_'+str(int(row['date'].timestamp()*1000)), axis=1)
         df_global['_index'] = 'biac_bags'

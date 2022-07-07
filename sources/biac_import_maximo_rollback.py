@@ -68,7 +68,7 @@ def log_message(message):
 
     message_to_send={
         "message":message,
-        "@timestamp":datetime.now().timestamp() * 1000,
+        "@timestamp":datetime(2022,6,14,3).timestamp() * 1000,
         "module":MODULE,
         "version":VERSION
     }
@@ -111,13 +111,13 @@ def getDisplayStart(now):
 
 ################################################################################
 def getDisplayDate503():
-    now = datetime.now()
+    now = datetime(2022,6,14,3)
     start_month = datetime(now.year, now.month, 1)
     return  start_month - relativedelta(months=4), start_month - relativedelta(months=3)
 
 ################################################################################
 def compute_str_months(dt):
-    today = datetime.now().date()
+    today = datetime(2022,6,14,3).date()
     start_month = datetime(today.year, today.month, 1).date()
     end_month = start_month + relativedelta(months=+1)
     
@@ -309,13 +309,13 @@ def messageReceived(destination,message,headers):
 
     
     
-    histo_date = datetime.now().date()
+    histo_date = datetime(2022,6,14,3).date()
     flag_histo = False
     regex = r'_([0-9]{8})\.'
     z = re.findall(regex, file_name)
-    if z:
-        flag_histo = True
-        histo_date = datetime.strptime(z[0], "%Y%m%d").date()
+    #if z:
+    #    flag_histo = True
+    #    histo_date = datetime.strptime(z[0], "%Y%m%d").date()
 
     flag_already_histo_for_today = False
     try:
@@ -323,8 +323,8 @@ def messageReceived(destination,message,headers):
                                         ,size=1
                                         ,query='histo_date:'+str(histo_date))
 
-        if len(dataframe) > 0:
-            flag_already_histo_for_today=True
+        #if len(dataframe) > 0:
+        #    flag_already_histo_for_today=True
     except:
         pass
     
@@ -340,15 +340,17 @@ def messageReceived(destination,message,headers):
 
     df = None
     try:        
-        sheet = 'WorkOrdersListBAC'
+        sheet = 'WorkOrdersListBAC.rdl'
         xl = pd.ExcelFile('./tmp/excel.xlsx')
 
         logger.info(xl.sheet_names)
         df = pd.read_excel('./tmp/excel.xlsx', sheet_name=sheet)
-        newheaders = df.iloc[0]
-        logger.info(newheaders)
-        df = df[1:]
-        df.columns = newheaders
+        #newheaders = df.iloc[0]
+        logger.info("HEADERS")
+        logger.info(df.columns)
+        #logger.info(newheaders)
+        #df = df[1:]
+        #df.columns = newheaders
 
         bulkbody = ''
         bulkres = ''
@@ -372,7 +374,7 @@ def messageReceived(destination,message,headers):
         df['screen_name'] = df.apply(extract_screen_name, axis=1)
         df[['lot', 'technic', 'Contract', 'Pm execution team']]
 
-        now = datetime.now()
+        now = datetime(2022,6,14,3)
         displayStart = getDisplayStart(now)
         displayStop = getDisplayStop(now)
 
@@ -594,9 +596,9 @@ def messageReceived(destination,message,headers):
         logger.info(obj)
 
 
-        if not flag_histo:
-            conn.send_message('/topic/BIAC_MAXIMO_IMPORTED', json.dumps(obj))
-            conn.send_message('/topic/BIAC_MAXIMOBIS_IMPORTED', json.dumps(obj))
+        #if not flag_histo:
+        conn.send_message('/queue/BIAC_MAXIMO_IMPORTED', json.dumps(obj))
+            #conn.send_message('/topic/BIAC_MAXIMOBIS_IMPORTED', json.dumps(obj))
     except Exception as e:
         endtime = time.time()
         logger.error(e)

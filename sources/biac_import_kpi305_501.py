@@ -58,7 +58,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.5"
+VERSION="1.0.6"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -414,7 +414,11 @@ def messageReceived(destination,message,headers):
                 logger.info("No worksheet to load...")
             else:
                 logger.info("Loading :"+sheettoload)
+               
                 dfdata = pd.read_excel(file, sheet_name=sheettoload)
+                logger.info(dfdata.shape)
+                logger.info(dfdata.head())
+
 
                 if dfdata.shape[1]==38:
                     newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
@@ -436,6 +440,37 @@ def messageReceived(destination,message,headers):
                             'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
                             'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',                        
                             'MonitorNOK', 'MonitorOK']
+                elif dfdata.shape[1]==50:
+                    dfdata.columns=[
+                            'Month', 'ControleOrg', 'Avid', 'QRcode', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label', 'Remarque', 'NoteStr', 'MonitorOKYN', 'LinkPeriod2', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'x7', 'x8', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism', 'x9', 'x10',
+                            'MonitorNOK', 'MonitorOK']
+                    newcols=[
+                            'Month', 'ControleOrg', 'Avid', 'QRcode', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label', 'Remarque', 'NoteStr', 'MonitorOKYN', 'LinkPeriod2',
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
+                            'MonitorNOK', 'MonitorOK', 'BAC ID'] 
+                    dfdata = dfdata[['Month', 'ControleOrg', 'Avid', 'QRcode', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                            'Label', 'Remarque', 'NoteStr', 'MonitorOKYN', 'LinkPeriod2',
+                            'SendDate2', 'Status', 'ReportDate2',
+                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
+                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
+                            'MonitorNOK', 'MonitorOK']]        
+                    dfdata['BAC ID'] = dfdata['Month_BacID'].apply(lambda x: x.split('_')[1])     
                 else:                         # MARCH 2019
                     newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
                             'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
@@ -447,7 +482,8 @@ def messageReceived(destination,message,headers):
                             'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
                             'Building2','DocName',
                             'MonitorNOK', 'MonitorOK']
-
+                dfdata.to_excel('./kpi501.xlsx')                            
+                logger.info(dfdata)
                 dfdata.columns=newcols
 
                 dfdata["Month"]=dfdata["Month"].apply(reorderMonth)

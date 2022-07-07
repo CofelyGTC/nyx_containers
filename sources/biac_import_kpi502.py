@@ -66,7 +66,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.2.2"
+VERSION="1.2.4"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
@@ -171,10 +171,10 @@ def computeReport(row):
     if row["Sheet"]=="Lot 4":
         return "Lot4 (BACDNB)"        
     
-    res=rps.getKPI500Config(row['Cc 5'], row['BAC Service'])
+    res=rps.getKPI500Config(row['Cc 5'], row['Sub-technic'])
     logger.info(res)
     if res==None:
-        logger.info(" %s => %s  "%(row['Cc 5'], row['BAC Service']))
+        logger.info(" %s => %s  "%(row['Cc 5'], row['Sub-technic']))
         return "NA"
     return res['key']
 
@@ -187,7 +187,10 @@ def recomputeKPI502():
 
     for key in keys:
         logger.info("Computing %s" %(key))
-        compute502barchart_v3(key)
+        try:
+            compute502barchart_v3(key)
+        except Exception as err:
+            logger.error(err)
 
 
 
@@ -227,8 +230,10 @@ def generate_kibana_dash(kib_df,rec_type,key):
 def compute502barchart_v3(reporttype):
 
     print('==============> KPI502 bar graph')
+    print(reporttype)
 
     cur_active=es_helper.elastic_to_dataframe(es,"biac_kpi502","active:1 AND key: \""+reporttype+"\"")
+    print(cur_active)
     startdate=datetime.strptime(cur_active["filedate"].iloc[0],"%Y-%m")
 
     
@@ -261,17 +266,25 @@ def compute502barchart_v3(reporttype):
     print(query)
     print(queryminusonemonth)
 
+    print('Step 1')
 
     cur_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",query)
+    print('Step 2')
     prev_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",queryminusonemonth)
+
+    print('Step 3')
+
 
     cur_df_4=cur_df[cur_df["ShortStatus"]==4].copy()
     cur_df_4_gr=cur_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
     cur_df_4_gr.columns=["value"]
+     
+    print('Step 4')
 
     prev_df_4=prev_df[prev_df["ShortStatus"]==4].copy()
     prev_df_4_gr=prev_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
     prev_df_4_gr.columns=["value"]
+    print('Step 5')
 
     merge_4_gr=cur_df_4_gr.merge(prev_df_4_gr,how="left", left_index=True, right_index=True)
     merge_4_gr.columns=["Cur","Prev"]
@@ -331,7 +344,10 @@ def messageReceived(destination,message,headers):
 
 
     if destination=="/topic/RECOMPUTE_502":
-        recomputeKPI502()
+        try:
+            recomputeKPI502()
+        except Exception as er:
+            logger.error(er)  
         return
     
     logger.info(headers)
@@ -460,6 +476,7 @@ def messageReceived(destination,message,headers):
         res4lot4=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),6,skip=0)
         res4table=[]
         
+        dfdata2.to_excel('./new502.xlsx')
 
         for key in dfdata2['key'].unique():
             print("===>"*30)
@@ -475,7 +492,7 @@ def messageReceived(destination,message,headers):
                 
 
         res4tabledf=pd.DataFrame(res4table)  
-        #print(res4tabledf)
+        res4tabledf.to_excel('./tablesKeys.xlsx')
         es_helper.dataframe_to_elastic(es,res4tabledf)
         
         #A/0
@@ -798,7 +815,10 @@ def messageReceived(destination,message,headers):
         logger.error(e3)   
         logger.error("Unable to update records biac_month_kpi502.") 
 
-    recomputeKPI502()
+    try:
+        recomputeKPI502()
+    except Exception as er:
+        logger.error(er)    
 
     endtime = time.time()    
     try:

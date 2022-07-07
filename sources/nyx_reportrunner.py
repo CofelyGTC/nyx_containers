@@ -42,7 +42,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from logstash_async.handler import AsynchronousLogstashHandler
 
 
-VERSION="1.4.0"
+VERSION="1.4.1"
 QUEUE=["/queue/NYX_REPORT_STEP2"]
 
 ################################################################################
