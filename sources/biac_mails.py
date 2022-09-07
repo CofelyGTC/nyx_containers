@@ -154,7 +154,7 @@ def decodePart(part,orgmes,fileHT):
 
 
         conn.send_message("/queue/MAIL_LOG",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":mailfrom,"To":mailto,"Subject":subject})
-        conn.send_message("/queue/AVAILABILITIES_IMPORT",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":mailfrom,"To":mailto,"Subject":subject})
+        conn.send_message("/queue/AVAILABILITIES_IMPORT_2",payload,headers={"CamelSplitAttachmentId":part.get_filename(), "file":part.get_filename(),"From":mailfrom,"To":mailto,"Subject":subject})
 
 
 def send_attachment(msg):

@@ -298,6 +298,8 @@ def loadKPI102():
 
 def compute_kpi102_monthly(df_kpi102):
     global es
+    logger.info("MONTH KPI 102")
+    logger.info(df_kpi102)
     starttime = time.time()
     
     df_kpi102['month'] = pd.to_datetime(df_kpi102['_timestamp'], unit='ms').dt.strftime('%Y-%m')

@@ -17,13 +17,13 @@ RUN rm -d -r /opt/sources/*.sh
 
 WORKDIR /opt/sources
 # CMD ["python", "nyx_xlsimporter.py"]
-CMD ["python", "nyx_reportrunner.py"]
+#CMD ["python", "nyx_reportrunner.py"]
 #CMD ["python", "biac_compute_instawork.py"]
 #CMD ["python", "biac_import_instawork.py"]
 #CMD ["python", "biac_import_spot_567.py"]
 # CMD ["python", "biac_import_kizeo.py"]
 # CMD ["python", "biac_import_feedback_comments.py"]
-# CMD ["python", "biac_import_kpi105.py"]
+CMD ["python", "biac_import_kpi105.py"]
 #CMD ["python", "biac_month_kizeo.py"]
 #CMD ["python", "biac_month_kizeo_2.py"]
 #CMD ["python", "biac_import_bags.py"]
