@@ -64,6 +64,7 @@ from functools import wraps
 from dateutil.relativedelta import relativedelta
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from time import sleep
 
 
 VERSION="1.2.4"
@@ -172,7 +173,7 @@ def computeReport(row):
         return "Lot4 (BACDNB)"        
     
     res=rps.getKPI500Config(row['Cc 5'], row['Sub-technic'])
-    logger.info(res)
+    #logger.info(res)
     if res==None:
         logger.info(" %s => %s  "%(row['Cc 5'], row['Sub-technic']))
         return "NA"

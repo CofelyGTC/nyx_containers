@@ -1,6 +1,8 @@
 ############################################
 # ReportStructure
 ############################################
+
+import time
 class ReportStructure:
     
 #===========================================    
@@ -76,7 +78,11 @@ class ReportStructure:
             name="Stefaan Pletinckx"
         
         name=name.replace("é","e")
-        #print("KPI 500 NAME:"+name+" BAC:"+bacservice)
+        
+        if bacservice == 'HVAC':
+            #time.sleep(1)
+            print("KPI 500 NAME:"+name+" BAC:"+bacservice)
+            #time.sleep(1)
 
         for rec in self.entities:
             if "header" not in rec:
@@ -103,4 +109,6 @@ class ReportStructure:
                 for pair in rec["header"]["kpi500exception"]:
                     if name==pair["name"] and pair["service"]==bacservice:
                         return rec 
+        if bacservice == 'HVAC':
+            print(self.entities)                
         return None   
