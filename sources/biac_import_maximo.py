@@ -59,7 +59,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 from elastic_helper import es_helper 
 
-VERSION="2.1.9"
+VERSION="2.1.11"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -340,15 +340,15 @@ def messageReceived(destination,message,headers):
 
     df = None
     try:        
-        sheet = 'WorkOrdersListBAC'
+        sheet = 'WorkOrdersListBAC.rdl'
         xl = pd.ExcelFile('./tmp/excel.xlsx')
 
         logger.info(xl.sheet_names)
         df = pd.read_excel('./tmp/excel.xlsx', sheet_name=sheet)
         newheaders = df.iloc[0]
         logger.info(newheaders)
-        df = df[1:]
-        df.columns = newheaders
+        #df = df[1:]
+        #df.columns = newheaders
 
         bulkbody = ''
         bulkres = ''
@@ -361,16 +361,30 @@ def messageReceived(destination,message,headers):
             es.indices.delete(index="biac_503maximo", ignore=[400, 404])
             time.sleep(3)
             
+
+        logger.info("step 1")  
+        logger.info(df.head())
+        logger.info(df.columns)  
         df = df[df['Contract'] !=0]  
+
+        logger.info("step 2")
 
         df['Contract'] = df['Contract'].apply(lambda x: x.upper())
 
+        logger.info("step 3")
+
         df['lot'] = df['Contract'].apply(lambda x: set_lot(x))
+
+        logger.info("step 4")
+
         df['technic'] = df.apply(lambda row: set_technic(row['Contract'], row['Pm execution team']), axis=1)
         
+        logger.info("step 5")
             
         df['screen_name'] = df.apply(extract_screen_name, axis=1)
         df[['lot', 'technic', 'Contract', 'Pm execution team']]
+
+        logger.info("step 6")
 
         now = datetime.now()
         displayStart = getDisplayStart(now)

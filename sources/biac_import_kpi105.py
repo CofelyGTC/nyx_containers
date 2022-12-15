@@ -63,7 +63,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI105_IMPORTER"
-VERSION = "1.0.5"
+VERSION = "1.0.6"
 QUEUE   = ["KPI105_IMPORT"]
 
 def log_message(message):
@@ -382,7 +382,7 @@ def loadKPI105():
         df_all=pd.DataFrame()
         for i in form_list:
             #if re.findall("LOT [1-9] - Dagelijkse ronde .*", i['name'].strip()):
-            if re.findall("LOT [1-9] - Tweemaal per week ronde*", i['name'].strip()):
+            if re.findall("LOT [1-9] - Tweemaal per week ronde*", i['name'].strip()) or re.findall("LOT [1-9] - Dagelijkse ronde *", i['name'].strip()):
                 logger.info('MATCH')
                 logger.info(i['name'])
                 

@@ -4,7 +4,7 @@ MAINTAINER lapin
 RUN apt-get update
 RUN apt-get install -y vim
 
-COPY ./sources/requirements.txt /opt/sources/requirements.txt
+COPY ./sources/requirementsNew.txt /opt/sources/requirements.txt
 RUN pip install -r /opt/sources/requirements.txt
 
 COPY ./sources /opt/sources
@@ -23,7 +23,7 @@ WORKDIR /opt/sources
 #CMD ["python", "biac_import_spot_567.py"]
 # CMD ["python", "biac_import_kizeo.py"]
 # CMD ["python", "biac_import_feedback_comments.py"]
-CMD ["python", "biac_import_kpi105.py"]
+#CMD ["python", "biac_import_kpi105.py"]
 #CMD ["python", "biac_month_kizeo.py"]
 #CMD ["python", "biac_month_kizeo_2.py"]
 #CMD ["python", "biac_import_bags.py"]
@@ -70,3 +70,5 @@ CMD ["python", "biac_import_kpi105.py"]
 #CMD ["python", "biac_import_kpi102_lot4.py"]
 # CMD ["python", "biac_import_availabilities.py"]
 #CMD ["python", "gtc_import_telephony.py"]
+
+CMD ["python", "ulg_compute_timesheet.py"]

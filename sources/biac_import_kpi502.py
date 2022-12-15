@@ -67,7 +67,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from time import sleep
 
 
-VERSION="1.2.4"
+VERSION="1.2.6"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
@@ -78,11 +78,14 @@ def fixDate(row):
         x = int(row['Reference Date'].timestamp()*1000)
     except Exception as er:
         print(er)
-        print(row)
+        #print(row)
         month = row['Month']
         newdt = datetime(int(month[:4]),int(month[-2:]),1)
+        print(newdt)
         x = int(newdt.timestamp()*1000)
-    return x    
+    finally:
+        print(x)
+        return x    
 
 def computeOverdue(row):
     """This function determines if a record is overdued. It depends on the lot and record type.
@@ -93,11 +96,11 @@ def computeOverdue(row):
     try:
         curmonth=datetime.strptime(row["Month"],"%Y-%m")
     except:
-        print("===========++>>>>"*30)
-        print(row["Month"])
+        #print("===========++>>>>"*30)
+        #print(row["Month"])
         return row["Month"]
     gm=datetime.strptime(goodmonth,"%m-%Y")
-#    print(gm)    
+#    #print(gm)    
 
     if row["Sheet"] == "Lot 4":
         if row["ShortStatus"]==5:
@@ -113,7 +116,7 @@ def computeOverdue(row):
         
 
 
-#    print("GM= %s" %(gm))    
+#    #print("GM= %s" %(gm))    
     if curmonth>=gm:
         return row["Month"]
     else:
@@ -230,11 +233,11 @@ def generate_kibana_dash(kib_df,rec_type,key):
 
 def compute502barchart_v3(reporttype):
 
-    print('==============> KPI502 bar graph')
-    print(reporttype)
+    #print('==============> KPI502 bar graph')
+    #print(reporttype)
 
     cur_active=es_helper.elastic_to_dataframe(es,"biac_kpi502","active:1 AND key: \""+reporttype+"\"")
-    print(cur_active)
+    #print(cur_active)
     startdate=datetime.strptime(cur_active["filedate"].iloc[0],"%Y-%m")
 
     
@@ -247,45 +250,45 @@ def compute502barchart_v3(reporttype):
     start_overdue_5=str(start_overdue_5.year)+"-"+(str(start_overdue_5.month)).zfill(2)
 
 
-    print(start_overdue_5)
+    #print(start_overdue_5)
 #    startminusonemonth=start-timedelta(days=32)
     startminusonemonth=start-relativedelta(months=1)
 
     filedate=str(start.year)+"-"+(str(start.month)).zfill(2)
     filedateminusonemonth=str(startminusonemonth.year)+"-"+(str(startminusonemonth.month)).zfill(2)
-    print("FileDate: %s" %(filedate))
+    #print("FileDate: %s" %(filedate))
 
     queryadd=" AND key: \""+reporttype.replace("Lot4 (DNB)","Lot4 (BACDNB)")+"\""
     if "All" in reporttype:
         queryadd=" AND  Lot: \"Lot 2\""
 
-        print(queryadd)
+        #print(queryadd)
 
     query='(ShortStatusFU: Actievereist OR ValueCount:0) AND filedate:'+filedate+queryadd
     queryminusonemonth='(ShortStatusFU: Actievereist OR ValueCount:0) AND filedate:'+filedateminusonemonth+queryadd
 
-    print(query)
-    print(queryminusonemonth)
+    #print(query)
+    #print(queryminusonemonth)
 
-    print('Step 1')
+    #print('Step 1')
 
     cur_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",query)
-    print('Step 2')
+    #print('Step 2')
     prev_df=es_helper.elastic_to_dataframe(es,"biac_kpi502",queryminusonemonth)
 
-    print('Step 3')
+    #print('Step 3')
 
 
     cur_df_4=cur_df[cur_df["ShortStatus"]==4].copy()
     cur_df_4_gr=cur_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
     cur_df_4_gr.columns=["value"]
      
-    print('Step 4')
+    #print('Step 4')
 
     prev_df_4=prev_df[prev_df["ShortStatus"]==4].copy()
     prev_df_4_gr=prev_df_4.groupby("MonthFU").agg({"ValueCount":["sum"]})
     prev_df_4_gr.columns=["value"]
-    print('Step 5')
+    #print('Step 5')
 
     merge_4_gr=cur_df_4_gr.merge(prev_df_4_gr,how="left", left_index=True, right_index=True)
     merge_4_gr.columns=["Cur","Prev"]
@@ -418,12 +421,13 @@ def messageReceived(destination,message,headers):
         #dfdata = dfdata.drop('Unnamed: 0', axis=1)
         dfdata=dfdata.reset_index()
         del dfdata["index"]
-        #print(dfdata.columns)
+        ##print(dfdata.columns)
         logger.info(dfdata.columns)
         #newcols=['Month','SRid','Status','Opm. number','Definition','Building','Floor','Place','Technic','Sub-technic','materials','AssetCode','Device','BACid','Frequency','Control','Report','Report Date','Reference Date','Reference Year','Reference source date','Last shipment','Repeat','Point of interest','KPI timing','GroupNum','Type','FB Name','FB date','FB','Orig label','Orig Definition','Control organism','To','Cc 1','Cc 2','Cc 3','Cc 4','Cc 5','Cc 6','Cc 7','Cc 8','Cc 9','BAC Dept','BAC Sub Dept','BAC Service','Group','Contractor','Lot','KPI Type','ShortStatus','ShortStatusFU','ConcatShortStatus&OrigStatus','LongStatus','Classification nr (O/I)','Classification (O/I)','Show graph','Report link','Status (M-1)','Report Date (M-1)','FB Date (M-1)','Deleted vs M-1','MonthFU','Sheet']
         newcols=['Month','SRid','Status','Opm. number','Definition','Building','Floor','Place','Technic','Sub-technic','materials','AssetCode','Device','BACid','Frequency','Control','Report','Report Date','Reference Date','Reference Year','Reference source date','Last shipment','Repeat','Point of interest','KPI timing','GroupNum','Type','FB Name','FB date','FB','Orig label','Orig Definition','Control organism','To','Cc 1','Cc 2','Cc 3','Cc 4','Cc 5','Cc 6','Cc 7','Cc 8','Cc 9','BAC Dept','BAC Sub Dept','BAC Service','Group','Contractor','Lot','KPI Type','ShortStatus','ShortStatusFU','ConcatShortStatus&OrigStatus','LongStatus','Classification nr (O/I)','Classification (O/I)','Show graph','Report link','Status (M-1)','Report Date (M-1)','FB Date (M-1)','Deleted vs M-1',"KPI Type Nr","CheckArchived",'Sheet']
         logger.info(newcols)
         dfdata.columns = newcols
+        dfdata.to_excel("./testExcel.xlsx")
         dfdata["KPI Type Nr"]=502
 
 
@@ -436,6 +440,7 @@ def messageReceived(destination,message,headers):
         dfdata2['_index'] = "biac_kpi502"
         #dfdata2['_timestamp'] = dfdata2['Reference Date'].apply(lambda x: getTimestamp(x)*1000)
         #dfdata2['_timestamp'] = dfdata2['Reference Date'].apply(lambda x: int(x.timestamp()*1000))
+        dfdata2['Reference Date'] = dfdata2['Reference Date'].apply(lambda x: x if not x=="" else (datetime.now()-timedelta(days=31)) )
         dfdata2['_timestamp'] = dfdata2.apply(lambda row: fixDate(row), axis=1)
         dfdata2['_id'] = dfdata2.apply(lambda row: get_id(row['Month'], row['SRid']), axis=1)
         dfdata2['_id']=dfdata2['_id'].apply(lambda x:goodmonth+"-"+x)
@@ -477,14 +482,17 @@ def messageReceived(destination,message,headers):
         res4lot4=compute_previous_months(int(goodmonth.split("-")[0]),int(goodmonth.split("-")[1]),6,skip=0)
         res4table=[]
         
+        print(dfdata2['Reference Date'])
+
+
         dfdata2.to_excel('./new502.xlsx')
 
         for key in dfdata2['key'].unique():
-            print("===>"*30)
-            print(key)
+            #print("===>"*30)
+            #print(key)
             if key.startswith("Lot4"):
                 res4touse=res4lot4
-                print("LOT4"*100)
+                #print("LOT4"*100)
             else:
                 res4touse=res4
             for rec in res4touse:                
@@ -504,7 +512,7 @@ def messageReceived(destination,message,headers):
         for key in dfdata2['key'].unique():
             if key.startswith("Lot4"):
                 res5touse=res5lot4
-                print("LOT4"*100)
+                #print("LOT4"*100)
             else:
                 res5touse=res5
             for rec in res5touse:
@@ -542,7 +550,9 @@ def messageReceived(destination,message,headers):
 # WRITE DATA
         res5tabledf=pd.DataFrame(res5table)  
         es_helper.dataframe_to_elastic(es,res5tabledf)
+        
         es_helper.dataframe_to_elastic(es,dfdata2)
+        
 
         ## NOW COMPUTE MONTH
 

@@ -68,7 +68,7 @@ def log_message(message):
 
     message_to_send={
         "message":message,
-        "@timestamp":datetime(2022,6,14,3).timestamp() * 1000,
+        "@timestamp":datetime(2022,10,14,3).timestamp() * 1000,
         "module":MODULE,
         "version":VERSION
     }
@@ -111,13 +111,13 @@ def getDisplayStart(now):
 
 ################################################################################
 def getDisplayDate503():
-    now = datetime(2022,6,14,3)
+    now = datetime(2022,10,14,3)
     start_month = datetime(now.year, now.month, 1)
     return  start_month - relativedelta(months=4), start_month - relativedelta(months=3)
 
 ################################################################################
 def compute_str_months(dt):
-    today = datetime(2022,6,14,3).date()
+    today = datetime(2022,10,14,3).date()
     start_month = datetime(today.year, today.month, 1).date()
     end_month = start_month + relativedelta(months=+1)
     
@@ -309,7 +309,7 @@ def messageReceived(destination,message,headers):
 
     
     
-    histo_date = datetime(2022,6,14,3).date()
+    histo_date = datetime(2022,10,14,3).date()
     flag_histo = False
     regex = r'_([0-9]{8})\.'
     z = re.findall(regex, file_name)
@@ -374,7 +374,7 @@ def messageReceived(destination,message,headers):
         df['screen_name'] = df.apply(extract_screen_name, axis=1)
         df[['lot', 'technic', 'Contract', 'Pm execution team']]
 
-        now = datetime(2022,6,14,3)
+        now = datetime(2022,10,14,3)
         displayStart = getDisplayStart(now)
         displayStop = getDisplayStop(now)
 
