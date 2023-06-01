@@ -1,10 +1,10 @@
-FROM python:3.7.3-slim
+FROM python:3.9.3-slim
 MAINTAINER lapin
 
 RUN apt-get update
 RUN apt-get install -y vim
 
-COPY ./sources/requirementsNew.txt /opt/sources/requirements.txt
+COPY ./sources/requirements.txt /opt/sources/requirements.txt
 RUN pip install -r /opt/sources/requirements.txt
 
 COPY ./sources /opt/sources
@@ -46,7 +46,7 @@ WORKDIR /opt/sources
 #CMD ["python", "gtc_sites_data.py"]
 #CMD ["python", "biac_lot2_monthly.py"]
 #CMD ["python", "biac_import_kpi103.py"]
-#CMD ["python", "biac_monthly_lot2.py"]
+CMD ["python", "biac_monthly_lot2.py"]
 #CMD ["python", "biac_import_kpi102.py"]
 #CMD ["python", "biac_import_waterloop.py"]
 #CMD ["python", "biac_lot2_monthly.py"]
@@ -71,4 +71,4 @@ WORKDIR /opt/sources
 # CMD ["python", "biac_import_availabilities.py"]
 #CMD ["python", "gtc_import_telephony.py"]
 
-CMD ["python", "ulg_compute_timesheet.py"]
+#CMD ["python", "ulg_compute_timesheet.py"]

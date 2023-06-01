@@ -50,7 +50,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.9"
+VERSION="1.0.10"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -164,8 +164,8 @@ def messageReceived(destination,message,headers):
     f.close()
 
     file = 'dataFile.xlsm'
-    dfrepdef = pd.read_excel(file, sheetname='REPDEF')
-    dfdata = pd.read_excel(file, sheetname='REPORT', skiprows=7)
+    dfrepdef = pd.read_excel(file, sheet_name='REPDEF')
+    dfdata = pd.read_excel(file, sheet_name='REPORT', skiprows=7)
     #logger.info(dfdata)
     filter_col = [col for col in dfdata if col.startswith('KPI') or col.startswith('GTA') or col.startswith('GTF') or col.startswith('GTK') or col.startswith('Lot')]
     columns = ['Unnamed: 2', 'Unnamed: 3', 'EQ']
