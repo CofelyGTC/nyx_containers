@@ -601,6 +601,8 @@ def messageReceived(destination,message,headers):
 
             dfdata["key"]=dfdata.apply(computeReport,axis=1)
 
+            
+
             #dfdata["_id"]=dfdata["Month_BacID"]
             dfdata["_index"]="biac_kpi305"
             dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
