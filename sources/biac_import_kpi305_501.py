@@ -87,12 +87,31 @@ def log_message(message):
 def computeReport(row):
     logger.info("Compute Report")
     logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
+    
+    
     res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
     if res==None:
         logger.error("BAD" *100)
         return "NA"
     else:
         return res["key"]
+
+def computeReport305(row):
+    logger.info("Compute Report")
+    logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
+    if row['Lot'] == 'Lot 1':
+        res = {}
+        res["key"] = 'Lot1 (BACHEA)'
+    elif row['Lot'] == 'Lot 3':
+        res = {}
+        res["key"] = 'Lot3 (BACEXT)'
+    else:
+        res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
+    if res==None:
+        logger.error("BAD" *100)
+        return "NA"
+    else:
+        return res["key"]        
 
 def compute305():
     logger.info(">>> COMPUTE 305 STARTED")
@@ -472,16 +491,7 @@ def messageReceived(destination,message,headers):
                             'MonitorNOK', 'MonitorOK']]        
                     dfdata['BAC ID'] = dfdata['Month_BacID'].apply(lambda x: x.split('_')[1])     
                 else:                         # MARCH 2019
-                    newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
-                            'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
-                            'Label','Note','Supervisor', 'MonitorOKYN', 'x1', 'Label2', 'LinkPeriod2',
-                            'SendDate2', 'Status', 'ReportDate2',
-                            'CheckDateSend', 'CheckStatus', 'CheckReportDate',
-                            'Month_BacID', 'CheckMonth', 'GlobalCheck', 'CountC',
-                            'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
-                            'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
-                            'Building2','DocName',
-                            'MonitorNOK', 'MonitorOK']
+                    newcols=['Month', 'ControlOrg', 'Avid', 'QRCode', 'SRPresentation', 'SendDate', 'TypeOfReport','ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData','Label','Note','Supervisor','MonitorOKYN', 'LinkPeriod2','Latest_Status','Count of "Opmerkingen"','Count of "Inbreuken"','theorical global status','delta global status','detail quality check','Organism', 'ReportDate2','Status', 'SendDate2','CheckDateSend', 'CheckStatus', 'CheckReportDate','Month_BacID', 'CheckMonth','Report_Type_Prio','Column1', 'GlobalCheck', 'CountC','CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept','BACService', 'Company', 'CofelyResp', 'Lot', 'Organisme','Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic','text_VL','text_sending date','text_Report date','text_Global status vs VL','text_Org.','text_Quality check']
                 dfdata.to_excel('./kpi501.xlsx')                            
                 logger.info(dfdata)
                 dfdata.columns=newcols
@@ -586,6 +596,19 @@ def messageReceived(destination,message,headers):
                     'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
                     'BACService', 'Company', 'CofelyResp', 'Lot', 'Organism',
                     'Building2','DocName','SupervisorNOK','SupervisorOK']
+            elif dfdata.shape[1]==52:  # JANUARY 2023
+                newcols=['Month', 'ControlOrg', 'Avid', 'QRCode', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                    'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                    'Label','Note','Supervisor','MonitorOKYN', 'LinkPeriod2',
+                    'Latest_Status'
+                    ,'Count of "Opmerkingen"','Count of "Inbreuken"','theorical global status','delta global status','detail quality check','Organism'
+                    , 'ReportDate2',
+                    'Status', 'SendDate2',
+                    'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                    'Month_BacID', 'CheckMonth','Report_Type_Prio','Column1', 'GlobalCheck', 'CountC',
+                    'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                    'BACService', 'Company', 'CofelyResp', 'Lot', 'Organisme',
+                    'Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic']                    
             else:
                 newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
                     'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
@@ -599,7 +622,7 @@ def messageReceived(destination,message,headers):
 
             dfdata.columns=newcols
 
-            dfdata["key"]=dfdata.apply(computeReport,axis=1)
+            dfdata["key"]=dfdata.apply(computeReport305,axis=1)
 
             
 

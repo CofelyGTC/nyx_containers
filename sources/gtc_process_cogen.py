@@ -864,6 +864,7 @@ def insertIntoELK(onecogendf,definition):
 
 
     if True and len(messagebody)>0:
+        logger.info(messagebody)
         res=es.bulk(messagebody)
         #print (res)
         try:
@@ -980,24 +981,28 @@ def calcCogen():
 def doTheWork(start):
     logger.info("Do the work ...")
     allcogens=getCogenNames()
+    logger.info(allcogens)
 
     for cogenname in allcogens:
-#        if cogenname != 'noh':
+        if cogenname == 'olv_asse':
 #        if cogenname != 'calypso':#cogenname != 'sportoase_beringen':
 #            continue
 #multires=loadCogen("lutosa",datetime(2017, 4, 4),datetime(2017, 4, 24))
 #        multires=loadCogen("sportoase_beringen",datetime(2017, 4, 4),datetime(2017, 4, 24))
 #multires=loadCogen("sportoase_braine",datetime(2017, 4, 4),datetime(2017, 4, 24))
-        multires=loadCogen(cogenname, datetime.today() - timedelta(days=40),datetime.now())
+          multires=loadCogen(cogenname, datetime.today() - timedelta(days=40),datetime.now())
 
-        cogendf=multires[1]
-#        print (cogendf)
+          cogendf=multires[1]
+          print(multires[0])
+          print (cogendf)
 
-        cogendf=computePerformance(cogendf)
-        cogendf.fillna(0, inplace=True)
-#        logger.info(cogendf)
+          cogendf=computePerformance(cogendf)
+          print(cogendf)
+          cogendf.fillna(0, inplace=True)
+          print(cogendf)
+  #        logger.info(cogendf)
 
-        insertIntoELK(cogendf,multires[0])
+          insertIntoELK(cogendf,multires[0])
 
 
 

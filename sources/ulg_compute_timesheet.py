@@ -39,7 +39,7 @@ from functools import wraps
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from logstash_async.handler import AsynchronousLogstashHandler
 
-VERSION="1.0.4"
+VERSION="1.0.5"
 MODULE="ULG_COMPUTE_TIMESHEET"
 QUEUE=["ULG_COMPUTE_TIMESHEET"]
 
@@ -214,7 +214,7 @@ def ulg_computed():
                 if startDay.strftime('%w') == '0':
                     print('Dimanche')
                     start1 = startDay.replace(hour = int(regularHoraire['sundayON1'][:2]), minute= int(regularHoraire['sundayON1'][-2:]), second=0).timestamp()
-                    start2 = startDay.replace(hour = int(regularHoraire['sundayON2'][:2]), minute= int(regularHoraire['sundayON1'][-2:]), second=0).timestamp()
+                    start2 = startDay.replace(hour = int(regularHoraire['sundayON2'][:2]), minute= int(regularHoraire['sundayON2'][-2:]), second=0).timestamp()
                     end1 = startDay.replace(hour = int(regularHoraire['sundayOFF1'][:2]), minute= int(regularHoraire['sundayOFF1'][-2:]), second=0).timestamp()
                     end2 = startDay.replace(hour = int(regularHoraire['sundayOFF2'][:2]), minute= int(regularHoraire['sundayOFF2'][-2:]), second=0).timestamp()
 
@@ -344,6 +344,8 @@ def ulg_compute_alone(circuit):
 
     start = datetime.now()-timedelta(days=1)
     end = start + timedelta(days=15)
+
+
     regulars = es_helper.elastic_to_dataframe(es, 'horaires_ulg_regular')
     #circuit = 'Stat.général'
     DB = 'XX'
@@ -373,6 +375,8 @@ def ulg_compute_alone(circuit):
 
     start = datetime.now()-timedelta(days=1)
     end = start + timedelta(days=15)
+
+
     roomsdf = df[df['bat_circuit'] == circuit]
     roomsdf = roomsdf.sort_values(by=['code_identification']).reset_index(drop = True)
     rooms = roomsdf['code_identification'].unique().tolist()
@@ -401,7 +405,7 @@ def ulg_compute_alone(circuit):
         end2 = startDay.timestamp()
 
         if regularHoraire != '':
-            #print(regularHoraire)
+            print(regularHoraire)
             #regularHoraire = json.loads(regularHoraire)
             DB = regularHoraire['DB']
             deroCovid = regularHoraire['dero_covid']
@@ -416,9 +420,11 @@ def ulg_compute_alone(circuit):
             if startDay.strftime('%w') == '0':
                 print('Dimanche')
                 start1 = startDay.replace(hour = int(regularHoraire['sundayON1'][:2]), minute= int(regularHoraire['sundayON1'][-2:]), second=0).timestamp()
-                start2 = startDay.replace(hour = int(regularHoraire['sundayON2'][:2]), minute= int(regularHoraire['sundayON1'][-2:]), second=0).timestamp()
+                start2 = startDay.replace(hour = int(regularHoraire['sundayON2'][:2]), minute= int(regularHoraire['sundayON2'][-2:]), second=0).timestamp()
                 end1 = startDay.replace(hour = int(regularHoraire['sundayOFF1'][:2]), minute= int(regularHoraire['sundayOFF1'][-2:]), second=0).timestamp()
                 end2 = startDay.replace(hour = int(regularHoraire['sundayOFF2'][:2]), minute= int(regularHoraire['sundayOFF2'][-2:]), second=0).timestamp()
+
+               
 
             elif startDay.strftime('%w') == '1':
                 print('Lundi')
@@ -461,7 +467,8 @@ def ulg_compute_alone(circuit):
 
         if horaireULG.shape[0] > 0:
             horaireULG = horaireULG.reset_index(drop=True)
-            #print('hooraireULG '+circuit)
+            print('horaireULG '+circuit)
+            print(horaireULG)
             for index, row in horaireULG.iterrows():
                 startRow = startDay.replace(hour = int(row['start_time'][:2]), minute=int(row['start_time'][-5:-3]), second=0).timestamp()
                 endRow = startDay.replace(hour = int(row['end_time'][:2]), minute=int(row['end_time'][-5:-3]), second=0).timestamp()
@@ -494,6 +501,8 @@ def ulg_compute_alone(circuit):
         logger.info(startDay)     
         logger.info(startDay.timestamp()+86400)
         logger.info("*******************************************")
+
+
         if deroCovid:
             logger.info("######################################")
             logger.info("DERO COVID")
@@ -511,7 +520,8 @@ def ulg_compute_alone(circuit):
                 end1 += deroCovidMins*60
                 if int(end1) >= startDay.timestamp()+86400:
                     end1 = (startDay + timedelta(days=1)-timedelta(minutes=1)).timestamp()
-                
+
+
         if deroCovidMorning:
             startdt = datetime.fromtimestamp(start1)
             if startdt.hour != 0:
@@ -520,6 +530,7 @@ def ulg_compute_alone(circuit):
         isConge = getConge(startDay)
         isCongeULG = getCongeULG(startDay)
         isCongeOffice = getCongeOffice(startDay)
+
         
         if (deroConge and isConge) or (deroCongeULG and isCongeULG) or (deroCongeOffice and isCongeOffice):
             start1=startDay.timestamp()
@@ -532,6 +543,8 @@ def ulg_compute_alone(circuit):
         idCircuit = idCircuit.replace(' ', '_')
         idCircuit = idCircuit.replace('.', '_')
         _id = idCircuit+'_'+str(ts)
+
+ 
 
         action["index"]={"_index":"ulg_horaires_computed","_type":"doc","_id":_id}
         newRec = {"@timestamp": ts, "circuit": circuit, "DB": DB, "start1": int(start1*1000), "start2": int(start2*1000), "end1": int(end1*1000), "end2": int(end2*1000), 'nextGen': nextGen, 'oldGenDecimal': oldGenDecimal}
