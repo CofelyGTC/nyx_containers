@@ -31,7 +31,7 @@ WORKDIR /opt/sources
 #CMD ["python","biac_mails.py"]
 #CMD ["python","nyx_reportscheduler.py"]
 #CMD ["python", "biac_mails.py"]
-#CMD ["python", "biac_import_kpi305_501.py"]
+CMD ["python", "biac_import_kpi305_501.py"]
 #CMD ["python","nyx_formatconverter.py"]
 #CMD ["python", "biac_availabilities_refactor.py"]
 #CMD ["python", "biac_month_availability.py"]
@@ -71,4 +71,4 @@ WORKDIR /opt/sources
 # CMD ["python", "biac_import_availabilities.py"]
 #CMD ["python", "gtc_import_telephony.py"]
 
-CMD ["python", "ulg_compute_timesheet.py"]
+#CMD ["python", "ulg_compute_timesheet.py"]
