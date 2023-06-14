@@ -624,6 +624,9 @@ def messageReceived(destination,message,headers):
 
             dfdata["key"]=dfdata.apply(computeReport305,axis=1)
 
+            dfdata["Avid"] = dfdata["Avid"].apply(lambda x: 0 if x=='-' else x)
+            dfdata["QRCode"] = dfdata["QRCode"].apply(lambda x: 0 if x=='-' else x)
+
             
 
             #dfdata["_id"]=dfdata["Month_BacID"]
