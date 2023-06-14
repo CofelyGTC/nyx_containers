@@ -3,6 +3,9 @@
 ############################################
 
 import time
+import logging
+
+logger=logging.getLogger()
 class ReportStructure:
     
 #===========================================    
@@ -69,8 +72,9 @@ class ReportStructure:
         return None
     
 #===========================================    
-    def getKPI500Config(self,name,bacservice):        
+    def getKPI500Config(self,name,bacservice):
         ent=self.getEntity(self.report)
+        logger.info(ent)
 
         if name =="Dirk Van Leemput":
             name="Stefaan Pletinckx"

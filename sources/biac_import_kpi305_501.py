@@ -58,7 +58,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.6"
+VERSION="1.0.7"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -86,10 +86,10 @@ def log_message(message):
 
 def computeReport(row):
     logger.info("Compute Report")
-    logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
+    logger.info("<%s> => <%s>" % (row["CofelyResp"],row["Sub Technic"]))
     
     
-    res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
+    res=rps.getKPI500Config(row["CofelyResp"],row["Sub Technic"])
     if res==None:
         logger.error("BAD" *100)
         return "NA"
@@ -98,7 +98,7 @@ def computeReport(row):
 
 def computeReport305(row):
     logger.info("Compute Report")
-    logger.info("<%s> => <%s>" % (row["CofelyResp"],row["BACService"]))
+    logger.info("<%s> => <%s>" % (row["CofelyResp"],row["Sub Technic"]))
     if row['Lot'] == 'Lot 1':
         res = {}
         res["key"] = 'Lot1 (BACHEA)'
@@ -106,7 +106,7 @@ def computeReport305(row):
         res = {}
         res["key"] = 'Lot3 (BACEXT)'
     else:
-        res=rps.getKPI500Config(row["CofelyResp"],row["BACService"])
+        res=rps.getKPI500Config(row["CofelyResp"],row["Sub Technic"])
     if res==None:
         logger.error("BAD" *100)
         return "NA"
@@ -492,9 +492,12 @@ def messageReceived(destination,message,headers):
                     dfdata['BAC ID'] = dfdata['Month_BacID'].apply(lambda x: x.split('_')[1])     
                 else:                         # MARCH 2019
                     newcols=['Month', 'ControlOrg', 'Avid', 'QRCode', 'SRPresentation', 'SendDate', 'TypeOfReport','ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData','Label','Note','Supervisor','MonitorOKYN', 'LinkPeriod2','Latest_Status','Count of "Opmerkingen"','Count of "Inbreuken"','theorical global status','delta global status','detail quality check','Organism', 'ReportDate2','Status', 'SendDate2','CheckDateSend', 'CheckStatus', 'CheckReportDate','Month_BacID', 'CheckMonth','Report_Type_Prio','Column1', 'GlobalCheck', 'CountC','CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept','BACService', 'Company', 'CofelyResp', 'Lot', 'Organisme','Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic','text_VL','text_sending date','text_Report date','text_Global status vs VL','text_Org.','text_Quality check']
+                    dfdata.columns = newcols
+                    dfdata['MonitorNOK'] = dfdata['MonitorOKYN'].apply(lambda x: 1 if x=='N' else 0)
+                    dfdata['MonitorOK'] = dfdata['MonitorOKYN'].apply(lambda x: 1 if x=='Y' else 0)
                 dfdata.to_excel('./kpi501.xlsx')                            
                 logger.info(dfdata)
-                dfdata.columns=newcols
+                #dfdata.columns=newcols
 
                 dfdata["Month"]=dfdata["Month"].apply(reorderMonth)
 
@@ -608,7 +611,20 @@ def messageReceived(destination,message,headers):
                     'Month_BacID', 'CheckMonth','Report_Type_Prio','Column1', 'GlobalCheck', 'CountC',
                     'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
                     'BACService', 'Company', 'CofelyResp', 'Lot', 'Organisme',
-                    'Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic']                    
+                    'Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic']
+            elif dfdata.shape[1]==58:  # JANUARY 2023      
+                newcols=['Month', 'ControlOrg', 'Avid', 'QRCode', 'SRPresentation', 'SendDate', 'TypeOfReport',
+                    'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
+                    'Label','Note','Supervisor','MonitorOKYN', 'LinkPeriod2',
+                    'Latest_Status'
+                    ,'Count of "Opmerkingen"','Count of "Inbreuken"','theorical global status','delta global status','detail quality check','Organism'
+                    , 'ReportDate2',
+                    'Status', 'SendDate2',
+                    'CheckDateSend', 'CheckStatus', 'CheckReportDate',
+                    'Month_BacID', 'CheckMonth','Report_Type_Prio','Column1', 'GlobalCheck', 'CountC',
+                    'CountCR', 'CountNC', 'CountPositives', 'Count', 'Dept', 'SubDept',
+                    'BACService', 'Company', 'CofelyResp', 'Lot', 'Organisme',
+                    'Building2','DocName','SupervisorNOK','SupervisorOK','Sub Technic','text_VL','text_sending date','text_Report date','text_Global status vs VL','text_Org.','text_Quality check']              
             else:
                 newcols=['Month', 'BACID', 'SRPresentation', 'SendDate', 'TypeOfReport',
                     'ReportNumber', 'ReportDate', 'Building', 'Material', 'ExtraData',
@@ -621,6 +637,8 @@ def messageReceived(destination,message,headers):
 
 
             dfdata.columns=newcols
+
+            dfdata['Month'] = dfdata['Month'].apply(lambda x: x[5:]+'-'+x[:-3])
 
             dfdata["key"]=dfdata.apply(computeReport305,axis=1)
 
