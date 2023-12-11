@@ -61,7 +61,7 @@ from lib import cogenhelper as ch
 containertimezone=pytz.timezone(get_localzone().zone)
 
 MODULE  = "GTC_SITES_COMPUTED"
-VERSION = "0.0.27"
+VERSION = "1.0.0"
 QUEUE   = ["GTC_SITES_COMPUTED_RANGE"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -715,7 +715,7 @@ def save_tags_to_computed(es, obj):
         index = 'opt_sites_computed-' + new_obj['@timestamp'].strftime('%Y-%m')
 
         action={}
-        action["index"]={"_index":index, "_type":"doc", "_id":_id}
+        action["index"]={"_index":index, "_id":_id}
         
         
         bulkbody+=json.dumps(action)+"\r\n"
@@ -756,7 +756,7 @@ def save_tags_to_computed(es, obj):
         index = 'opt_sites_computed-' + new_obj['@timestamp'].strftime('%Y-%m')
 
         action={}
-        action["index"]={"_index":index, "_type":"doc", "_id":_id}
+        action["index"]={"_index":index, "_id":_id}
         
         
         bulkbody+=json.dumps(action)+"\r\n"
@@ -801,7 +801,7 @@ def doTheWork(start):
         obj_to_es = create_obj(df, start)
         obj_to_es['@timestamp'] = containertimezone.localize(start)
         obj_to_es['site'] = 'LUTOSA'
-        es.index(index='daily_cogen_lutosa', doc_type='doc', id=int(start.timestamp()), body = obj_to_es)
+        es.index(index='daily_cogen_lutosa', id=int(start.timestamp()), body = obj_to_es)
 
         save_tags_to_computed(es, obj_to_es)
     except Exception as er:
