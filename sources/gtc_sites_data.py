@@ -33,7 +33,7 @@ from elastic_helper import es_helper
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="1.1.1"
+VERSION="1.1.2"
 MODULE="GTC_SITES_DATA"
 QUEUE=["GTC_SITES_DATA_temp1"]
 
@@ -484,7 +484,7 @@ def handleOneMessage(name,body):
                 updateCache(row[0],localdate,row[3])
                 action={}
                 id=(client_area_name+utc_to_local(row['date']).strftime('%Y%m%d%H%M')).lower()
-                action["index"]={"_index":indexname,"_type":"doc","_id":id}
+                action["index"]={"_index":indexname,"_id":id}
                 bulkbody+=json.dumps(action)+"\r\n"
                 bulkbody+=json.dumps(newrec)+"\r\n"
               else:

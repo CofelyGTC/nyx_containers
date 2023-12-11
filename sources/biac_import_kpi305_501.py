@@ -58,7 +58,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
-VERSION="1.0.7"
+VERSION="1.0.9"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -504,7 +504,7 @@ def messageReceived(destination,message,headers):
                 if not dfdata.empty:
 
 
-                    regex = r"Lot[0-4]"
+                    regex = r"Lot [0-4]"
                     
                     matches = re.finditer(regex, orgfile, re.MULTILINE)
                     lot="NA"
@@ -528,27 +528,29 @@ def messageReceived(destination,message,headers):
                     dfdata["SRPresentation"]=pd.to_datetime(dfdata["SRPresentation"],dayfirst=True)
 
                     dfdata=dfdata.fillna("")
+                    dfdata["Avid"] = dfdata["Avid"].apply(lambda x: 0 if x=='-' else x)
+                    dfdata["QRCode"] = dfdata["QRCode"].apply(lambda x: 0 if x=='-' else x)
 
         #            logger.info(dfdata["FileLot"])
 
                     for month in dfdata["Month"].unique():
                             deletequery={
-                                    "query":{
-                                        "bool": {
-                                            "must": [
-                                            {
-                                                "query_string": {
-                                                "query": "Month: "+month
-                                                }
-                                            },
-                                            {
-                                                "query_string": {
-                                                "query": "FileLot: "+lot
-                                                }
-                                            }
-                                            ]
-                                        }            
-                                    }   
+                                "query": {
+                                    "bool": {
+                                    "must": [
+                                        {
+                                        "match": {
+                                            "Month": month
+                                        }
+                                        },
+                                        {
+                                        "match": {
+                                            "Lot": lot
+                                        }
+                                        }
+                                    ]
+                                    }
+                                }
                                 }
                             logger.info("Deleting records")
                             logger.info(deletequery)
@@ -657,23 +659,39 @@ def messageReceived(destination,message,headers):
 
             dfdata=dfdata.fillna("")
 
-            logger.info(dfdata)
+            logger.info(dfdata.head())
+
+            regex = r"Lot [0-4]"
+                    
+            logger.info(orgfile)        
+            matches = re.finditer(regex, orgfile, re.MULTILINE)
+            lot="NA"
+            logger.info(matches)
+            for matchNum, match in enumerate(matches, start=1):    
+                lot=match.group()
+                break
+            logger.info("Lot:"+lot)
 
 
             for month in dfdata["Month"].unique():
                     deletequery={
-                            "query":{
-                                "bool": {
+                                "query": {
+                                    "bool": {
                                     "must": [
-                                    {
-                                        "query_string": {
-                                        "query": "Month: "+month
+                                        {
+                                        "match": {
+                                            "Month": month
                                         }
-                                    }
+                                        },
+                                        {
+                                        "match": {
+                                            "Lot": lot
+                                        }
+                                        }
                                     ]
-                                }            
-                            }   
-                        }
+                                    }
+                                }
+                                }
                     logger.info("Deleting records")
                     logger.info(deletequery)
                     try:

@@ -437,12 +437,12 @@ def messageReceived(destination,message,headers):
             try:
 
                 if ispm or issafe:
-                    if displayStart <= scheduledStart < displayStop:
+                    if displayStart <= scheduledStart < displayStop and KPI503 != "Done OK":
                         display = 1
                     elif scheduledStart < displayStart:
                         overdue = 1
                 else:
-                    if start_dt_503.timestamp() <= scheduledStart < stop_dt_503.timestamp():
+                    if start_dt_503.timestamp() <= scheduledStart < stop_dt_503.timestamp() and KPI503 != "Done OK":
                         display = 1
                         KPI503computed = 'New overdue'
                     elif scheduledStart < start_dt_503.timestamp():
