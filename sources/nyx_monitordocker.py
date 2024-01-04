@@ -44,11 +44,12 @@ from elastic_helper import es_helper
 import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
+from elasticsearch.helpers import bulk
 import dotenv
 dotenv.load_dotenv()
 
-VERSION="1.0.5"
+VERSION="1.1.3"
 MODULE="MonitorDocker"
 QUEUE=["/topic/DOCKER_COMMAND"]
 
@@ -85,7 +86,8 @@ def messageReceived(destination,message,headers):
 def load_data():
     logger.info("Load Data............................")
     global elkversion
-    bulkbody=""    
+    if elkversion <= 7: bulkbody=""
+    else: bulkbody=[]
 
     for container in client.containers.list(all=True):        
         cont={
@@ -129,22 +131,35 @@ def load_data():
 
         action={}
         if elkversion<=6:
-            action["index"] = {"_index": "docker_status",
-                               "_type": "_doc","_id":id}
-        else:
-            action["index"] = {"_index": "docker_status","_id":id}
+            action["index"] = {"_index": "docker_status","_type": "_doc","_id":id}
+            bulkbody+=json.dumps(action)+"\r\n"
+            bulkbody+=json.dumps(cont)+"\r\n"  
 
-        bulkbody+=json.dumps(action)+"\r\n"
-        bulkbody+=json.dumps(cont)+"\r\n"  
+        elif elkversion==7:
+            action["index"] = {"_index": "docker_status","_id":id}
+            bulkbody+=json.dumps(action)+"\r\n"
+            bulkbody+=json.dumps(cont)+"\r\n"  
+
+        else:
+            action["_op_type"] = "index"
+            action["_index"] = "docker_status"
+            action["_id"] = id
+            action["_source"] = cont
+            bulkbody.append(action)
 
     logger.info("BULK")
-    res=es.bulk(bulkbody)  
-    if res["errors"]:    
-        logger.info(res)
+    if elkversion <= 7:
+        res=es.bulk(bulkbody) 
+        if res["errors"]:    
+            logger.info(res)
+    else:
+        try:
+            success, failed = bulk(es, bulkbody)
+            logger.info(f"Bulk indexing successful: {success}, failed: {failed}")
+        except Exception as e:
+            logger.error("Error during bulk indexing: %s", str(e))
+        
     logger.info(">>>Load Data............................")
-
-client=None
-elkversion=6
 
 if __name__ == '__main__':    
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
@@ -193,9 +208,7 @@ if __name__ == '__main__':
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])
 
-    elkversion=getELKVersion(es)    
-    print('elkversion: ', elkversion)
-
+    elkversion=getELKVersion(es)
 
     logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
     client = docker.from_env()
