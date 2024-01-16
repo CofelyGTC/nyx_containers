@@ -40,11 +40,11 @@ from logging.handlers import TimedRotatingFileHandler
 from amqstompclient import amqstompclient
 from datetime import datetime
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
 from dateutil import parser
 
-VERSION="0.0.4"
+VERSION="0.0.6"
 MODULE="FormatConverter"
 QUEUE=["/queue/NYX_CONVERTER"]
 
@@ -142,7 +142,9 @@ if __name__ == '__main__':
     while True:
         time.sleep(5)
         try:            
+            logger.info("send_life_sign")
             variables={"platform":"_/_".join(platform.uname()),"icon":"transgender"}
+            logger.info(f"variables: {variables}")
             conn.send_life_sign(variables=variables)
         except Exception as e:
             logger.error("Unable to send life sign.")

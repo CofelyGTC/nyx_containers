@@ -8,7 +8,7 @@ RUN pip install --upgrade pip
 COPY ./sources/requirementsV8Update.txt /opt/sources/requirements.txt
 RUN pip install -r /opt/sources/requirements.txt
 
-COPY ./sources/nyx_monitordocker.py /opt/sources/nyx_monitordocker.py
+COPY ./sources/nyx_formatconverter.py /opt/sources/nyx_formatconverter.py
 COPY ./sources/amqstomp.py /opt/sources/amqstomp.py
 # RUN rm -d -r /opt/sources/logs
 RUN mkdir  /opt/sources/logs
@@ -18,8 +18,8 @@ RUN mkdir  /opt/sources/logs
 #RUN rm -d -r /opt/sources/reports
 
 WORKDIR /opt/sources
-# CMD ["python", "nyx_formatconverter.py"]
-CMD ["python", "nyx_monitordocker.py"]
+CMD ["python", "nyx_formatconverter.py"]
+# CMD ["python", "nyx_monitordocker.py"]
 # CMD ["python", "nyx_xlsimporter.py"]
 # CMD ["python", "nyx_reportrunner.py"]
 # CMD ["python", "biac_compute_instawork.py"]
