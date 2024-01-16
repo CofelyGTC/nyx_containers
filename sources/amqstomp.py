@@ -7,7 +7,7 @@ import time
 import os
 
 logger = logging.getLogger(__name__)
-amqclientversion = "1.2.0"
+amqclientversion = "1.2.1"
 
 
 ##################################################################################
@@ -33,17 +33,20 @@ class AMQListener(stomp.ConnectionListener):
         logger.warn("#=- HEART BEAT TIMEOUT ERROR")
         self.internal_conn.heartbeat_timeout()
 
-    def on_message(self, headers, message):
+    def on_message(self, frame):
+        headers = frame.headers
+        body = frame.body
+
         if self.internal_conn.earlyack:
             logger.debug("Early ack")
             self.internal_conn.conn.ack(
                 headers["message-id"], headers["subscription"])
 
         destination = "NA"
-        if("destination" in headers):
+        if "destination" in headers:
             destination = headers["destination"]
         logger.debug("#=->>>> Message received (" + destination +
-                     ") PAYLOAD=" + str(len(message)))
+                    ") PAYLOAD=" + str(len(body)))
 
         if destination not in self.received:
             self.received[destination] = 1
@@ -53,14 +56,13 @@ class AMQListener(stomp.ConnectionListener):
         self.globalmessages += 1
 
         try:
-            if self.callback != None:
-                self.callback(destination, message, headers)
+            if self.callback is not None:
+                self.callback(destination, body, headers)
             else:
                 logger.warning("#=- No call back defined")
 
         except Exception:
             self.globalerrors += 1
-
             logger.error("ERROR:", exc_info=True)
             err = sys.exc_info()
             errstr = str(err[0]) + str(err[1]) + str(err[2])
@@ -70,6 +72,7 @@ class AMQListener(stomp.ConnectionListener):
             self.internal_conn.conn.ack(
                 headers["message-id"], headers["subscription"])
         logger.debug("#=-<<<< Message handled")
+
 
 
 ##################################################################################
@@ -138,10 +141,11 @@ class AMQClient():
         if "heartbeats" in self.server:
             heartbeats = self.server["heartbeats"]
 
-        self.conn = stomp.Connection(
+        self.conn = stomp.Connection11(
             [(self.server["ip"], self.server["port"])], heartbeats=heartbeats,heart_beat_receive_scale=self.heart_beat_receive_scale)
 
         self.listener = self.listener_class(self, self.callback)
+        print('self.listener: ', self.listener.__dict__)
         self.conn.set_listener('simplelistener', self.listener)
         logger.debug("#=- Starting connection...")
 #        self.conn.start()
@@ -208,14 +212,14 @@ class AMQClient():
     def send_message(self, destination, message, headers=None):
         logger.debug("#=- Send Message to " + destination +
                      ". LEN=" + str(len(message)))
+        
         if destination not in self.sent:
             self.sent[destination] = 1
         else:
             self.sent[destination] += 1
 
         try:
-            self.conn.send(
-                body=message, destination=destination, headers=headers)
+            self.conn.send(body=message, destination=destination, headers=headers)
         except Exception:            
             
             logger.error("#=- Error raised while sending. ")

@@ -1,24 +1,27 @@
-FROM python:3.9.3-slim
+FROM python:3.9.17-slim
 MAINTAINER lapin
 
-RUN apt-get update
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y vim
 
+RUN pip install --upgrade pip
 COPY ./sources/requirementsV8Update.txt /opt/sources/requirements.txt
 RUN pip install -r /opt/sources/requirements.txt
 
-COPY ./sources /opt/sources
-RUN rm -d -r /opt/sources/logs
+COPY ./sources/nyx_monitordocker.py /opt/sources/nyx_monitordocker.py
+COPY ./sources/amqstomp.py /opt/sources/amqstomp.py
+# RUN rm -d -r /opt/sources/logs
 RUN mkdir  /opt/sources/logs
-RUN rm -d -r /opt/sources/*.sh
+# RUN rm -d -r /opt/sources/*.sh
 #RUN rm -d -r /opt/sources/*.bat
 #RUN rm -d -r /opt/sources/jaspergenerator
 #RUN rm -d -r /opt/sources/reports
 
 WORKDIR /opt/sources
+# CMD ["python", "nyx_formatconverter.py"]
+CMD ["python", "nyx_monitordocker.py"]
 # CMD ["python", "nyx_xlsimporter.py"]
 # CMD ["python", "nyx_reportrunner.py"]
-CMD ["python", "nyx_monitordocker.py"]
 # CMD ["python", "biac_compute_instawork.py"]
 # CMD ["python", "biac_import_instawork.py"]
 # CMD ["python", "biac_import_spot_567.py"]
@@ -33,7 +36,6 @@ CMD ["python", "nyx_monitordocker.py"]
 # CMD ["python", "nyx_reportscheduler.py"]
 # CMD ["python", "biac_mails.py"]
 # CMD ["python", "biac_import_kpi305_501.py"]
-# CMD ["python", "nyx_formatconverter.py"]
 # CMD ["python", "biac_availabilities_refactor.py"]
 # CMD ["python", "biac_month_availability.py"]
 # CMD ["python", "biac_lot7_computed.py"]
