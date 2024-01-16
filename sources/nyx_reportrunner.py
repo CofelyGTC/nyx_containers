@@ -54,7 +54,8 @@ import os,logging,sys
 from functools import wraps
 from datetime import datetime
 from dateutil.parser import parse
-from amqstompclient import amqstompclient
+# from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
 from elasticsearch import Elasticsearch as ES
