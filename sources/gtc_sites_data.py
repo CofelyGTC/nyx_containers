@@ -575,25 +575,28 @@ if __name__ == '__main__':
         ,body=query
         )
     
-    data = res['aggregations']['2']['buckets']
-    
-    for tag in data:
-        tagkey = tag['key']
-        value = tag['1']['hits']['hits'][0]['fields']['value'][0]
-        timestamp = datetime.fromtimestamp(int(tag['1']['hits']['hits'][0]['sort'][0] / 1000))
-        datestr = timestamp.strftime("%Y-%m-%d %H:%M")
-        datestr2 = timestamp.strftime("%Y-%m-%d 00:00")
-        
-        if "fields" in tag['3']['hits']['hits'][0]:
-          value_day = tag['3']['hits']['hits'][0]['fields']['value_day'][0]
-          #print(str(tagkey)+': '+str(value) + ' , ' + str(value_day) + ' ' + datestr)
-          key = tagkey+datestr
-          key2 = tagkey+datestr2
-          lastvaluecache[tagkey]= {"key": key, "value": value}
-          dayvaluecache[tagkey]= {"key": key2, "value": value_day}
+    try:
+      data = res['aggregations']['2']['buckets']
+      
+      for tag in data:
+          tagkey = tag['key']
+          value = tag['1']['hits']['hits'][0]['fields']['value'][0]
+          timestamp = datetime.fromtimestamp(int(tag['1']['hits']['hits'][0]['sort'][0] / 1000))
+          datestr = timestamp.strftime("%Y-%m-%d %H:%M")
+          datestr2 = timestamp.strftime("%Y-%m-%d 00:00")
+          
+          if "fields" in tag['3']['hits']['hits'][0]:
+            value_day = tag['3']['hits']['hits'][0]['fields']['value_day'][0]
+            #print(str(tagkey)+': '+str(value) + ' , ' + str(value_day) + ' ' + datestr)
+            key = tagkey+datestr
+            key2 = tagkey+datestr2
+            lastvaluecache[tagkey]= {"key": key, "value": value}
+            dayvaluecache[tagkey]= {"key": key2, "value": value_day}
 
-    logger.info(lastvaluecache)
-    logger.info(dayvaluecache)
+      logger.info(lastvaluecache)
+      logger.info(dayvaluecache)
+    except Exception as e :
+        print(e)
 
     conn=amqstompclient.AMQClient(server
     , {"name":MODULE,"version":VERSION,"lifesign":"/topic/NYX_MODULE_INFO"},QUEUE,callback=messageReceived)
