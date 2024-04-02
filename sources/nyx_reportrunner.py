@@ -194,7 +194,7 @@ def messageReceivedReport(destination,message,headers):
             path='/'.join(jasper.split('/')[0:-1])
             logger.info("PATH="+path)
 
-            containertimezone=pytz.timezone(tzlocal.get_localzone().zone)
+            containertimezone=pytz.timezone(tzlocal.get_localzone().key)
 
             def convert_dt(adate):
                 return "DATE@"+parse(adate).astimezone(containertimezone).strftime("%Y%m%d%H%M%S")
