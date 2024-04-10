@@ -49,7 +49,7 @@ from elasticsearch.helpers import bulk
 import dotenv
 dotenv.load_dotenv()
 
-VERSION="1.1.3"
+VERSION="1.1.4"
 MODULE="MonitorDocker"
 QUEUE=["/topic/DOCKER_COMMAND"]
 
