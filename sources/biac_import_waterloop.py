@@ -96,10 +96,10 @@ def getKPI(row):
     KPI = 0
     
     if season == 1:
-        if t121 <= (1.15 * spwinter):
+        if t121 <= (1.15 * spwinter) and t118 >= (spwinter - 10):
             KPI = 1
-        elif t118 >= (spwinter - 10):
-            KPI = 1
+        #elif t118 >= (spwinter - 10):
+        #    KPI = 1
         else:
             KPI=0
     else:

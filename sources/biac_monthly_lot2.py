@@ -153,6 +153,11 @@ def messageReceived(destination,message,headers):
         lot = 3
         category = 'lot3_monthly'
         INDEX_PATTERN = "biac_monthly_lot3"
+    
+    if 'Lot2' in filename:
+        lot = 2
+        category = 'lot2_monthly'
+        INDEX_PATTERN = "biac_monthly_lot2"  
 
     if 'Lot1' in filename:
         lot = 1

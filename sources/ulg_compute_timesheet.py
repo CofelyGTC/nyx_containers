@@ -39,9 +39,9 @@ from functools import wraps
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from logstash_async.handler import AsynchronousLogstashHandler
 
-VERSION="1.0.5"
-MODULE="ULG_COMPUTE_TIMESHEET"
-QUEUE=["ULG_COMPUTE_TIMESHEET"]
+VERSION="1.0.7"
+MODULE="TEST_ULG_COMPUTE_TIMESHEET"
+QUEUE=["TEST_ULG_COMPUTE_TIMESHEET"]
 
 ################################################################################
 def messageReceived(destination,message,headers):
@@ -145,8 +145,9 @@ def getCongeOffice(ts):
 def ulg_computed():
     global es
 
-    start = datetime.now()-timedelta(days=1)
-    end = start + timedelta(days=15)
+    start = datetime.now()
+    #-timedelta(days=1)
+    end = start + timedelta(days=10)
     regulars = es_helper.elastic_to_dataframe(es, 'horaires_ulg_regular')
     circuit = 'Stat.général'
     DB = 'XX'
@@ -260,32 +261,85 @@ def ulg_computed():
             if horaireULG.shape[0] > 0:
                 horaireULG = horaireULG.reset_index(drop=True)
                 #print('hooraireULG '+circuit)
+                horaireULG = horaireULG.sort_values(by=['start_datetime']).reset_index(drop=True)
+                regularIsNotSet = False
+                singleTimesheet = False
+                doubleTimesheet = False
+                largestPause = 0
+                if regularHoraire != '':
+                    if start1 == end1 and start2 == end2:
+                        regularIsNotSet = True
+
+                    if start1 != end1 and start2 == end2:
+                        singleTimesheet = True
+
+                    if start1 != end1 and start2 != end2:
+                        doubleTimesheet = True
+                        largestPause = start2 - end1
+                
+                
+                    
                 for index, row in horaireULG.iterrows():
+                    print(row['start_time']+' - '+row['end_time'])
                     startRow = startDay.replace(hour = int(row['start_time'][:2]), minute=int(row['start_time'][-5:-3]), second=0).timestamp()
                     endRow = startDay.replace(hour = int(row['end_time'][:2]), minute=int(row['end_time'][-5:-3]), second=0).timestamp()
-                    if regularHoraire == '' and index ==0:
-                        start1 = startRow
-                        end1 = endRow
-
-                    if start2 != end2: 
+                
+                        
+                        
+                    if regularIsNotSet or regularHoraire == '':
+                        #print("Step 0.1")
+                        if index==0:
+                            print("step 1")
+                            start1 = startRow
+                            end1 = endRow
+                        else:
+                            print(int(startRow-end1))
+                            if int(startRow-end1)<3600:
+                                print("step 2")
+                                end1 = endRow
+                            elif start2 == end2:
+                                print("step 3")
+                                largestPause = startRow-end1
+                                start2 = startRow
+                                end2 = endRow
+                            elif startRow-end2 >= largestPause:
+                                end1 = end2
+                                start2 = startRow
+                                end2 = endRow
+                                largestPause = startRow-end1
+                            else:
+                                print("step 4")
+                                end2=endRow
+                            
+                    if singleTimesheet:
+                        if startRow < start1:
+                            start1 = startRow
+                        if endRow > end1:
+                            end1 = endRow
+                            
+                    if doubleTimesheet:
                         if startRow < start1:
                             start1 = startRow
 
                         if startRow >= end1 and startRow < start2:
                             start2 = startRow
+                            largestPause = start2 -end1
 
                         if endRow > end1 and endRow <= start2:
                             end1 = endRow
+                            largestPause = start2 -end1
 
                         if endRow > end2:
-                            end2 = endRow
-                    else:
-                        if index == 0 and start1 == end1:
-                            start1 = startRow
-                        if startRow < start1:
-                            start1 = startRow
-                        if endRow > end1:
-                            end1 = endRow
+                            if startRow - end2 >= largestPause:
+                                end1 = end2
+                                start2 = startRow
+                                end2 = endRow
+                                largestPause = startRow-end1
+                                
+                                
+                                
+                            else:
+                                end2 = endRow
                             
                             
             
@@ -330,8 +384,10 @@ def ulg_computed():
 
 
 
-
+            
             start = start+timedelta(days=1)
+        res = es.bulk(body=bulkbody)
+        bulkbody=""    
     
 
     res = es.bulk(body=bulkbody)
@@ -466,35 +522,87 @@ def ulg_compute_alone(circuit):
 
 
         if horaireULG.shape[0] > 0:
-            horaireULG = horaireULG.reset_index(drop=True)
-            print('horaireULG '+circuit)
-            print(horaireULG)
-            for index, row in horaireULG.iterrows():
-                startRow = startDay.replace(hour = int(row['start_time'][:2]), minute=int(row['start_time'][-5:-3]), second=0).timestamp()
-                endRow = startDay.replace(hour = int(row['end_time'][:2]), minute=int(row['end_time'][-5:-3]), second=0).timestamp()
-                if regularHoraire == '' and index ==0:
-                    start1 = startRow
-                    end1 = endRow
+                horaireULG = horaireULG.reset_index(drop=True)
+                #print('hooraireULG '+circuit)
+                horaireULG = horaireULG.sort_values(by=['start_datetime']).reset_index(drop=True)
+                regularIsNotSet = False
+                singleTimesheet = False
+                doubleTimesheet = False
+                largestPause = 0
+                if regularHoraire != '':
+                    if start1 == end1 and start2 == end2:
+                        regularIsNotSet = True
 
-                if start2 != end2: 
-                    if startRow < start1:
-                        start1 = startRow
+                    if start1 != end1 and start2 == end2:
+                        singleTimesheet = True
 
-                    if startRow >= end1 and startRow < start2:
-                        start2 = startRow
+                    if start1 != end1 and start2 != end2:
+                        doubleTimesheet = True
+                        largestPause = start2 - end1
+                
+                
+                    
+                for index, row in horaireULG.iterrows():
+                    print(row['start_time']+' - '+row['end_time'])
+                    startRow = startDay.replace(hour = int(row['start_time'][:2]), minute=int(row['start_time'][-5:-3]), second=0).timestamp()
+                    endRow = startDay.replace(hour = int(row['end_time'][:2]), minute=int(row['end_time'][-5:-3]), second=0).timestamp()
+                
+                        
+                        
+                    if regularIsNotSet or regularHoraire == '':
+                        #print("Step 0.1")
+                        if index==0:
+                            print("step 1")
+                            start1 = startRow
+                            end1 = endRow
+                        else:
+                            print(int(startRow-end1))
+                            if int(startRow-end1)<3600:
+                                print("step 2")
+                                end1 = endRow
+                            elif start2 == end2:
+                                print("step 3")
+                                largestPause = startRow-end1
+                                start2 = startRow
+                                end2 = endRow
+                            elif startRow-end2 >= largestPause:
+                                end1 = end2
+                                start2 = startRow
+                                end2 = endRow
+                                largestPause = startRow-end1
+                            else:
+                                print("step 4")
+                                end2=endRow
+                            
+                    if singleTimesheet:
+                        if startRow < start1:
+                            start1 = startRow
+                        if endRow > end1:
+                            end1 = endRow
+                            
+                    if doubleTimesheet:
+                        if startRow < start1:
+                            start1 = startRow
 
-                    if endRow > end1 and endRow <= start2:
-                        end1 = endRow
+                        if startRow >= end1 and startRow < start2:
+                            start2 = startRow
+                            largestPause = start2 -end1
 
-                    if endRow > end2:
-                        end2 = endRow
-                else:
-                    if index == 0 and start1 == end1:
-                        start1 = startRow
-                    if startRow < start1:
-                        start1 = startRow
-                    if endRow > end1:
-                        end1 = endRow
+                        if endRow > end1 and endRow <= start2:
+                            end1 = endRow
+                            largestPause = start2 -end1
+
+                        if endRow > end2:
+                            if startRow - end2 >= largestPause:
+                                end1 = end2
+                                start2 = startRow
+                                end2 = endRow
+                                largestPause = startRow-end1
+                                
+                                
+                                
+                            else:
+                                end2 = endRow
         
         
         logger.info("*******************************************")
