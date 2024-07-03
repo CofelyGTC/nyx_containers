@@ -84,6 +84,7 @@ def get_month_day_range(date):
     last_day=last_day+timedelta(1)
     last_day = last_day - timedelta(seconds=1)
     
+    
     local_timezone = tzlocal.get_localzone()
     first_day=first_day.astimezone(local_timezone)
     last_day=last_day.astimezone(local_timezone)

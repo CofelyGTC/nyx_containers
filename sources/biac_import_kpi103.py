@@ -172,7 +172,7 @@ def loadKPI103():
 
         df_all=pd.DataFrame()
         for i in form_list:
-            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()) and not 'Wateranalyse' in i['name']:
+            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()) and not 'Wateranalyse' in i['name'] and not 'test' in i['name']:
                 logger.info('MATCH')
                 logger.info(i['name'])
                 

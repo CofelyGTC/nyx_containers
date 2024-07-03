@@ -58,7 +58,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "1.0.2"
+VERSION = "1.0.4"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -129,14 +129,16 @@ def extract_contract(row):
         if tmp == 'sanitair':
             return 'BACSAN'
         
+        if 'hvac' in tmp:
+            return 'BACHVA'
+        
         if 'hvac pa' in tmp:
             return 'BACSAN'
         
         if tmp == 'elektriciteit':
             return 'BACELE'
         
-        if 'hvac pb' in tmp:
-            return 'BACHVA'
+        
     
     return None
 
@@ -176,6 +178,9 @@ def extract_screen_name(row):
         if tmp == 'sanitair':
             return 'sani'
         
+        if 'hvac' in tmp:
+            return 'hvacpb'
+        
         if 'hvac pa' in tmp:
             return 'hvacpa'
         
@@ -200,6 +205,8 @@ def clean_technic(str_tec):
 
     """
     str_tec = str_tec.lower()
+    if 'hvac' in str_tec:
+            return 'hvac pb'  
     if 'hvac pa' in str_tec:
             return 'hvac pa'    
         
@@ -224,7 +231,7 @@ def create_default_records(es):
     
     kpi          = ['201', '202', '204', '205', '207', '208', '216', '217', '303']
     lot          = ['1', '2', '3', '4']
-    technic      = ['acces', 'fire fighting', 'cradle', 'dnb', 'sanitair', 'hvac pa', 'elektriciteit', 'hvac pb']
+    technic      = ['acces', 'fire fighting', 'cradle', 'dnb', 'sanitair', 'hvac pa', 'elektriciteit', 'hvac pb', 'hvac']
     
     df_kpi       = pd.DataFrame({'kpi': kpi, 'merge': 1})
     df_lot       = pd.DataFrame({'lot': lot, 'merge': 1})
@@ -271,7 +278,7 @@ def create_default_records_2(es):
     
     kpi          = ['201', '202', '203', '204', '205', '207', '208', '209', '210', '211', '213', '216', '217', '303']
     lot          = ['1', '2', '3', '4']
-    technic      = ['acces', 'fire fighting', 'cradle', 'dnb', 'sanitair', 'hvac pa', 'elektriciteit', 'hvac pb']
+    technic      = ['acces', 'fire fighting', 'cradle', 'dnb', 'sanitair', 'hvac pa', 'elektriciteit', 'hvac pb', 'hvac']
     
     df_kpi       = pd.DataFrame({'kpi': kpi, 'merge': 1})
     df_lot       = pd.DataFrame({'lot': lot, 'merge': 1})
@@ -566,6 +573,7 @@ def loadKizeo():
             
             #1r = requests.post(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token,post)
             r = requests.get(url_kizeo + '/forms/' + form_id + '/data/exports_info?Authorization='+token)
+
 
             if r.status_code != 200:
                 logger.error('something went wrong...')

@@ -176,10 +176,15 @@ def computeReport(row):
         return "Lot4 (BACDNB)"        
     
     res=rps.getKPI500Config(row['Cc 5'], row['Sub-technic'])
-    #logger.info(res)
+    if row['Sub-technic'] == "SANI":
+        logger.info("####"*100)
+        logger.info(row['Cc 5'])
+        logger.info(res)
+        logger.info("####"*100)
     if res==None:
         logger.info(" %s => %s  "%(row['Cc 5'], row['Sub-technic']))
         return "NA"
+    logger.info(res['key'])
     return res['key']
 
 ################################################################################
@@ -449,6 +454,7 @@ def messageReceived(destination,message,headers):
         filedate=file[1:].split(".")[0][-7:]
         dfdata2["filedate"]=filedate
         dfdata2['key'] = dfdata2.apply(computeReport , axis=1)
+        dfdata2.to_excel("./tmp/kpi502_tmp.xlsx")
 
         dfdata2["ShortStatus"]=dfdata2["LongStatus"].apply(computeShortStatus)    
         logger.info(len(dfdata2))
