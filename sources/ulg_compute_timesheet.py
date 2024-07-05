@@ -39,7 +39,7 @@ from functools import wraps
 from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 from logstash_async.handler import AsynchronousLogstashHandler
 
-VERSION="1.0.7"
+VERSION="1.0.8"
 MODULE="TEST_ULG_COMPUTE_TIMESHEET"
 QUEUE=["TEST_ULG_COMPUTE_TIMESHEET"]
 
@@ -152,9 +152,11 @@ def ulg_computed():
     circuit = 'Stat.général'
     DB = 'XX'
     roomRegular = regulars[regulars['circuit'] == circuit].reset_index(drop = True)
+    #query="bat_circuit: B8_St*"
     fromULG = es_helper.elastic_to_dataframe(es, 'horaires_ulg_import', start=start, end=end)
     df = es_helper.elastic_to_dataframe(es, 'ulg_circuits')
     df = df.sort_values(by=['bat_circuit']).reset_index(drop=True)
+    #print(df)
     circuits = df['bat_circuit'].unique().tolist()
     
     
@@ -175,13 +177,16 @@ def ulg_computed():
 
         start = datetime.now()-timedelta(days=1)
         end = start + timedelta(days=15)
+        #print(circuit)
         roomsdf = df[df['bat_circuit'] == circuit]
         roomsdf = roomsdf.sort_values(by=['code_identification']).reset_index(drop = True)
+        #print(roomsdf)
         rooms = roomsdf['code_identification'].unique().tolist()
+        #print(rooms)
         roomRegular = regulars[regulars['circuit'] == circuit].reset_index(drop = True)
         regularHoraire = ''
         if roomRegular.shape[0] > 0:
-            print(roomRegular)
+            #print(roomRegular)
             regularHoraire = json.loads(roomRegular.loc[0].to_json())
 
         while start <= end:
@@ -260,7 +265,6 @@ def ulg_computed():
 
             if horaireULG.shape[0] > 0:
                 horaireULG = horaireULG.reset_index(drop=True)
-                #print('hooraireULG '+circuit)
                 horaireULG = horaireULG.sort_values(by=['start_datetime']).reset_index(drop=True)
                 regularIsNotSet = False
                 singleTimesheet = False
@@ -296,7 +300,12 @@ def ulg_computed():
                             print(int(startRow-end1))
                             if int(startRow-end1)<3600:
                                 print("step 2")
-                                end1 = endRow
+                                if startRow<start1:
+                                    start1=startRow
+                                if endRow>end1:
+                                    end1=endRow      
+                                    
+                                
                             elif start2 == end2:
                                 print("step 3")
                                 largestPause = startRow-end1
