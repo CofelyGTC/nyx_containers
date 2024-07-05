@@ -67,7 +67,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "1.0.5"
+VERSION = "1.0.4"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):

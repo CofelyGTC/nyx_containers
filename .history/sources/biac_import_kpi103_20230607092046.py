@@ -67,7 +67,7 @@ from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "1.0.5"
+VERSION = "1.0.3"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -172,7 +172,7 @@ def loadKPI103():
 
         df_all=pd.DataFrame()
         for i in form_list:
-            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()) and not 'Wateranalyse' in i['name'] and not 'test' in i['name'] and not 'Communicatie' in i['name'] and not 'noodverlichting' in i['name']:
+            if re.findall("LOT 1 - Gebouw .*$", i['name'].strip()) and not 'Wateranalyse' in i['name']:
                 logger.info('MATCH')
                 logger.info(i['name'])
                 

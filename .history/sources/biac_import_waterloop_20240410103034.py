@@ -23,7 +23,7 @@ import numpy as np
 from math import ceil
 
 
-VERSION="1.0.4"
+VERSION="1.0.3"
 MODULE="BIAC_IMPORT_WATERLOOP"
 QUEUE=["/queue/WATERLOOP_IMPORT"]
 INDEX_PATTERN = "biac_waterloop"
