@@ -59,7 +59,7 @@ from datetime import datetime
 import tzlocal # $ pip install tzlocal
 
 
-VERSION="0.2.1"
+VERSION="1.1.1"
 MODULE="BIAC_INSTAWORK_IMPORTER"
 QUEUE=["INSTAWORK_IMPORT"]
 

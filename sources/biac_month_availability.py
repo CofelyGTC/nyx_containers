@@ -30,13 +30,13 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
 import numpy as np
 
 import math
@@ -44,7 +44,7 @@ from copy import deepcopy
 from pandas.io.json import json_normalize
 
 
-VERSION="1.0.15"
+VERSION="1.2.1"
 MODULE="BIAC_MONTH_AVAILABILITY"
 QUEUE=["/topic/BIAC_AVAILABILITY_IMPORTED"]
 
@@ -73,7 +73,7 @@ def log_message(message):
 
 def es_search_with_scroll(es, index, doc_type, query, size, scroll):
     print('es_search_with_scroll')
-    res = es.search(index=index, doc_type=doc_type,
+    res = es.search(index=index,
                     size=size, scroll=scroll, body=query)
 
     sid = res['_scroll_id']
@@ -131,10 +131,10 @@ def update_availability_last_week(last_month, last_week, es):
     #print(update_query_0)
     #print(update_query_1)
 
-    es.update_by_query(body=update_query_0, doc_type="doc",
+    es.update_by_query(body=update_query_0,
                        index="biac_availability*")
 
-    es.update_by_query(body=update_query_1, doc_type="doc",
+    es.update_by_query(body=update_query_1,
                        index="biac_availability*")
 
 def process_thresh(row):
@@ -514,13 +514,13 @@ def messageReceived(destination,message,headers):
         _id = index
 
         action = {}
-        action["index"] = {"_index": _index, "_type": "doc", "_id": _id}
+        action["index"] = {"_index": _index, "_id": _id}
         #action["index"] = {"_index": _index, "_type": "doc"}
         message_body += json.dumps(action)+"\r\n"
         message_body += row.to_json()+"\r\n"
 
         if len(message_body) > 512000:
-            bulkres = es.bulk(message_body)
+            bulkres = es.bulk(body=message_body)
             message_body = ""
 
             if(not(bulkres["errors"])):
@@ -538,13 +538,13 @@ def messageReceived(destination,message,headers):
         _id = index
 
         action = {}
-        action["index"] = {"_index": _index, "_type": "doc", "_id": _id}
+        action["index"] = {"_index": _index, "_id": _id}
         #action["index"] = {"_index": _index, "_type": "doc"}
         message_body += json.dumps(action)+"\r\n"
         message_body += row.to_json()+"\r\n"
 
         if len(message_body) > 512000:
-            bulkres = es.bulk(message_body)
+            bulkres = es.bulk(body=message_body)
             message_body = ""
 
             if(not(bulkres["errors"])):
@@ -562,7 +562,7 @@ def messageReceived(destination,message,headers):
     if message_body:
 
         #print(bulkres)
-        bulkres = es.bulk(message_body)
+        bulkres = es.bulk(body=message_body)
 
         if(not(bulkres["errors"])):
                 logger.info("BULK done without errors.")
@@ -627,8 +627,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

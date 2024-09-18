@@ -38,14 +38,14 @@ from functools import wraps
 from datetime import datetime
 from datetime import timedelta
 from elastic_helper import es_helper 
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from pandas.io.json import json_normalize
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
-VERSION="1.0.9"
+VERSION="1.1.1"
 MODULE="BIAC_LOT5_COMPUTED"
 QUEUE=["/topic/BIAC_AVAILABILITY_LOT5_IMPORTED"]
 
@@ -176,7 +176,7 @@ def getPreviousMonth(lastmonth):
 
 def es_search_with_scroll(es, index, doc_type, query, size, scroll):
     print('es_search_with_scroll')
-    res = es.search(index=index, doc_type=doc_type,
+    res = es.search(index=index,
                     size=size, scroll=scroll, body=query)
 
     sid = res['_scroll_id']

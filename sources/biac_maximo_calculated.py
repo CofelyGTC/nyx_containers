@@ -7,17 +7,18 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
+from elastic_helper import es_helper
 import numpy as np
 
 
-VERSION="1.0.14"
+VERSION="1.1.1"
 MODULE="BIAC_MAXIMO_CALCULATED"
 QUEUE=["/topic/BIAC_MAXIMO_IMPORTED"]
 
@@ -335,7 +336,7 @@ def messageReceived(destination,message,headers):
         bulkbody = ''
         bulkres = ''
         action = {}
-        action["index"] = {"_index": "biac_maximo_monthly", "_type": "doc", "_id": 'KPI301'+screen+ts}
+        action["index"] = {"_index": "biac_maximo_monthly", "_id": 'KPI301'+screen+ts}
         average = 1
         if size != 0:
             average = oksize / size
@@ -362,7 +363,7 @@ def messageReceived(destination,message,headers):
         bulkbody += json.dumps(action)+"\r\n"
         bulkbody += json.dumps(newrec) + "\r\n"
         logger.info(bulkbody)
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
         bulkbody = ''
         bulkres = ''
         doneokquery = getokquery
@@ -433,7 +434,7 @@ def messageReceived(destination,message,headers):
         bulkbody = ''
         bulkres = ''
         action = {}
-        action["index"] = {"_index": "biac_maximo_monthly", "_type": "doc", "_id": 'KPI302'+screen+ts}
+        action["index"] = {"_index": "biac_maximo_monthly", "_id": 'KPI302'+screen+ts}
         average = 1 
         if donenok != 0:
             average = doneok / donenok
@@ -495,7 +496,7 @@ def messageReceived(destination,message,headers):
         bulkbody += json.dumps(newrec) + "\r\n"
 
         logger.info(bulkbody)
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
 
 
 
@@ -545,8 +546,8 @@ es=None
 logger.info (os.environ["ELK_SSL"])
 
 if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    host_params=os.environ["ELK_URL"]
+    es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
 else:
     host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
     es = ES(hosts=[host_params])

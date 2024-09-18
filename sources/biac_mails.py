@@ -27,6 +27,7 @@ import uuid
 import email
 import base64
 import imaplib
+import ssl
 import platform
 import threading
 import os,logging
@@ -34,20 +35,21 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
 import numpy as np
 from sqlalchemy import create_engine
+from elastic_helper import es_helper 
 
 
 
 MODULE  = "BIAC_MAILS"
-VERSION = "1.0.0"
+VERSION = "1.1.2"
 QUEUE   = []
 MAILS=0
 ATTACHMENTS=0
@@ -192,7 +194,9 @@ def loadMails():
     logger.info("LOADING MAILS")
     logger.info("=============")
 
-    M = imaplib.IMAP4_SSL(os.environ["EMAIL_URL"], os.environ["EMAIL_PORT"])
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    context.set_ciphers('DEFAULT@SECLEVEL=1')
+    M = imaplib.IMAP4_SSL(os.environ["EMAIL_URL"], os.environ["EMAIL_PORT"], ssl_context=context)
     M.login(os.environ["EMAIL_USER"], os.environ["EMAIL_PASSWORD"])
     M.select()
     typ, data = M.search(None, 'ALL')

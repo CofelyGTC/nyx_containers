@@ -38,19 +38,19 @@ import re
 
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from datetime import date
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
 import numpy as np
 from math import ceil
 
 
-VERSION="1.0.12"
+VERSION="1.1.1"
 MODULE="BIAC_IMPORT_MONTHLY_LOT2"
 QUEUE=["/queue/BIAC_FILE_2_Lot2AvailabilityMonthly","/queue/BIAC_FILE_1_Lot1AvailabilityMonthly", "/queue/BIAC_FILE_3_Lot3AvailabilityMonthly"]
 INDEX_PATTERN = "biac_monthly_lot2"
@@ -203,8 +203,7 @@ def messageReceived(destination,message,headers):
                 es_id = str(id_report) + '_' +str(col) + '_' + str(ts)
 
                 action = {}
-                action["index"] = {"_index": es_index,
-                    "_type": "doc", "_id": es_id}
+                action["index"] = {"_index": es_index, "_id": es_id}
 
                 try:
                     newrec = {
@@ -237,7 +236,7 @@ def messageReceived(destination,message,headers):
 
     logger.info(bulkbody)
     logger.info("BULK READY:" + str(len(bulkbody)))
-    bulkres = es.bulk(bulkbody, request_timeout=30)
+    bulkres = es.bulk(body=bulkbody, request_timeout=30)
     logger.info("BULK DONE")
     bulkbody = ''
     if(not(bulkres["errors"])):
@@ -321,8 +320,8 @@ es=None
 logger.info (os.environ["ELK_SSL"])
 
 if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    host_params=os.environ["ELK_URL"]
+    es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
 else:
     host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
     es = ES(hosts=[host_params])

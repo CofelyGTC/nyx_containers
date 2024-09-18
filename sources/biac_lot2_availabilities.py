@@ -34,19 +34,21 @@ import re
 
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from datetime import date
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
+
 import numpy as np
 from math import ceil
 
 
-VERSION="1.0.9"
+VERSION="1.2.3"
 MODULE="BIAC_IMPORT_LOT2_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_2_Lot2Availability"]
 INDEX_PATTERN = "biac_availability"
@@ -157,7 +159,7 @@ def messageReceived(destination,message,headers):
     ef = pd.ExcelFile(file)
     dfs = []
     for sheet in ef.sheet_names:
-        df = pd.read_excel(file, sheetname=sheet)
+        df = pd.read_excel(file, sheet_name=sheet)
         dfs.append(df)
 
     dfdef = dfs[0]
@@ -179,12 +181,12 @@ def messageReceived(destination,message,headers):
 
     dfdata = dfdata[1:]
 
-    idrepport = dfdef.get_value(0,'id_report')
-    interval = dfdef.get_value(0,'interval')
-    startDate = dfdef.get_value(0,'g_start_date')
-    stopDate = dfdef.get_value(0,'end_date')
-    report_type = dfdef.get_value(0,'report_type')
-    name  = dfdef.get_value(0,'name').lower()
+    idrepport = dfdef._get_value(0,'id_report')
+    interval = dfdef._get_value(0,'interval')
+    startDate = dfdef._get_value(0,'g_start_date')
+    stopDate = dfdef._get_value(0,'end_date')
+    report_type = dfdef._get_value(0,'report_type')
+    name  = dfdef._get_value(0,'name').lower()
     name=name.replace('%','')
 
     first_day_year = startDate.to_pydatetime().replace(
@@ -246,7 +248,7 @@ def messageReceived(destination,message,headers):
 
         for i in row.index:
             if re.match(regex1, i) or re.match(regex2, i):
-                objective = objectives.get_value(1, i)
+                objective = objectives._get_value(1, i)
 
                 weekOfYear = week_of_year(ts)
                 display = 0
@@ -269,8 +271,7 @@ def messageReceived(destination,message,headers):
                 es_id = str(idrepport) + '_' + i + '_' + str(ts)
 
                 action = {}
-                action["index"] = {"_index": es_index,
-                    "_type": "doc", "_id": es_id}
+                action["index"] = {"_index": es_index,"_id": es_id}
 
                 try:
                     newrec = {
@@ -304,7 +305,7 @@ def messageReceived(destination,message,headers):
 
                 if len(bulkbody) > 512000:
                     logger.info("BULK READY:" + str(len(bulkbody)))
-                    bulkres = es.bulk(bulkbody, request_timeout=30)
+                    bulkres = es.bulk(body=bulkbody, request_timeout=30)
                     logger.info("BULK DONE")
                     bulkbody = ''
                     if(not(bulkres["errors"])):
@@ -321,7 +322,7 @@ def messageReceived(destination,message,headers):
 
     if len(bulkbody) > 0:
         logger.info("BULK READY FINAL:" + str(len(bulkbody)))
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
         logger.info("BULK DONE FINAL")
         if(not(bulkres["errors"])):
             logger.info("BULK done without errors.")
@@ -396,8 +397,8 @@ es=None
 logger.info (os.environ["ELK_SSL"])
 
 if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    host_params=os.environ["ELK_URL"]
+    es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
 else:
     host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
     es = ES(hosts=[host_params])

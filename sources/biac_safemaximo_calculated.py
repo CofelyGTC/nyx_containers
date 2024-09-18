@@ -7,17 +7,17 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
 import numpy as np
 
 
-VERSION="1.0.1"
+VERSION="1.1.1"
 MODULE="BIAC_SAFEMAXIMO_CALCULATED"
 QUEUE=["/topic/BIAC_MAXIMOBIS_IMPORTED"]
 
@@ -335,7 +335,7 @@ def messageReceived(destination,message,headers):
         bulkbody = ''
         bulkres = ''
         action = {}
-        action["index"] = {"_index": "biac_safemaximo_monthly", "_type": "doc", "_id": 'KPI301'+screen+ts}
+        action["index"] = {"_index": "biac_safemaximo_monthly", "_id": 'KPI301'+screen+ts}
         average = 1
         if size != 0:
             average = oksize / size
@@ -362,7 +362,7 @@ def messageReceived(destination,message,headers):
         bulkbody += json.dumps(action)+"\r\n"
         bulkbody += json.dumps(newrec) + "\r\n"
         logger.info(bulkbody)
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
         bulkbody = ''
         bulkres = ''
         doneokquery = getokquery
@@ -433,7 +433,7 @@ def messageReceived(destination,message,headers):
         bulkbody = ''
         bulkres = ''
         action = {}
-        action["index"] = {"_index": "biac_safemaximo_monthly", "_type": "doc", "_id": 'KPI302'+screen+ts}
+        action["index"] = {"_index": "biac_safemaximo_monthly", "_id": 'KPI302'+screen+ts}
         average = 1 
         if donenok != 0:
             average = doneok / donenok
@@ -495,7 +495,7 @@ def messageReceived(destination,message,headers):
         bulkbody += json.dumps(newrec) + "\r\n"
 
         logger.info(bulkbody)
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
 
 
 
