@@ -54,15 +54,15 @@ from datetime import datetime
 import datetime as dt
 
 from elastic_helper import es_helper
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
-
+from elasticsearch import Elasticsearch as ES
+from elastic_helper import es_helper 
 
 
 MODULE  = "BIAC_KPI102_LOT4_IMPORTER"
-VERSION = "1.0.1"
+VERSION = "1.1.1"
 QUEUE   = ["KPI102_LOT4_IMPORT"]
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -156,12 +156,12 @@ def compute_kib_index(es, df_all):
             _index = 'biac_kib_kpi102_lot4' 
             
             action = {}
-            action["index"] = {"_index": _index, "_type": "doc", "_id": _id}
+            action["index"] = {"_index": _index, "_id": _id}
 
             bulk_body += json.dumps(action) + "\r\n"
             bulk_body += json.dumps(obj, cls=DateTimeEncoder) + "\r\n"
     
-    bulkres=es.bulk(bulk_body)
+    bulkres=es.bulk(body=bulk_body)
 
     
     
@@ -345,8 +345,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

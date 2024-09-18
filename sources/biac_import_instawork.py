@@ -44,13 +44,14 @@ import threading
 import os,logging
 import pandas as pd
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 import numpy as np
 
 
@@ -289,8 +290,7 @@ def messageReceived(destination,message,headers):
                 logger.error("Unable to read.",exc_info=True)
 
             action = {}
-            action["index"] = {"_index": es_index,
-                "_type": "doc","_id":str(lot)+"_"+str(row["Order"])+ext}
+            action["index"] = {"_index": es_index, "_id":str(lot)+"_"+str(row["Order"])+ext}
             newrec=row["json"]
             bulkbody += json.dumps(action)+"\r\n"
             bulkbody += newrec + "\r\n"
@@ -299,7 +299,7 @@ def messageReceived(destination,message,headers):
             if len(bulkbody) > 512000:
                 logger.info("BULK READY:" + str(len(bulkbody)))
                 #logger.info(bulkbody)
-                bulkres = es.bulk(bulkbody, request_timeout=30)
+                bulkres = es.bulk(body=bulkbody, request_timeout=30)
         #        bulkres={}
                 logger.info("BULK DONE")
                 bulkbody = ''
@@ -316,7 +316,7 @@ def messageReceived(destination,message,headers):
             
         if len(bulkbody) > 0:
             logger.info("BULK READY FINAL:" + str(len(bulkbody)))
-            bulkres = es.bulk(bulkbody)
+            bulkres = es.bulk(body=bulkbody)
             #logger.info(bulkbody)
             logger.info("BULK DONE FINAL")
             if(not(bulkres["errors"])):
@@ -389,11 +389,12 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])
+    logger.info("AMQC_URL          :"+os.environ["AMQC_URL"])
 
     curday="NA"
 

@@ -52,18 +52,20 @@ import platform
 
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+#from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+#from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 import numpy as np
 from math import ceil
 
 
-VERSION="1.0.24"
+VERSION="1.1.1"
 MODULE="BIAC_IMPORT_AVAILABILITIES"
 QUEUE=["/queue/BIAC_FILE_6_BoardingBridge","/queue/BIAC_FILE_6_PCA","/queue/BIAC_FILE_6_400HZ", 
         "/queue/BIAC_FILE_3_Lot3Availability", "/queue/BIAC_FILE_5_tri", "/queue/BIAC_FILE_7_screening"]
@@ -371,8 +373,7 @@ def messageReceived(destination,message,headers):
                 es_id = str(idrepport) + '_' + i + '_' + str(ts)
 
                 action = {}
-                action["index"] = {"_index": es_index,
-                    "_type": "doc", "_id": es_id}
+                action["index"] = {"_index": es_index, "_id": es_id}
 
                 rowInterval = 0
 
@@ -414,7 +415,7 @@ def messageReceived(destination,message,headers):
 
             if len(bulkbody) > 512000:
                 logger.info("BULK READY:" + str(len(bulkbody)))
-                bulkres = es.bulk(bulkbody, request_timeout=30)
+                bulkres = es.bulk(body=bulkbody, request_timeout=30)
                 logger.info("BULK DONE")
                 bulkbody = ''
                 if(not(bulkres["errors"])):
@@ -431,7 +432,7 @@ def messageReceived(destination,message,headers):
 
     if len(bulkbody) > 0:
         logger.info("BULK READY FINAL:" + str(len(bulkbody)))
-        bulkres = es.bulk(bulkbody)
+        bulkres = es.bulk(body=bulkbody)
         logger.info("BULK DONE FINAL")
         if(not(bulkres["errors"])):
             logger.info("BULK done without errors.")
@@ -522,8 +523,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

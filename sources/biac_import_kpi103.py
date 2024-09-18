@@ -58,16 +58,16 @@ from calendar import monthrange
 
 from elastic_helper import es_helper 
 
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
 
 MODULE  = "BIAC_KPI103_IMPORTER"
-VERSION = "1.0.3"
+VERSION = "1.1.1"
 QUEUE   = ["KPI103_IMPORT"]
 
 def get_days_already_passed(str_month):
@@ -377,8 +377,7 @@ def computeStats103():
                 
 
                 action = {}
-                action["index"] = {"_index": es_index,
-                        "_type": "doc"}
+                action["index"] = {"_index": es_index}
                 bulkbody.append(json.dumps(action))  
                 if ronde=="16":
                     finalronde="Ronde 16"
@@ -419,7 +418,7 @@ def computeStats103():
             rondestats[key]["notdone"]=datetime.now().date().day-rondestats[key]["done"]
             
             action = {}
-            action["index"] = {"_index": es_index,"_type": "doc"}
+            action["index"] = {"_index": es_index}
             obj={"@timestamp":datetime.now().date().isoformat(),"value":rondestats[key]["done"]
                     ,"ronde":key,"rec_type":"stats_done","globalpercentage":percentage}        
             bulkbody.append(json.dumps(action))
@@ -440,7 +439,7 @@ def computeStats103():
             bulkbody.append(json.dumps(obj))            
 
                         
-        res=es.bulk("\r\n".join(bulkbody))
+        res=es.bulk(body="\r\n".join(bulkbody))
     except:
         logger.error("Unable to compute stats.",exc_info=True)
 

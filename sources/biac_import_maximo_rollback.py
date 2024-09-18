@@ -51,15 +51,15 @@ import pandas as pd
 from functools import wraps
 from datetime import datetime
 from datetime import timedelta
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 from elastic_helper import es_helper 
 
-VERSION="2.1.9"
+VERSION="2.2.1"
 MODULE="BIAC_MAXIMO_IMPORTER"
 QUEUE=["MAXIMO_IMPORT"]
 
@@ -522,14 +522,11 @@ def messageReceived(destination,message,headers):
                 es_id = woid+'_'+str(scheduledStart)
                 action = {}
                 if ispm:
-                    action["index"] = {"_index": 'biac_maximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_maximo', "_id": es_id}
                 elif issafe:
-                    action["index"] = {"_index": 'biac_safemaximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_safemaximo', "_id": es_id}
                 else:
-                    action["index"] = {"_index": 'biac_503maximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_503maximo', "_id": es_id}
 
                 bulkbody += json.dumps(action)+"\r\n"
                 bulkbody += json.dumps(newrec) + "\r\n"
@@ -539,14 +536,11 @@ def messageReceived(destination,message,headers):
                 es_id = woid+'_'+str(scheduledStart)+'_'+(histo_date.strftime('%Y-%m-%d'))
                 action = {}
                 if ispm:
-                    action["index"] = {"_index": 'biac_histo_maximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_histo_maximo', "_id": es_id}
                 elif issafe:
-                    action["index"] = {"_index": 'biac_safehisto_maximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_safehisto_maximo', "_id": es_id}
                 else:
-                    action["index"] = {"_index": 'biac_503histo_maximo',
-                        "_type": "doc", "_id": es_id}
+                    action["index"] = {"_index": 'biac_503histo_maximo', "_id": es_id}
 
                 newrec['histo_date_dt'] = str(histo_date)
                 newrec['histo_date'] = histo_date.strftime('%Y-%m-%d')
@@ -557,7 +551,7 @@ def messageReceived(destination,message,headers):
 
             if len(bulkbody) > 512000:
                 logger.info("BULK READY:" + str(len(bulkbody)))
-                bulkres = es.bulk(bulkbody, request_timeout=30)
+                bulkres = es.bulk(body=bulkbody, request_timeout=30)
                 logger.info("BULK DONE")
                 bulkbody = ''
                 if(not(bulkres["errors"])):
@@ -573,7 +567,7 @@ def messageReceived(destination,message,headers):
         
         if len(bulkbody) > 0:
             logger.info("BULK READY FINAL:" + str(len(bulkbody)))
-            bulkres = es.bulk(bulkbody)
+            bulkres = es.bulk(body=bulkbody)
             logger.info(bulkres)
             logger.info("BULK DONE FINAL")
             if(not(bulkres["errors"])):
@@ -656,8 +650,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

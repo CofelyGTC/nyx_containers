@@ -7,18 +7,20 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
+from elasticsearch import Elasticsearch as ES
+#from lib import pandastoelastic as pte
+#from lib import elastictopandas as etp
+from elastic_helper import es_helper 
 import numpy as np
 
 
-VERSION="1.0.2"
+VERSION="1.1.1"
 MODULE="BIAC_COMPUTE_KPI304"
 QUEUE=["/topic/BIAC_KPI304_IMPORTED"]
 
@@ -71,7 +73,7 @@ def messageReceived(destination,message,headers):
     start = now-timedelta(days=365)
     end = now+timedelta(days=365)
 
-    df = etp.genericIntervalSearch(es, "biac_kpi304-*", query='*', start=start, end=end)
+    df = es_helper.elastic_to_dataframe(es, "biac_kpi304-*", query='*', start=start, end=end)
     df2 = df[['@timestamp', 'date', 'display',
        'elecobj', 'elecscore', 'electotal',  'fireobj',
        'firescore', 'firetotal', 'hvacobj',
@@ -118,7 +120,7 @@ def messageReceived(destination,message,headers):
 
     dffinal['_index'] = 'biac_kpi304_computed'
     dffinal['_id'] = dffinal.apply(lambda row: get_id(row['_timestamp'], row['week']), axis=1)
-    res = pte.pandas_to_elastic(es, dffinal)
+    res = es_helper.pandas_to_elastic(es, dffinal)
 
 
 

@@ -53,15 +53,14 @@ from itertools import product
 from datetime import timedelta
 
 from elastic_helper import es_helper 
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
-
+from elasticsearch import Elasticsearch
 
 
 MODULE  = "BIAC_KPI102_IMPORTER"
-VERSION = "0.0.9"
+VERSION = "1.0.1"
 QUEUE   = ["KPI102_IMPORT"]
 
 def log_message(message):
@@ -140,12 +139,12 @@ def compute_kib_heatmap(df_stats):
                         }
                     
                     action = {}
-                    action["index"] = {"_index": es_index,"_type": "doc"}
+                    action["index"] = {"_index": es_index}
                     bulkbody.append(json.dumps(action))  
                     bulkbody.append(json.dumps(obj))  
 
         es.indices.delete(index=es_index, ignore=[400, 404])            
-        res=es.bulk("\r\n".join(bulkbody))
+        res=es.bulk(body="\r\n".join(bulkbody))
     except:
         logger.error("Unable to compute stats.",exc_info=True)
 
@@ -416,8 +415,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

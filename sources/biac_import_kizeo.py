@@ -50,15 +50,16 @@ from functools import wraps
 from datetime import datetime
 from datetime import timedelta
 from elastic_helper import es_helper 
-from amqstompclient import amqstompclient
+#from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
 
 MODULE  = "BIAC_KIZEO_IMPORTER"
-VERSION = "1.0.4"
+VERSION = "1.1.3"
 QUEUE   = ["KIZEO_IMPORT"]
 
 def log_message(message):
@@ -298,8 +299,10 @@ def create_default_records_2(es):
     df_all['percentage_conform'] = 100
     df_all['percentage_no_conform'] = 0
     local_timezone = tzlocal.get_localzone()
+
     
-    df_all['last_update'] = local_timezone.localize(datetime(2019, 1, 1, 0, 0, 0, 0))
+    df_all['last_update'] = pytz.timezone(str(local_timezone)).localize(datetime(2019, 1, 1))
+    #local_timezone.localize(datetime(2019, 1, 1, 0, 0, 0, 0))
     
     df_all['_index'] = 'biac_month_2_kizeo'
     df_all['_id'] = df_all.apply(lambda row: row['lot'] + '_' + str(row['kpi']) + '_' + str(row['screen_name']), axis=1)
@@ -442,8 +445,7 @@ def importKizeo(headers):
             es_index = 'biac_kizeo'
             #es_id    = row['lot']+'_'+str(row['kpi'])+'_'+str(int(row['@timestamp'].timestamp()*1000))
             action = {}
-            action["index"] = {"_index": es_index,
-                "_type": "doc"}
+            action["index"] = {"_index": es_index}
             
             #action["index"] = {"_index": es_index,
             #    "_type": "doc", "_id": es_id}
@@ -456,7 +458,7 @@ def importKizeo(headers):
 
             if len(bulkbody) > 512000:
                 logger.info("BULK READY:" + str(len(bulkbody)))
-                bulkres = es.bulk(bulkbody, request_timeout=30)
+                bulkres = es.bulk(body=bulkbody, request_timeout=30)
                 logger.info("BULK DONE")
                 bulkbody = ''
                 if(not(bulkres["errors"])):
@@ -474,7 +476,7 @@ def importKizeo(headers):
 
         if len(bulkbody) > 0:
             logger.info("BULK READY FINAL:" + str(len(bulkbody)))
-            bulkres = es.bulk(bulkbody)
+            bulkres = es.bulk(body=bulkbody)
             logger.info("BULK DONE FINAL")
             if(not(bulkres["errors"])):
                 logger.info("BULK done without errors.")
@@ -658,8 +660,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

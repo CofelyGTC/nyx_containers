@@ -48,17 +48,18 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
-from lib import pandastoelastic as pte
-from lib import elastictopandas as etp
-from amqstompclient import amqstompclient
+#from lib import pandastoelastic as pte
+#from lib import elastictopandas as etp
+from elastic_helper import es_helper 
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
 
 MODULE  = "BIAC_SPOT567_IMPORTER"
-VERSION = "1.0.0"
+VERSION = "1.1.1"
 QUEUE   = ["SPOT567_IMPORT"]
 
 localtz = timezone('Europe/Paris')
@@ -127,7 +128,7 @@ def compute_kpi(df_reduced, lot, kpi_number, complaint_field='Totaal'):
     for index, row in df_reduced.iterrows():
 
         action = {}
-        action["index"] = {"_index": _index, "_type": "doc", "_id": str(int(row['datetime_ctrl'].timestamp()))+'_kpi'+str(kpi_number)}
+        action["index"] = {"_index": _index, "_id": str(int(row['datetime_ctrl'].timestamp()))+'_kpi'+str(kpi_number)}
         
         obj = {
             '@timestamp': row['datetime_ctrl'],
@@ -203,7 +204,7 @@ def compute_lot6(df):
         elif i.startswith('9'):
             bulkbody+=compute_kpi(df_reduced, lot, 9)
 
-    bulkres = es.bulk(bulkbody,request_timeout=30)
+    bulkres = es.bulk(body=bulkbody,request_timeout=30)
     logger.info("BULK DONE")
 
 
@@ -239,7 +240,7 @@ def compute_lot7(df):
         elif i.startswith('6'):
             bulkbody+=compute_kpi(df_reduced, lot, 6)
             
-    bulkres = es.bulk(bulkbody,request_timeout=30)
+    bulkres = es.bulk(body=bulkbody,request_timeout=30)
     logger.info("BULK DONE")
 
 
@@ -279,7 +280,7 @@ def compute_lot5(df):
         elif i.startswith('17'):
             bulkbody+=compute_kpi(df_reduced, lot, 17, 'Afwijkingen')
 
-    bulkres = es.bulk(bulkbody,request_timeout=30)
+    bulkres = es.bulk(body=bulkbody,request_timeout=30)
     logger.info("BULK DONE")
 
 
@@ -309,7 +310,7 @@ def create_default_record(kpi, lot):
     logger.info('create default record - lot :'+str(lot)+' - kpi : '+str(kpi))
 
 
-    es.index(index='biac_spot_lot'+str(lot)+'_monthly', doc_type='doc', id=str(int(obj['@timestamp'].timestamp()))+'_kpi'+str(kpi), body=obj)
+    es.index(index='biac_spot_lot'+str(lot)+'_monthly', id=str(int(obj['@timestamp'].timestamp()))+'_kpi'+str(kpi), body=obj)
 
 
 
@@ -318,7 +319,7 @@ def handle_kpi_monthly(dt_obj, lot, kpi):
     dt_start=get_month_day_range(dt_obj['dt_min'])[0]
     dt_end=get_month_day_range(dt_obj['dt_max'])[1]
 
-    res = etp.genericIntervalSearch(es,index='biac_spot_lot'+str(lot),query="kpi:"+str(kpi),start=dt_start,end=dt_end, datecolumns=['@timestamp'])
+    res = es_helper.elastic_to_dataframe(es,index='biac_spot_lot'+str(lot),query="kpi:"+str(kpi),start=dt_start,end=dt_end)
 
     if len(res) == 0:
         create_default_record(kpi, lot)
@@ -348,7 +349,7 @@ def handle_kpi_monthly(dt_obj, lot, kpi):
             obj['percentage'] = round(100*(obj['conform'] / obj['check']), 2) 
             logger.info(str(obj))
 
-            es.index(index='biac_spot_lot'+str(lot)+'_monthly', doc_type='doc', id=str(int(dt.timestamp()))+'_kpi'+str(kpi), body=obj)
+            es.index(index='biac_spot_lot'+str(lot)+'_monthly', id=str(int(dt.timestamp()))+'_kpi'+str(kpi), body=obj)
 
 
 #################################################

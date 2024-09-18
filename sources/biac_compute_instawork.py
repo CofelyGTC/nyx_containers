@@ -18,17 +18,17 @@ from lib import elastictopandas as etp
 
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 import numpy as np
 
 
-VERSION="0.3.12"
+VERSION="1.0.1"
 MODULE="BIAC_MONTH_INSTAWORK"
 QUEUE=["/topic/BIAC_INSTAWORK_IMPORTED"]
 
@@ -462,8 +462,7 @@ def compute(query,lot):
     summary=[]
     for ordertype in ["CM","PM","FUM","CMVIN"]:
         action = {}
-        action["index"] = {"_index": es_index,
-            "_type": "doc"}
+        action["index"] = {"_index": es_index}
         overdue=overdueht.get(ordertype,{'counts': 0})["counts"]
         tobecompleted=tobecompletedht.get(ordertype,{'counts': 0})["counts"]    
         
@@ -541,8 +540,7 @@ def compute(query,lot):
     for index, row in full.iterrows():
         
         action = {}
-        action["index"] = {"_index": es_index,
-            "_type": "doc"}
+        action["index"] = {"_index": es_index}
         newrec=row["json"]
         bulkbody += json.dumps(action)+"\r\n"
         bulkbody += newrec + "\r\n"
@@ -659,8 +657,8 @@ es=None
 logger.info (os.environ["ELK_SSL"])
 
 if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    host_params=os.environ["ELK_URL"]
+    es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
 else:
     host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
     es = ES(hosts=[host_params])

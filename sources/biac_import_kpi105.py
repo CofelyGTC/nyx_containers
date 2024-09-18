@@ -54,16 +54,16 @@ from datetime import datetime
 from datetime import timedelta
 from calendar import monthrange
 from elastic_helper import es_helper 
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
 
 MODULE  = "BIAC_KPI105_IMPORTER"
-VERSION = "1.0.6"
+VERSION = "1.1.1"
 QUEUE   = ["KPI105_IMPORT"]
 
 def log_message(message):
@@ -276,8 +276,7 @@ def computeStats105(lot=2):
                 
 
                 action = {}
-                action["index"] = {"_index": es_index,
-                        "_type": "doc"}
+                action["index"] = {"_index": es_index}
                 bulkbody.append(json.dumps(action))  
                 obj={"@timestamp":datetime.now().date().isoformat(),"done":value,"ronde":ronde,"date":date,"rec_type":"heatmap", 'lot':lot}
                 bulkbody.append(json.dumps(obj))            
@@ -322,7 +321,7 @@ def computeStats105(lot=2):
             rondestats[key]["notdone"]=datetime.now().date().day-rondestats[key]["done"]
             
             action = {}
-            action["index"] = {"_index": es_index,"_type": "doc"}
+            action["index"] = {"_index": es_index}
             obj={"@timestamp":datetime.now().date().isoformat(),"value":rondestats[key]["done"]
                     ,"ronde":key,"rec_type":"stats_done","globalpercentage":percentage, 'lot':lot}        
             bulkbody.append(json.dumps(action))
@@ -337,7 +336,7 @@ def computeStats105(lot=2):
             bulkbody.append(json.dumps(obj))            
 
                         
-        res=es.bulk("\r\n".join(bulkbody))
+        res=es.bulk(body="\r\n".join(bulkbody))
     except:
         logger.error("Unable to compute stats.",exc_info=True)
 

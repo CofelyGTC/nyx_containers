@@ -37,19 +37,19 @@ import os,logging
 import pandas as pd
 
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import timedelta
 from functools import wraps
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from logstash_async.handler import AsynchronousLogstashHandler
-from lib import pandastoelastic as pte
+from elastic_helper import es_helper 
 import numpy as np
 from sqlalchemy import create_engine
 
 
 MODULE  = "BIAC_BAGS_IMPORTER"
-VERSION = "0.0.5"
+VERSION = "1.0.3"
 QUEUE   = ["BAGS_IMPORT"]
 
 def sizeof_fmt(num, suffix='B'):
@@ -172,8 +172,8 @@ def messageReceived(destination,message,headers):
         df_month['_id']    = df_month.apply(lambda row: row['site']+'_'+str(int(row['date'].timestamp()*1000)), axis=1)
         df_month['_index'] = 'biac_month_bags'
 
-        pte.pandas_to_elastic(es, df_global)
-        pte.pandas_to_elastic(es, df_month)
+        es_helper.dataframe_to_elastic(es, df_global)
+        es_helper.dataframe_to_elastic(es, df_month)
 
 
         first_bags_ts = df_global['date'].min()
@@ -258,8 +258,8 @@ es=None
 logger.info (os.environ["ELK_SSL"])
 
 if os.environ["ELK_SSL"]=="true":
-    host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-    es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+    host_params=os.environ["ELK_URL"]
+    es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
 else:
     host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
     es = ES(hosts=[host_params])

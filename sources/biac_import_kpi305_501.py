@@ -51,14 +51,14 @@ from datetime import datetime
 from datetime import timedelta
 from lib import reporthelper as rp
 from elastic_helper import es_helper 
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from dateutil.relativedelta import relativedelta
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 
 
-VERSION="1.0.1O"
+VERSION="1.1.1"
 MODULE="BIAC_KPI_305_501_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI305","BIAC_EXCELS_KPI501"]
 
@@ -163,8 +163,7 @@ def compute305():
     for key in alllot:
         action={}
             
-        action["index"] = {"_index": es_index,
-            "_type": "doc"
+        action["index"] = {"_index": es_index
             ,"_id":(alllot[key]["key"]+alllot[key]["Month"]).replace("(","").replace(")","").replace(" ","").lower()
                         }
         
@@ -178,7 +177,7 @@ def compute305():
         bulkbody += json.dumps(action)+"\r\n"
         bulkbody += newrec + "\r\n"
             
-    res=es.bulk(bulkbody)
+    res=es.bulk(body=bulkbody)
     if res["errors"]:
         logger.error("Error in bulk")
         logger.info(res)
@@ -293,8 +292,7 @@ def compute501():
         if len(alllot[key]["key"])==4:
             alllot[key]["key"]+=" (All)"
             
-        action["index"] = {"_index": es_index,
-            "_type": "doc"
+        action["index"] = {"_index": es_index
             ,"_id":(alllot[key]["key"]+alllot[key]["Month"]).replace("(","").replace(")","").replace(" ","").lower()
                         }
         
@@ -308,7 +306,7 @@ def compute501():
         bulkbody += json.dumps(action)+"\r\n"
         bulkbody += newrec + "\r\n"
 
-    res=es.bulk(bulkbody)
+    res=es.bulk(body=bulkbody)
     if res["errors"]:
         logger.error("Error in bulk")
         logger.info(res)
@@ -773,8 +771,8 @@ if __name__ == '__main__':
     logger.info (os.environ["ELK_SSL"])
 
     if os.environ["ELK_SSL"]=="true":
-        host_params = {'host':os.environ["ELK_URL"], 'port':int(os.environ["ELK_PORT"]), 'use_ssl':True}
-        es = ES([host_params], connection_class=RC, http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]),  use_ssl=True ,verify_certs=False)
+        host_params=os.environ["ELK_URL"]
+        es = ES([host_params], http_auth=(os.environ["ELK_LOGIN"], os.environ["ELK_PASSWORD"]), verify_certs=False)
     else:
         host_params="http://"+os.environ["ELK_URL"]+":"+os.environ["ELK_PORT"]
         es = ES(hosts=[host_params])

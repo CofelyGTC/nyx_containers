@@ -56,18 +56,18 @@ import pandas as pd
 from elastic_helper import es_helper 
 from lib import reporthelper as rp
 from logging.handlers import TimedRotatingFileHandler
-from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from datetime import datetime
 from datetime import date
 from datetime import timedelta
 from functools import wraps
 from dateutil.relativedelta import relativedelta
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
 from time import sleep
 
 
-VERSION="1.2.6"
+VERSION="1.3.1"
 MODULE="BIAC_KPI502_IMPORTER"
 QUEUE=["BIAC_EXCELS_KPI502","/topic/RECOMPUTE_502"]
 
@@ -210,7 +210,7 @@ def generate_kibana_dash(kib_df,rec_type,key):
 
     for index,row in kib_df.iterrows():
         action = {}
-        action["index"] = {"_index": "biac_kpi502_kib","_type": "doc"}
+        action["index"] = {"_index": "biac_kpi502_kib"}
         record={"type":rec_type,"month":row["Month"],"key":key,"value":0,"label":"","active":1}
         bulkbody.append(json.dumps(action))
         bulkbody.append(json.dumps(record))   
@@ -234,7 +234,7 @@ def generate_kibana_dash(kib_df,rec_type,key):
                 bulkbody.append(json.dumps(record))   
 
 
-    res=es.bulk(bulkbody)
+    res=es.bulk(body=bulkbody)
 
 def compute502barchart_v3(reporttype):
 
