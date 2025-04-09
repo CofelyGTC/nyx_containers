@@ -47,10 +47,11 @@ import datetime as dt
 from datetime import datetime
 from datetime import timedelta
 #from lib import pandastoelastic as pte
-from amqstompclient import amqstompclient
+# from amqstompclient import amqstompclient
+import amqstomp as amqstompclient
 from logging.handlers import TimedRotatingFileHandler
 from logstash_async.handler import AsynchronousLogstashHandler
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES #, RequestsHttpConnection as RC
 
 import collections
 import dateutil.parser
