@@ -6,7 +6,8 @@ import datetime
 import traceback
 import collections
 import pandas as pd
-from elasticsearch import Elasticsearch as ES, RequestsHttpConnection as RC
+from elasticsearch import Elasticsearch as ES
+#, RequestsHttpConnection as RC
 
 logger=logging.getLogger()
 
@@ -49,8 +50,7 @@ def pandas_to_elastic(es, df):
         for index, row in df.iterrows():
             action = {}
 
-            action["index"] = {"_index": row["_index"],
-                               "_type": "doc"}
+            action["index"] = {"_index": row["_index"],"_type": "doc"}
             if "_id" in row:
                 action["index"]["_id"]=row["_id"]
             
